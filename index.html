@@ -3,399 +3,858 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArkLegendsPVE Saddle Command Generator (Vibrant Edition)</title>
+    <title>ArkLegendsPvE Creature Command Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    // Custom colors for a vibrant, pleasing theme
-                    colors: {
-                        'ark-accent': '#1e90ff', // Electric Blue (Accent/Focus)
-                        'ark-secondary': '#5f27cd', // Deep Purple (Primary background contrast)
-                        'ark-primary': '#1c1729', // Very Dark Purple/Black Background
-                        'ark-card': '#2e274b', // Slightly lighter Card Background
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        // Soft glow for the new theme
-                        '3xl': '0 15px 30px -10px rgba(0, 0, 0, 0.4), 0 0 15px rgba(30, 144, 255, 0.5)'
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        .container {
-            max-width: 800px;
+        /* Base Colors - Dark & Modern */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Very Dark Background */
+            color: #e6e6e6; /* Off-White/Light Gray for Primary Text */
         }
-        /* Custom styling for the Select element to match inputs */
-        #blueprintSelector {
-            appearance: none;
-            /* Update arrow color to match new theme */
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23d1d5db'%3E%3Cpath d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 0.8em;
+        .container-card {
+            max-width: 90%;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #161b22; /* Slightly Lighter Card Background */
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 255, 133, 0.1); /* Subtle Neon Glow */
         }
-        .body-bg-gradient {
-            background-image: linear-gradient(135deg, #1c1729 0%, #2e274b 100%);
+        
+        /* Neon Accents for a Bright, Vibrant Look */
+        .neon-heading {
+            color: #00FF85; /* Vivid Neon Green */
+            text-shadow: 0 0 5px rgba(0, 255, 133, 0.5);
         }
-        /* Style for the search input to match other inputs */
-        #saddleSearch {
+        
+        /* Instruction Styling */
+        .instruction-step {
+            color: #1E90FF; /* Electric Blue for clear steps */
+        }
+        .instruction-text {
+            color: #e6e6e6; /* White/Light text */
+        }
+
+        .input-label {
+            color: #1E90FF; /* Electric Blue for Labels */
+        }
+
+        /* Input/Output Styling */
+        .input-style {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            color: #00FF85; /* Neon Green Text Input */
+            border-radius: 8px;
+            padding: 0.75rem;
+            transition: border-color 0.2s;
+        }
+        .input-style:focus {
+            border-color: #1E90FF;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.3);
+        }
+        .command-output {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            cursor: pointer;
+            min-height: 4rem;
+            color: #FFFFFF; /* White for the Final Command */
+            transition: all 0.2s;
+        }
+        .command-output:hover {
+            border-color: #FF0099;
+            box-shadow: 0 0 8px rgba(255, 0, 153, 0.4);
+        }
+
+        /* Button Styling - Primary Action */
+        .button-primary {
+            background-color: #00FF85; /* Neon Green */
+            color: #0d1117; /* Dark text for contrast */
+        }
+        .button-copy, .button-primary {
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            font-weight: 700;
+        }
+        .button-primary:hover {
+            background-color: #66FFB5;
+            box-shadow: 0 0 10px rgba(0, 255, 133, 0.6);
+            transform: translateY(-1px);
+        }
+        .button-copy {
+            background-color: #1E90FF; /* Electric Blue */
+            color: #0d1117;
+            margin-top: 0.5rem; /* Separated from generate button */
+        }
+        .button-copy:hover {
+            background-color: #4B94F9;
+            box-shadow: 0 0 10px rgba(30, 144, 255, 0.6);
+            transform: translateY(0);
+        }
+        .button-copy:active, .button-primary:active {
+            transform: translateY(0);
+        }
+        
+        /* Radio button styling (Gender) */
+        .radio-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            border: 1px solid #484f58;
+            background-color: #30363d;
+        }
+        /* Default checked style (used by female) - Hot Pink */
+        input[type="radio"]:checked + .radio-label {
+            background-color: #FF0099; /* Hot Pink for default/female selected state */
             color: white;
+            font-weight: 600;
+            border-color: #FF0099;
         }
-        /* Hide options that don't match the search filter */
-        .hidden-option {
-            display: none !important;
+        /* Male specific checked style - Electric Blue */
+        #genderMale:checked + .radio-label {
+            background-color: #1E90FF; /* Electric Blue for male selected state */
+            border-color: #1E90FF;
+        }
+
+        /* Fixed Flags Section */
+        .fixed-flags-heading {
+            color: #FF6F61; /* Warm Coral accent */
+        }
+        .fixed-flag-text {
+            color: #A8DADC; /* Light Cyan for details */
+        }
+
+        /* --- CUSTOM DROPDOWN STYLES --- */
+        .custom-dropdown-container {
+            position: relative;
+        }
+
+        #dropdownDisplay {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /* Inherits input-style properties */
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #161b22; /* Card background */
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            z-index: 100;
+            margin-top: 4px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .dropdown-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .dropdown-content li {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #1a202a;
+            transition: background-color 0.1s;
+        }
+
+        .dropdown-content li:hover {
+            background-color: #30363d;
+        }
+
+        .dropdown-category-header {
+            padding: 10px 12px;
+            font-weight: 700;
+            border-top: 2px solid #30363d;
+            border-bottom: 1px solid #30363d;
+            pointer-events: none; /* Make header unclickable */
+        }
+
+        /* --- Custom Category Colors for List Items and Headers --- */
+        
+        .category-astraeos, .category-astraeos li { color: #008080; } /* Teal for main Astraeos */
+        .category-astraeos-core, .category-astraeos-core li { color: #008080; } /* Teal for Astraeos Core */
+        .category-extinction, .category-extinction li { color: #FFA500; } /* Orange for Extinction */
+        .category-amissa, .category-amissa li { color: #8A2BE2; } /* Blue Violet/Purple for Amissa */
+        .category-modded, .category-modded li { color: #FF69B4; } /* Hot Pink */
+        .category-s-variants, .category-s-variants li { color: #ADD8E6; } /* Light Blue (S-Dinos) */
+        .category-draconic, .category-draconic li { color: #FF0000; } /* Bright Red */
+        .category-island, .category-island li { color: #00FF00; } /* Pure Green */
+        .category-scorched, .category-scorched li { color: #FFFF00; } /* Pure Yellow */
+        .category-aberration, .category-aberration li { color: #90EE90; } /* Light Green */
+        .category-aquatic, .category-aquatic li { color: #00FFFF; } /* Cyan/Bright Blue for Aquatic */
+        .category-asa, .category-asa li { color: #00FFFF; } /* Cyan (Using same for new official) */
+
+
+        /* Mobile optimization */
+        @media (min-width: 640px) {
+            .container-card {
+                max-width: 600px;
+            }
         }
     </style>
 </head>
-<body class="body-bg-gradient min-h-screen p-4 sm:p-8 font-sans text-white">
-    <div class="container mx-auto bg-ark-card shadow-3xl rounded-xl p-6 md:p-10 border-2 border-ark-accent/50">
+<body class="flex justify-center min-h-screen p-4">
 
-        <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">
-                <span class="text-ark-accent">ArkLegendsPVE</span> Saddle Command Generator
-            </h1>
-            <p class="text-gray-300 text-lg">
-                Generates **Ascendant** commands for verified saddles (Base Game & Mods). 
-            </p>
-        </header>
+    <div class="container-card w-full">
+        <h1 class="text-3xl font-bold text-center mb-6 neon-heading">ArkLegendsPvE Creature Command Generator</h1>
+        <p class="text-center text-sm mb-6 text-gray-400">Generates the **Scriptcommand SpawnDinoInBall** command for modded servers.</p>
 
-        <section class="mb-8 p-4 bg-ark-secondary rounded-lg border border-ark-accent/50">
-            <h2 class="text-xl font-bold text-white mb-3">🛠️ How to Use:</h2>
-            <ol class="list-decimal list-inside space-y-2 text-gray-200 ml-4">
-                <li>Insert player's **Specimen/Implant Number** into the top box.</li>
-                <li>Use the **Search Bar** to quickly find your saddle.</li>
-                <li>Select the desired saddle from the **dropdown menu**.</li>
-                <li>Hit the **Generate Admin Command** button.</li>
-                <li>**Copy Command** to be used as an RCON command in Discord/Server Console.</li>
+        <div class="mb-6 p-4 border border-gray-700 rounded-lg bg-gray-900/50">
+            <h2 class="text-lg font-bold mb-3 instruction-step">✅ Quick-Start Instructions:</h2>
+            <ol class="space-y-2 list-decimal list-inside text-sm font-semibold instruction-text">
+                <li class="instruction-step">
+                    <span class="instruction-text">Get a player's **EOS ID** and paste it into the top box.</span>
+                </li>
+                <li class="instruction-step">
+                    <span class="instruction-text">Select a **Creature** from the dropdown menu.</span>
+                </li>
+                <li class="instruction-step">
+                    <span class="instruction-text">Select **Male** or **Female** gender.</span>
+                </li>
+                <li class="instruction-step">
+                    <span class="instruction-text">Hit **Generate Command** and then **Copy Command**.</span>
+                </li>
+                <li class="instruction-step">
+                    <span class="instruction-text">The code can now be used with **RCON commands in Discord**.</span>
+                </li>
             </ol>
-        </section>
-
-        <section class="space-y-6">
-            
-            <div>
-                <label for="characterId" class="block text-sm font-medium text-gray-300 mb-1">Target Character ID (Specimen/Implant Number - Optional for Self)</label>
-                <input type="text" id="characterId" value="" placeholder="e.g., 123456789 (Leave empty to target yourself)"
-                    class="w-full px-4 py-3 border border-ark-accent/30 rounded-lg focus:ring-ark-accent focus:border-ark-accent shadow-inner bg-ark-primary text-white">
-            </div>
-
-            <div id="blueprintPathContainer">
-                <label for="saddleSearch" class="block text-sm font-medium text-gray-300 mb-1">Search/Filter Saddles</label>
-                <input type="text" id="saddleSearch" placeholder="Type a creature name to filter the list..." onkeyup="filterSaddles()"
-                       class="w-full px-4 py-3 border border-ark-accent/30 rounded-lg focus:ring-ark-accent focus:border-ark-accent shadow-inner bg-ark-primary text-white mb-4">
-                
-                <label for="blueprintSelector" class="block text-sm font-medium text-gray-300 mb-1">Select Verified Saddle Blueprint Path</label>
-                <select id="blueprintSelector" onchange="updateBlueprintPath()"
-                    class="w-full px-4 py-3 border border-ark-accent/30 rounded-lg focus:ring-ark-accent focus:border-ark-accent shadow-inner bg-ark-primary text-white cursor-pointer">
-                    </select>
-            </div>
-
-            <div>
-                <label for="customBlueprintPath" class="block text-sm font-medium text-gray-300 mb-1">Current/Custom Blueprint Path</label>
-                <input type="text" id="customBlueprintPath" 
-                    value="Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_ArgentavisSaddle.PrimalItemArmor_ArgentavisSaddle'"
-                    placeholder="Enter a custom blueprint path here..."
-                    class="w-full px-4 py-3 border border-ark-accent/30 rounded-lg bg-ark-primary/80 focus:ring-ark-accent focus:border-ark-accent shadow-inner text-sm text-gray-100">
-                <p class="text-xs text-gray-400 mt-1">
-                    The command will use this path.
-                </p>
-            </div>
-
-            <div class="mt-8">
-                <div class="grid grid-cols-3 gap-6 text-center text-sm font-semibold text-gray-200 p-3 bg-ark-secondary rounded-lg border border-ark-accent/50">
-                    <span>Quantity: <strong class="text-ark-accent">1</strong></span>
-                    <span>Quality Index: <strong class="text-ark-accent">100 (Ascendant)</strong></span>
-                    <div class="flex items-center justify-center">
-                        <input type="checkbox" id="isBlueprint"
-                            class="h-5 w-5 text-ark-accent bg-ark-card border-ark-accent/50 rounded focus:ring-ark-accent">
-                        <label for="isBlueprint" class="ml-2 font-semibold">
-                            Generate as Blueprint (<strong class="text-ark-accent">1</strong>)
-                        </label>
-                    </div>
-                </div>
-            </div>
-            
-        </section>
-        
-        <div class="mt-8 text-center">
-             <button onclick="generateCommand()"
-                class="w-full sm:w-auto bg-ark-accent hover:bg-blue-600 text-white text-lg font-bold py-3 px-8 rounded-lg transition duration-200 shadow-xl transform hover:scale-[1.02] active:scale-[0.98] border border-white/20">
-                🚀 Generate Admin Command 
-            </button>
         </div>
-        <div class="mt-10">
-            <h2 class="text-xl font-bold text-gray-100 mb-4">Generated Command</h2>
+        <div class="mb-4">
+            <label for="playerInput" class="block text-sm font-medium mb-2 input-label">1. Target Player EOS ID (ID after -p=):</label>
+            <input type="text" id="playerInput" value="00024953ec774cf98878f25e96eca484" oninput="liveUpdateCommand()" class="w-full input-style" placeholder="Enter player's EOS or Steam ID here">
+            <p class="text-xs text-gray-500 mt-1">This ID specifies whose inventory the Cryopod/Ball will be placed into.</p>
+        </div>
+        
+        <div class="mb-4">
+            <label for="creatureSearch" class="block text-sm font-medium mb-2 input-label">Search Creature:</label>
+            <input type="text" id="creatureSearch" oninput="filterCreatures(this.value)" class="w-full input-style" placeholder="Type to filter list...">
+        </div>
+        <div class="mb-4 custom-dropdown-container">
+            <label class="block text-sm font-medium mb-2 input-label">2. Select Creature:</label>
             
-            <div class="relative">
-                <textarea id="commandOutput" rows="3" readonly
-                    class="w-full p-4 text-sm font-mono bg-ark-primary/50 text-ark-accent rounded-lg border-2 border-ark-accent resize-none shadow-lg"></textarea>
+            <div id="dropdownDisplay" class="input-style" onclick="toggleDropdown()">
+                <span id="selectedCreatureText">--- Choose a Dino ---</span>
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+
+            <div id="dropdownContent" class="dropdown-content">
+                <ul id="creatureList">
+                    </ul>
             </div>
             
-            <div class="mt-4 text-center">
-                <button onclick="copyCommand()" 
-                    class="w-full sm:w-auto bg-ark-accent hover:bg-blue-600 text-white font-bold py-2 px-8 rounded-lg transition duration-200 shadow-xl transform hover:scale-[1.03] active:scale-[0.98]">
-                    Copy Command
-                </button>
+            <input type="hidden" id="selectedBlueprintPath" value="">
+        </div>
+        
+        <div class="mb-6">
+            <label class="block text-sm font-medium mb-2 input-label">3. Creature Gender (-f flag):</label>
+            <div class="flex space-x-4">
+                <input type="radio" id="genderFemale" name="genderRadio" value="1" checked onchange="liveUpdateCommand()" class="hidden">
+                <label for="genderFemale" class="radio-label">
+                    <span class="mr-2">♀️</span> Female (-f=1)
+                </label>
+
+                <input type="radio" id="genderMale" name="genderRadio" value="0" onchange="liveUpdateCommand()" class="hidden">
+                <label for="genderMale" class="radio-label">
+                    <span class="mr-2">♂️</span> Male (-f=0)
+                </label>
             </div>
-            <p id="copyMessage" class="text-sm text-center text-ark-accent mt-2 opacity-0 transition duration-300 h-4"></p>
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-medium mb-2 input-label">4. Generated Command (Copy & Paste to Console):</label>
+            <div id="commandOutput" class="command-output p-3 rounded-lg text-sm" onclick="copyCommand()">
+                Select a creature and enter a Player ID to generate the command.
+            </div>
+        </div>
+        
+        <button id="generateButton" onclick="generateCommand()" class="button-primary w-full text-black font-semibold py-3 rounded-xl flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            Generate Command
+        </button>
+
+        <button id="copyButton" onclick="copyCommand()" class="button-copy w-full text-white font-semibold py-3 rounded-xl flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+            Copy Command
+        </button>
+
+        <div id="statusMessage" class="mt-4 text-center text-sm opacity-0 transition-opacity duration-300"></div>
+
+        <div class="mt-8 pt-4 border-t border-gray-700">
+            <h3 class="text-xl font-semibold mb-3 fixed-flags-heading">Command Details (Fixed High-Value Flags)</h3>
+            <ul class="text-xs space-y-1 list-disc list-inside fixed-flag-text">
+                <li><strong class="text-gray-200">-b=1:</strong> **Locked to 1** (Base Level/Multiplier).</li>
+                <li><strong class="text-gray-200">-i=1:</strong> Sets **100% Imprinting**.</li>
+                <li><strong class="text-gray-200">-a=1:** Sets **1 Mutation** applied (Genetic Level Increase).</li>
+                <li><strong class="text-gray-200">-s=255,255,255,255,255,255,255,255:** Maxes out all 8 stat allocations and/or color regions (highly desirable).</li>
+            </ul>
         </div>
     </div>
 
     <script>
-        const commandOutput = document.getElementById('commandOutput');
-        const characterIdInput = document.getElementById('characterId');
-        const blueprintSelector = document.getElementById('blueprintSelector');
-        const customBlueprintPathInput = document.getElementById('customBlueprintPath');
-        const isBlueprintCheckbox = document.getElementById('isBlueprint');
-        const copyMessage = document.getElementById('copyMessage');
-        const saddleSearchInput = document.getElementById('saddleSearch');
-
-        // *************** VERIFIED ARK: SURVIVAL ASCENDED (ASA) SADDLE BLUEPRINT PATHS ***************
-        const saddleBlueprints = [
-            // ----------------------------------------------------------------------
-            // --- BASE GAME: THE ISLAND / CORE CREATURES ---------------------------
-            // ----------------------------------------------------------------------
-            { name: "--- THE ISLAND (CORE) SADDLES ---", path: "ISLAND_HEADER", isSeparator: true },
-            { name: "Allosaurus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_AlloSaddle.PrimalItemArmor_AlloSaddle'" },
-            { name: "Ankylosaurus Saddle (Ankylo)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_AnkyloSaddle.PrimalItemArmor_AnkyloSaddle'" },
-            { name: "Argentavis Saddle (Default)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_ArgentavisSaddle.PrimalItemArmor_ArgentavisSaddle'" },
-            { name: "Baryonyx Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_BaryonyxSaddle.PrimalItemArmor_BaryonyxSaddle'" },
-            { name: "Basilosaurus Saddle (Basilo)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_BasilosaurusSaddle.PrimalItemArmor_BasilosaurusSaddle'" },
-            { name: "Beelzebufo Saddle (Frog)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_ToadSaddle.PrimalItemArmor_ToadSaddle'" },
-            { name: "Brontosaurus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_BrontoSaddle.PrimalItemArmor_BrontoSaddle'" },
-            { name: "Carcharodontosaurus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_CarchaSaddle.PrimalItemArmor_CarchaSaddle'" },
-            { name: "Castoroides Saddle (Beaver)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_BeaverSaddle.PrimalItemArmor_BeaverSaddle'" },
-            { name: "Doedicurus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_DoedicurusSaddle.PrimalItemArmor_DoedicurusSaddle'" },
-            { name: "Dunkleosteus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_DunkleosteusSaddle.PrimalItemArmor_DunkleosteusSaddle'" },
-            { name: "Giganotosaurus Saddle (Giga)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_GigantSaddle.PrimalItemArmor_GigantSaddle'" },
-            { name: "Helicoprion Saddle", path: "Blueprint'/Game/ASA/Dinos/Helicoprion/Saddle/PrimalItemArmor_Helicoprion.PrimalItemArmor_Helicoprion'" },
-            { name: "Ichthyosaurus Saddle (Ichy)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_IchthySaddle.PrimalItemArmor_IchthySaddle'" },
-            { name: "Karkinos Saddle (Aberration)", path: "Blueprint'/Game/Aberration/Dinos/Crab/PrimalItemArmor_CrabSaddle.PrimalItemArmor_CrabSaddle'" }, 
-            { name: "Mammoth Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MammothSaddle.PrimalItemArmor_MammothSaddle'" },
-            { name: "Megalodon Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MegalodonSaddle_Tek.PrimalItemArmor_MegalodonSaddle_Tek'" },
-            { name: "Megatherium Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MegatheriumSaddle.PrimalItemArmor_MegatheriumSaddle'" },
-            { name: "Mosasaurus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MosaSaddle.PrimalItemArmor_MosaSaddle'" },
-            { name: "Paraceratherium Saddle (Paracer)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_ParacerSaddle.PrimalItemArmor_ParacerSaddle'" },
-            { name: "Pteranodon Saddle (Ptera)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_PteraSaddle.PrimalItemArmor_PteraSaddle'" },
-            { name: "Quetzalcoatlus Saddle (Quetzal)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_QuetzSaddle.PrimalItemArmor_QuetzSaddle'" },
-            { name: "Rex Saddle (T-Rex)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_RexSaddle.PrimalItemArmor_RexSaddle'" },
-            { name: "Rhyniognatha Saddle (ASA Exclusive)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_RhynioSaddle.PrimalItemArmor_RhynioSaddle'" }, 
-            { name: "Sabertooth Saddle (Saber)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_SaberSaddle.PrimalItemArmor_SaberSaddle'" },
-            { name: "Sarcosuchus Saddle (Sarco)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_SarcoSaddle.PrimalItemArmor_SarcoSaddle'" },
-            { name: "Spinosaurus Saddle (Spino)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_SpinoSaddle.PrimalItemArmor_SpinoSaddle'" },
-            { name: "Stegosaurus Saddle (Stego)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_StegoSaddle.PrimalItemArmor_StegoSaddle'" },
-            { name: "Tapejara Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_TapejaraSaddle.PrimalItemArmor_TapejaraSaddle'" },
-            { name: "Triceratops Saddle (Trike)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_TrikeSaddle.PrimalItemArmor_TrikeSaddle'" },
-            { name: "Woolly Rhino Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_RhinoSaddle.PrimalItemArmor_RhinoSaddle'" },
+        // Data structure (Includes new Extinction and Corrupted creatures)
+        const CREATURE_BLUEPRINTS = {
             
-            // ----------------------------------------------------------------------
-            // --- BASE GAME: SCORCHED EARTH / EXCLUSIVE CREATURES ------------------
-            // ----------------------------------------------------------------------
-            { name: "--- SCORCHED EARTH SADDLES ---", path: "SCORCHED_HEADER", isSeparator: true },
-            { name: "Mantis Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MantisSaddle.PrimalItemArmor_MantisSaddle'" },
-            { name: "Morellatops Saddle (Camel)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_CamelsaurusSaddle.PrimalItemArmor_CamelsaurusSaddle'" },
-            { name: "Rock Elemental Saddle (Golems)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_GolemsSaddle.PrimalItemArmor_GolemsSaddle'" },
-            { name: "Vulture Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_VultureSaddle.PrimalItemArmor_VultureSaddle'" },
-            { name: "Wyvern Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_WyvernSaddle.PrimalItemArmor_WyvernSaddle'" },
+            // --- ASTRAEOS ADDITIONS (TEAL) ---
+            "Astraeos Additions (Astral)": [
+                // Astral Creatures (BP_C suffix removed, Mosasaur folder name corrected)
+                { name: "Astral Argentavis", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Argentavis/AstralArgent_Character_BP.AstralArgent_Character_BP" },
+                { name: "Astral Carnotaurus", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Carno/AstralCarno_Character_BP.AstralCarno_Character_BP" },
+                { name: "Astral Deinosuchus", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Deinosuchus/AstralDeinosuchusASA_Character_BP.AstralDeinosuchusASA_Character_BP" },
+                { name: "Astral Direwolf", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Direwolf/AstralDirewolf_Character_BP.AstralDirewolf_Character_BP" },
+                { name: "Astral Mammoth", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Mammoth/AstralMammoth_Character_BP.AstralMammoth_Character_BP" },
+                { name: "Astral Megalodon", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Megalodon/AstralMegalodon_Character_BP.AstralMegalodon_Character_BP" },
+                { name: "Astral Mosasaur", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Mosasaurus/Astral_Mosa_Character_BP.Astral_Mosa_Character_BP" }, 
+                { name: "Astral Raptor", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Raptor/AstralRaptor_Character_BP.AstralRaptor_Character_BP" },
+                { name: "Astral T-Rex", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Rex/AstralRex_Character_BP.AstralRex_Character_BP" },
+                { name: "Astral Tusoteuthis", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Tusoteuthis/AstralTusoteuthis_Character_BP.AstralTusoteuthis_Character_BP" },
+            ],
             
-            // ----------------------------------------------------------------------
-            // --- ABERRATION CREATURES ---------------------------------------------
-            // ----------------------------------------------------------------------
-            { name: "--- ABERRATION SADDLES ---", path: "ABERRATION_HEADER", isSeparator: true },
-            { name: "Bulbdog Saddle (Shoulder)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_BulbdogSaddle.PrimalItemArmor_BulbdogSaddle'" },
-            { name: "Lightpet Glider/Saddle (Vines)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_LightpetSaddle.PrimalItemArmor_LightpetSaddle'" },
-            { name: "Rock Drake Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_RockDrakeSaddle.PrimalItemArmor_RockDrakeSaddle'" },
-            
-            // ----------------------------------------------------------------------
-            // --- EXPANSION VARIANTS -----------------------------------------------
-            // ----------------------------------------------------------------------
-            { name: "--- ABERRATION/EXTINCTION VARIANTS ---", path: "VARIANTS_HEADER", isSeparator: true },
-            { name: "Velonasaur Saddle (Extinction)", path: "Blueprint'/Game/Extinction/CoreBlueprints/Items/Saddle/PrimalItemArmor_SpindlesSaddle.PrimalItemArmor_SpindlesSaddle'" }, 
-            { name: "Spinolosurus Saddle (Ab. Spino Variant)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_SpinolosaurSaddle.PrimalItemArmor_SpinolosaurSaddle'" }, 
-            
-            // ----------------------------------------------------------------------
-            // --- PLATFORM SADDLES -------------------------------------------------
-            // ----------------------------------------------------------------------
-            { name: "--- PLATFORM SADDLES ---", path: "PLATFORM_HEADER", isSeparator: true },
-            { name: "Bronto Platform Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_BrontoSaddle_Platform.PrimalItemArmor_BrontoSaddle_Platform'" },
-            { name: "Paracer Platform Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_ParacerSaddle_Platform.PrimalItemArmor_ParacerSaddle_Platform'" },
-            { name: "Quetzal Platform Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_QuetzSaddle_Platform.PrimalItemArmor_QuetzSaddle_Platform'" },
-            
-            // ----------------------------------------------------------------------
-            // --- TEK SADDLES ------------------------------------------------------
-            // ----------------------------------------------------------------------
-            { name: "--- TEK SADDLES ---", path: "TEK_HEADER", isSeparator: true },
-            { name: "Tek Megalodon Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MegalodonSaddle_Tek.PrimalItemArmor_MegalodonSaddle_Tek'" },
-            { name: "Tek Mosasaurus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MosaSaddle_Tek.PrimalItemArmor_MosaSaddle_Tek'" },
-            { name: "Tek Rex Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_RexSaddle_Tek.PrimalItemArmor_RexSaddle_Tek'" },
-            { name: "Tek Tapejara Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_TapejaraSaddle_Tek.PrimalItemArmor_TapejaraSaddle_Tek'" },
-            { name: "Tek Trike Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_TrikeSaddle_Tek.PrimalItemArmor_TrikeSaddle_Tek'" },
-            
-            // ----------------------------------------------------------------------
-            // --- MODDED SADDLES ---------------------------------------------------
-            // ----------------------------------------------------------------------
-            { name: "--- MODDED SADDLES ---", path: "MODDED_HEADER", isSeparator: true },
-            { name: "Snow Monster Saddle (Lost Colony Mod)", path: "Blueprint'/Game/LostColony/Dinos/SnowMonster/PrimalItemArmor_SnowMonsterSaddle.PrimalItemArmor_SnowMonsterSaddle'" },
-            { name: "Glaucus Saddle (MODDED)", path: "Blueprint'/Glaucus/Content/Saddle/PrimalItemArmor_GlaucusSaddle.PrimalItemArmor_GlaucusSaddle'" },
-
-            // --- DRACONIC CHRONICLES SADDLES ---
-            { name: "--- DRACONIC CHRONICLES SADDLES ---", path: "DC_HEADER", isSeparator: true },
-            { name: "Fire Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/FireWyvern/PrimalItemArmor_FireWyvernArmor.PrimalItemArmor_FireWyvernArmor'" },
-            { name: "Lightning Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/LightningWyvern/PrimalItemArmor_LightningWyvernArmor.PrimalItemArmor_LightningWyvernArmor'" },
-            { name: "Poison Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/PoisonWyvern/PrimalItemArmor_PoisonWyvernArmor.PrimalItemArmor_PoisonWyvernArmor'" },
-            { name: "Ice Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/IceWyvern/PrimalItemArmor_IceWyvernArmor.PrimalItemArmor_IceWyvernArmor'" },
-            { name: "Blood Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/BloodWyvern/PrimalItemArmor_BloodArmor.PrimalItemArmor_BloodArmor'" },
-            { name: "Ember Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/EmberWyvern/PrimalItemArmor_EmberArmor.PrimalItemArmor_EmberArmor'" },
-            { name: "Tropical Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/TropicalWyvern/PrimalItemArmor_TropicalWyvernArmor.PrimalItemArmor_TropicalWyvernArmor'" },
-            { name: "Sand Dragon Saddle (DC)", path: "Blueprint'/DraconicChronicles/Saddles/SandDragon/PrimalItemArmor_SandDragonSaddle.PrimalItemArmor_SandDragonSaddle'" },
-            { name: "Polar Dragon Platform Saddle (DC)", path: "Blueprint'/DraconicChronicles/Saddles/PolarSaddle/PrimalItemArmor_PolarDragonSaddle_Platform.PrimalItemArmor_PolarDragonSaddle_Platform'" },
-            { name: "Blood Storm Dragon Saddle (DC)", path: "Blueprint'/DraconicChronicles/Saddles/BloodStorm/PrimalItemArmor_BloodStormDragonSaddle.PrimalItemArmor_BloodStormDragonSaddle'" },
-            { name: "Flameforge Dragon Saddle (DC)", path: "Blueprint'/DraconicChronicles/Saddles/FlameforgeDragon/PrimalItemArmor_FlameforgeDragonSaddle.PrimalItemArmor_FlameforgeDragonSaddle'" },
-            { name: "Dragonkin Saddle (DC)", path: "Blueprint'/DraconicChronicles/Saddles/Dragonkin/PrimalItemArmor_DragonkinSaddle.PrimalItemArmor_DragonkinSaddle'" },
-            
-            // --- S-VARIANT SADDLES (Only Desmodus Remaining) ---
-            { name: "--- S-VARIANTS SADDLES ---", path: "S_VARIANTS_HEADER", isSeparator: true },
-            { name: "S-Desmodus Saddle", path: "Blueprint'/SDinoVariants/S-Desmodus/PrimalItemArmor_S-DesmodusSaddle.PrimalItemArmor_S-DesmodusSaddle'" },
-            
-            // ----------------------------------------------------------------------
-            // --- END LIST ---------------------------------------------------------
-            // ----------------------------------------------------------------------
-            { name: "--- CUSTOM PATH (Use box below) ---", path: "CUSTOM", isSeparator: true },
-        ];
+            // --- ASTRAEOS (CORE) --- 
+            "Astraeos (Core)": [
+                { name: "Minotaur", path: "/AstraeosCreatures/Minotaur/Minotaur_Character_BP.Minotaur_Character_BP" }, 
+                { name: "Seahorse", path: "/AstraeosCreatures/Seahorse/Seahorse_Character_BP.Seahorse_Character_BP" }, 
+                { name: "Cyclops", path: "/AstraeosCreatures/Cyclops/Cyclops_Character_BP.Cyclops_Character_BP" }, 
+            ],
 
 
-        // Function to populate the dropdown
-        function populateDropdown(filterText = '') {
-            const selector = blueprintSelector;
-            const fragment = document.createDocumentFragment();
-            const filter = filterText.toLowerCase();
-            let isFirstOption = true; // Flag to track the first non-separator option for default selection
+            // --- EXTINCTION (ORANGE) ---
+            "Extinction (Official)": [
+                // Standard Extinction Creatures
+                { name: "Enforcer", path: "/Game/Extinction/Dinos/Enforcer/Enforcer_Character_BP.Enforcer_Character_BP" },
+                { name: "Gacha", path: "/Game/Extinction/Dinos/Gacha/Gacha_Character_BP.Gacha_Character_BP" },
+                { name: "Gasbags", path: "/Game/Extinction/Dinos/GasBags/GasBags_Character_BP.GasBags_Character_BP" },
+                { name: "Managarmr (Ice Jumper)", path: "/Game/Extinction/Dinos/IceJumper/IceJumper_Character_BP.IceJumper_Character_BP" },
+                { name: "Scout", path: "/Game/Extinction/Dinos/Scout/Scout_Character_BP.Scout_Character_BP" },
+                { name: "Snow Owl", path: "/Game/Extinction/Dinos/SnowOwl/SnowOwl_Character_BP.SnowOwl_Character_BP" },
+                { name: "Velonasaur (Spiker)", path: "/Game/Extinction/Dinos/Spiker/Spiker_Character_BP.Spiker_Character_BP" },
+                // Corrupt Creatures
+                { name: "Corrupt Araneo (Spider)", path: "/Game/Extinction/Dinos/Corrupt/Araneo/Araneo_Character_BP_Corrupt.Araneo_Character_BP_Corrupt" },
+                { name: "Corrupt Arthropluera", path: "/Game/Extinction/Dinos/Corrupt/Arthro/Arthro_Character_BP_Corrupt.Arthro_Character_BP_Corrupt" },
+                { name: "Corrupt Carno", path: "/Game/Extinction/Dinos/Corrupt/Carno/Carno_Character_BP_Corrupt.Carno_Character_BP_Corrupt" },
+                { name: "Corrupt Chalicotherium", path: "/Game/Extinction/Dinos/Corrupt/Chali/Chali_Character_BP_Corrupt.Chali_Character_BP_Corrupt" },
+                { name: "Corrupt Deathworm", path: "/Game/Extinction/Dinos/Corrupt/Deathworm/Deathworm_Character_BP_Corrupt.Deathworm_Character_BP_Corrupt" },
+                { name: "Corrupt Dilo", path: "/Game/Extinction/Dinos/Corrupt/Dilo/Dilo_Character_BP_Corrupt.Dilo_Character_BP_Corrupt" },
+                { name: "Corrupt Dimorphodon", path: "/Game/Extinction/Dinos/Corrupt/Dimorphodon/Dimorph_Character_BP_Corrupt.Dimorph_Character_BP_Corrupt" },
+                { name: "Corrupt Gigant (Giga)", path: "/Game/Extinction/Dinos/Corrupt/Giganotosaurus/Gigant_Character_BP_Corrupt.Gigant_Character_BP_Corrupt" }, 
+                { name: "Corrupt Iguanodon", path: "/Game/Extinction/Dinos/Corrupt/Iguanodon/Iguanodon_Character_BP_Corrupt.Iguanodon_Character_BP_Corrupt" },
+                { name: "Corrupt Paraceratherium", path: "/Game/Extinction/Dinos/Corrupt/Paraceratherium/Paracer_Character_BP_Corrupt.Paracer_Character_BP_Corrupt" },
+                { name: "Corrupt Pteranodon", path: "/Game/Extinction/Dinos/Corrupt/Ptero/Ptero_Character_BP_Corrupt.Ptero_Character_BP_Corrupt" },
+                { name: "Corrupt Raptor", path: "/Game/Extinction/Dinos/Corrupt/Raptor/Raptor_Character_BP_Corrupt.Raptor_Character_BP_Corrupt" },
+                { name: "Corrupt Rex", path: "/Game/Extinction/Dinos/Corrupt/Rex/Rex_Character_BP_Corrupt.Rex_Character_BP_Corrupt" },
+                { name: "Corrupt Rock Drake", path: "/Game/Extinction/Dinos/Corrupt/RockDrake/RockDrake_Character_BP_Corrupt.RockDrake_Character_BP_Corrupt" },
+                { name: "Corrupt Spino", path: "/Game/Extinction/Dinos/Corrupt/Spino/Spino_Character_BP_Corrupt.Spino_Character_BP_Corrupt" },
+                { name: "Corrupt Stego", path: "/Game/Extinction/Dinos/Corrupt/Stego/Stego_Character_BP_Corrupt.Stego_Character_BP_Corrupt" },
+                { name: "Corrupt Trike", path: "/Game/Extinction/Dinos/Corrupt/Trike/Trike_Character_BP_Corrupt.Trike_Character_BP_Corrupt" },
+                { name: "Corrupt Wyvern", path: "/Game/Extinction/Dinos/Corrupt/Wyvern/Wyvern_Character_BP_Corrupt.Wyvern_Character_BP_Corrupt" },
+            ],
 
-            // Clear existing options
-            selector.innerHTML = '';
-            
-            saddleBlueprints.forEach(item => {
-                const optionNameLower = item.name.toLowerCase();
-                const option = document.createElement('option');
+            // --- AMISSA ADDITIONS (PURPLE) ---
+            "Amissa Additions (Wyverns)": [
+                { name: "Amissa Shadow Wyvern", path: "/AmissaAdditions/Assets/Dinos/Amissa_Wyverns/WyvernVariants/AmissaWyvern_Character_BP_ShadowWyvern.AmissaWyvern_Character_BP_ShadowWyvern" },
+                { name: "Amissa Poison Wyvern", path: "/AmissaAdditions/Assets/Dinos/Amissa_Wyverns/WyvernVariants/AmissaWyvern_Character_BP_Poison.AmissaWyvern_Character_BP_Poison" },
+                { name: "Amissa Mountain Wyvern", path: "/AmissaAdditions/Assets/Dinos/Amissa_Wyverns/WyvernVariants/AmissaWyvern_Character_BP_Mountain.AmissaWyvern_Character_BP_Mountain" },
+                { name: "Amissa Lightning Wyvern", path: "/AmissaAdditions/Assets/Dinos/Amissa_Wyverns/WyvernVariants/AmissaWyvern_Character_BP_Lightning2.AmissaWyvern_Character_BP_Lightning2" },
+                { name: "Amissa Ice Wyvern", path: "/AmissaAdditions/Assets/Dinos/Amissa_Wyverns/WyvernVariants/AmissaWyvern_Character_BP_Ice.AmissaWyvern_Character_BP_Ice" },
+                { name: "Amissa Fire Wyvern", path: "/AmissaAdditions/Assets/Dinos/Amissa_Wyverns/WyvernVariants/AmissaWyvern_Character_BP_Fire.AmissaWyvern_Character_BP_Fire" },
+            ],
 
-                // Logic to handle filtering: Skip non-separator items that don't match the filter
-                if (!item.isSeparator && filter && optionNameLower.indexOf(filter) === -1) {
-                    return;
-                }
+            // --- MODDED (Non S-Dinos) --- (Pink)
+            "Modded (Non-S)": [
+                { name: "Ossidon", path: "/Game/LostColony/Dinos/SnowMonster/SnowMonster_Character_BP.SnowMonster_Character_BP" }, 
+                { name: "Jungle Thorax Spider", path: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/JungleThoraxSpider_Character_BP.JungleThoraxSpider_Character_BP" },
+                { name: "Snow Thorax Spider", path: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/SnowThoraxSpider_Character_BP.SnowThoraxSpider_Character_BP" },
+                { name: "Cute Thorax Spider", path: "/CyrusJumpingSpider/Content/Spider/Jumper/CuteThoraxSpider_Character_BP.CuteThoraxSpider_Character_BP" },
+                { name: "Glaucus (Sea Slug)", path: "/Glaucus/Content/Glaucus_Character_BP.Glaucus_Character_BP" },
+
+                // Drakara Variants
+                { name: "Drakara (Standard)", path: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP.Drakara_Character_BP" },
+                { name: "Drakara (Dwarfs)", path: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP_Dwarfs.Drakara_Character_BP_Dwarfs" },
+                { name: "Drakara (Aberrant)", path: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP_Aberrant.Drakara_Character_BP_Aberrant" },
+                { name: "Drakara (Bloodfang)", path: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Bloodfang.Drakara_Character_BP_Bloodfang" },
+                { name: "Drakara (Arctic)", path: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Arctic.Drakara_Character_BP_Arctic" },
+
+                // Moros Variants
+                { name: "Moro Raptor", path: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/MoroRaptor_Character_BP.MoroRaptor_Character_BP" },
+                { name: "Gen 2 Moro Raptor", path: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/Gen2MoroRaptor.Gen2MoroRaptor" },
+                { name: "Moros Rex", path: "/Moros_Indomitable_Duo/IndominusRex/Models/MorosRex_Character_BP.MorosRex_Character_BP" },
+                { name: "Gen 2 Moros Rex", path: "/Moros_Indomitable_Duo/MoroRex_Gen2/Blueprints/MoroRexGen2_Character_BP.MoroRexGen2_Character_BP" },
+                { name: "Moros Nothosaurus", path: "/Moros_Nothosaurus/Dinos/Blueprints/MorosNothosaurus_Character_BP.MorosNothosaurus_Character_BP" },
+            ],
+
+            // --- S-DINO VARIANTS --- (Light Blue)
+            "S-Dino Variants": [
+                { name: "S-Fire Lion", path: "/SDinoVariantsFantasticTames/Assets/CoreBlueprints/Creatures/S-FireLion/S-FireLion_Character_BP.S-FireLion_Character_BP" }, 
+                { name: "S-Dark Pegasus", path: "/SDinoVariantsFantasticTames/Assets/CoreBlueprints/Creatures/S-Pegasus/S-DarkPegasus_Character_BP.S-DarkPegasus_Character_BP" }, 
+                { name: "S-Allosaurus", path: "/SDinoVariants/S-Allosaurus/S-Allo_Character_BP.S-Allo_Character_BP" },
+                { name: "S-Ankylo", path: "/SDinoVariants/S-Ankylosaurus/S-Ankylo_Character_BP.S-Ankylo_Character_BP" },
+                { name: "S-Andrewsarchus", path: "/SDinoVariants/S-Andrewsarchus/S-Andrewsarchus_Character_BP.S-Andrewsarchus_Character_BP" },
+                { name: "S-Basilosaurus", path: "/SDinoVariants/S-Basilosaurus/S-Basilosaurus_Character_BP.S-Basilosaurus_Character_BP" },
+                { name: "S-Carcharodontosaurus", path: "/SDinoVariants/S-Carcha/S-Carcha_Character_BP.S-Carcha_Character_BP" },
+                { name: "S-Cat", path: "/SDinoVariants/S-Cat/S-Cat_Character_BP.S-Cat_Character_BP" },
+                { name: "S-Ceratosaurus", path: "/SDinoVariants/S-Cerato/S-Ceratosaurus_Character_BP_ASA.S-Ceratosaurus_Character_BP_ASA" },
+                { name: "S-Daeodon", path: "/SDinoVariants/S-Daeodon/S-Daeodon_Character_BP.S-Daeodon_Character_BP" },
+                { name: "S-Deinonychus", path: "/SDinoVariants/S-Deinonychus/S-Deinonychus_Character_BP.S-Deinonychus_Character_BP" },
+                { name: "S-Deinosuchus", path: "/SDinoVariants/S-Deinosuchus/S-DeinosuchusASA_Character_BP.S-DeinosuchusASA_Character_BP" },
+                { name: "S-Desmodus", path: "/SDinoVariants/S-Desmodus/S-Desmodus_Character_BP.S-Desmodus_Character_BP" },
+                { name: "S-Direbear", path: "/SDinoVariants/S-Direbear/S-Direbear_Character_BP.S-Direbear_Character_BP" },
+                { name: "S-Direwolf", path: "/SDinoVariants/S-Direwolf/S-Direwolf_Character_BP.S-Direwolf_Character_BP" },
+                { name: "S-Doedicurus", path: "/SDinoVariants/S-Doedicurus/S-Doed_Character_BP.S-Doed_Character_BP" },
+                { name: "S-Dunkleosteus", path: "/SDinoVariants/S-Dunkleosteus/S-Dunkle_Character_BP.S-Dunkle_Character_BP" }, 
+                { name: "S-Fasolasuchus", path: "/SDinoVariants/S-Fasolasuchus/S-Fasola_Character_BP.S-Fasola_Character_BP" },
+                { name: "S-Fenrir", path: "/SDinoVariants/S-Fenrir/S-Fenrir_Character_BP.S-Fenrir_Character_BP" },
+                { name: "S-Griffin", path: "/SDinoVariants/S-Griffin/S-Griffin_Character_BP.S-Griffin_Character_BP" },
+                { name: "S-Mantis", path: "/SDinoVariants/S-Mantis/S-Mantis_Character_BP.S-Mantis_Character_BP" },
+                { name: "S-Megalodon", path: "/SDinoVariants/S-Megalodon/S-Megalodon_Character_BP.S-Megalodon_Character_BP" },
+                { name: "S-Megalosaurus", path: "/SDinoVariants/S-Megalosaurus/S-Megalosaurus_Character_BP.S-Megalosaurus_Character_BP" },
+                { name: "S-Megaraptor", path: "/SDinoVariants/S-Megaraptor/S-Megaraptor_Character_BP.S-Megaraptor_Character_BP" },
+                { name: "S-Mosasaurus", path: "/SDinoVariants/S-Mosa/S-Mosa_Character_BP.S-Mosa_Character_BP" },
+                { name: "S-Otter", path: "/SDinoVariants/S-Otter/S-Otter_Character_BP.S-Otter_Character_BP" },
+                { name: "S-Plesiosaur", path: "/SDinoVariants/S-Plesiosaur/S-Plesiosaur_Character_BP.S-Plesiosaur_Character_BP" },
+                { name: "S-Queen Bee", path: "/SDinoVariants/S-Bee/S-QueenBee_Character_BP.S-QueenBee_Character_BP" },
+                { name: "S-Rex", path: "/SDinoVariants/S-Rex/S-Rex_Character_BP.S-Rex_Character_BP" },
+                { name: "S-Reaper King (Tamed)", path: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Male_Tamed.S-Xenomorph_Character_BP_Male_Tamed" }, 
+                { name: "S-Reaper Queen", path: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Female.S-Xenomorph_Character_BP_Female" }, 
+                { name: "S-Rhyniognatha", path: "/SDinoVariants/S-Rhynio/S-Rhynio_Character_BP.S-Rhynio_Character_BP" },
+                { name: "S-Rockdrake", path: "/SDinoVariants/S-Rockdrake/S-RockDrake_Character_BP.S-RockDrake_Character_BP" },
+                { name: "S-Shinehorn", path: "/SDinoVariants/S-Shinehorn/S-LanternGoat_Character_BP.S-LanternGoat_Character_BP" },
+                { name: "S-Snow Owl", path: "/SDinoVariants/S-SnowOwl/S-Owl_Character_BP.S-Owl_Character_BP" },
+                { name: "S-Spinosaurus", path: "/SDinoVariants/S-Spinosaurus/S-Spino_Character_BP.S-Spino_Character_BP" },
+                { name: "S-Therizinosaurus", path: "/SDinoVariants/S-Therizinosaur/S-Therizino_Character_BP.S-Therizino_Character_BP" },
+                { name: "S-Thylacoleo", path: "/SDinoVariants/S-Thylacoleo/S-Thylacoleo_Character_BP.S-Thylacoleo_Character_BP" },
+                { name: "S-Trike", path: "/SDinoVariants/S-Trike/S-Trike_Character_BP.S-Trike_Character_BP" },
+                { name: "S-Unicorn", path: "/SDinoVariants/S-Unicorn/S-Equus_Character_BP_Unicorn.S-Equus_Character_BP_Unicorn" },
+                { name: "S-Velonasaur", path: "/SDinoVariants/S-Velonasaur/S-Spindles_Character_BP.S-Spindles_Character_BP" },
+                { name: "S-Fire Wyvern", path: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Fire.S-Wyvern_Character_BP_Fire" },
+                { name: "S-Ice Wyvern", path: "/SDinoVariants/S-IceWyvern/S-Wyvern_Character_BP_Ice.S-Wyvern_Character_BP_Ice" },
+                { name: "S-Lightning Wyvern", path: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Lightning.S-Wyvern_Character_BP_Lightning" },
+                { name: "S-Poison Wyvern", path: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Poison.S-Wyvern_Character_BP_Poison" },
+                { name: "S-Maeguana", path: "/SDinoVariants/S-Maeguana/S-Maelizard_Character_BP.S-Maelizard_Character_BP" },
+            ],
+
+            // --- DRACONIC CHRONICLES --- (Bright Red)
+            "Draconic Chronicles (DC)": [
+                { name: "DC: Dragonkin Brawler", path: "/DraconicChronicles/Dino/Dragonkin/DragonKin_BrawlerBP.DragonKin_BrawlerBP" }, 
+                { name: "DC: Hydro Dragon", path: "/DraconicChronicles/Dino/HydroDragon/HydroDragonBP.HydroDragonBP" }, 
+                { name: "DC: Undead Wyvern", path: "/DraconicChronicles/Dino/UndeadWyvern/UndeadWyvern_BP.UndeadWyvern_BP" }, 
+                { name: "DC: Glowveil Dragon", path: "/DraconicChronicles/Dino/GlowveilDragon/GlowveilDragon_BP.GlowveilDragon_BP" }, 
+                { name: "DC: Undead Dragon (Tamed)", path: "/DraconicChronicles/Dino/UndeadDragon/UndeadDragonBP_Tamed.UndeadDragonBP_Tamed" }, 
+                { name: "DC: Headless Hydra", path: "/DraconicChronicles/Dino/HeadlessHydra/HeadlessHydraBP.HeadlessHydraBP" }, 
+                { name: "DC: Elder Wyvern", path: "/DraconicChronicles/Dino/Dragon/ElderWyvernBP.ElderWyvernBP" }, 
                 
-                // Logic to handle separator visibility
-                if (item.isSeparator && filter) {
-                    // When actively filtering, only show separators if their name matches the filter
-                    if (optionNameLower.indexOf(filter) === -1) {
-                        return;
-                    }
-                }
+                { name: "DC: Shadow Wyvern", path: "/DraconicChronicles/Dino/ShadowWyvern/ShadowWyvern_BP.ShadowWyvern_BP" },
+                { name: "DC: Blood Storm Dragon", path: "/DraconicChronicles/Dino/Gigant/BloodStormDragon.BloodStormDragon" },
+                { name: "DC: Blood Wyvern", path: "/DraconicChronicles/Dino/BloodWyvern/CrystalWyvern_Character_BP_Blood1.CrystalWyvern_Character_BP_Blood1" },
+                { name: "DC: Dragonkin", path: "/DraconicChronicles/Dino/Dragonkin/DragonKinBP.DragonKinBP" }, 
+                { name: "DC: Ember Wyvern", path: "/DraconicChronicles/Dino/EmberWyvern/CrystalWyvern_Character_BP_Ember1.CrystalWyvern_Character_BP_Ember1" }, 
+                { name: "DC: Fire Wyvern", path: "/DraconicChronicles/Dino/FireWyvern/Wyvern_Character_BP_Fire1.Wyvern_Character_BP_Fire1" },
+                { name: "DC: Flameforge Dragon", path: "/DraconicChronicles/Dino/FlameforgeDragon/FlameforgeDragonBP.FlameforgeDragonBP" },
+                { name: "DC: Frost Wyvern", path: "/DraconicChronicles/Dino/FrostWyvern/Ragnarok_Wyvern_Override_Ice1.Ragnarok_Wyvern_Override_Ice1" },
+                { name: "DC: Inferno Wyvern", path: "/DraconicChronicles/Dino/Wyvern/InfernoWyvernBP.InfernoWyvernBP" },
+                { name: "DC: Lightning Wyvern", path: "/DraconicChronicles/Dino/LightningWyvern/Wyvern_Character_BP_Lightning1.Wyvern_Character_BP_Lightning1" }, 
+                { name: "DC: Poison Wyvern", path: "/DraconicChronicles/Dino/PoisonWyvern/Wyvern_Character_BP_Poison1.Wyvern_Character_BP_Poison1" },
+                { name: "DC: Polar Dragon", path: "/DraconicChronicles/Dino/PolarDragon/PolarDragonBP.PolarDragonBP" },
+                { name: "DC: Rejuvenating Dragon", path: "/DraconicChronicles/Dino/RejuvenatingDragon/RejuvenatingDragonBP.RejuvenatingDragonBP" },
+                { name: "DC: Sand Dragon", path: "/DraconicChronicles/Dino/SandDragon/SandDragonBP.SandDragonBP" },
+                { name: "DC: Tidal Dragon", path: "/DraconicChronicles/Dino/TidalDragon/TidalDragon_BP.TidalDragon_BP" },
+                { name: "DC: Tropical Wyvern", path: "/DraconicChronicles/Dino/TropicalWyvern/CrystalWyvernTropicalBP.CrystalWyvernTropicalBP" },
+                { name: "DC: Wyrm", path: "/DraconicChronicles/Dino/Wyrm/WyrmBP.WyrmBP" },
+                { name: "DC: Wyvernicorn", path: "/DraconicChronicles/Dino/Wyvernicorn/Wyvernicorn_BP.Wyvernicorn_BP" },
+            ],
 
-                option.value = item.path;
-                option.textContent = item.name;
-                
-                if (item.isSeparator) {
-                    option.disabled = true;
-                    option.style.fontWeight = 'bold';
-                    option.style.backgroundColor = '#5f27cd'; // Darker color for separators
-                    option.style.color = '#e0e0e0'; // Light gray text for separators
-                } else if (isFirstOption) {
-                    // Automatically select the first visible (non-separator) option
-                    option.selected = true;
-                    isFirstOption = false;
-                    // Update the custom path input on initial load/filter, but only if we have a valid path
-                    if (item.path !== "CUSTOM") {
-                        customBlueprintPathInput.value = item.path;
-                    }
-                }
-                
-                fragment.appendChild(option);
-            });
+            // --- ASA/New Official Creatures (Default - Cyan) ---
+            "ASA/New Official (The Island, etc.)": [
+                { name: "Helicoprion", path: "/Game/ASA/Dinos/Helicoprion/Helicoprion_Character_BP.Helicoprion_Character_BP" }, 
+                { name: "Vibis (Summer)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Summer.ShoulderDragon_Character_BP_Summer" },
+                { name: "Vibis (Spring)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Spring.ShoulderDragon_Character_BP_Spring" },
+                { name: "Vibis (Winter)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Winter.ShoulderDragon_Character_BP_Winter" },
+                { name: "Vibis (Autumn)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Autumn.ShoulderDragon_Character_BP_Autumn" },
+                { name: "Fire Lion (Official)", path: "/Game/ASA/Dinos/FireLion/FireLion_Character_BP.FireLion_Character_BP" }, 
+                { name: "Dark Pegasus (Official)", path: "/Game/ASA/Dinos/DarkPegasus/DarkPegasus_Character_BP.DarkPegasus_Character_BP" }, 
+                { name: "Carcharodontosaurus (Carcha)", path: "/Game/PrimalEarth/Dinos/Carcharodontosaurus/Carcha_Character_BP.Carcha_Character_BP" },
+                { name: "Rhyniognatha (Rhynio)", path: "/Game/PrimalEarth/Dinos/Rhyniognatha/Rhynio_Character_BP.Rhynio_Character_BP" },
+            ],
             
-            selector.appendChild(fragment);
+            // --- THE ISLAND (Official) --- (Green)
+            "The Island (Official)": [
+                { name: "Achatina", path: "/Game/PrimalEarth/Dinos/Achatina/Achatina_Character_BP.Achatina_Character_BP" },
+                { name: "Ankylosaurus (Anky)", path: "/Game/PrimalEarth/Dinos/Ankylo/Ankylo_Character_BP.Ankylo_Character_BP" },
+                { name: "Araneo (Spider)", path: "/Game/PrimalEarth/Dinos/Spider-Araneo/SpiderS_Character_BP.SpiderS_Character_BP" },
+                { name: "Archaeopteryx", path: "/Game/PrimalEarth/Dinos/Archaeopteryx/Archa_Character_BP.Archa_Character_BP" },
+                { name: "Argentavis", path: "/Game/PrimalEarth/Dinos/Argent/Argent_Character_BP.Argent_Character_BP" },
+                { name: "Arthropluera", path: "/Game/PrimalEarth/Dinos/Arthropluera/Arthro_Character_BP.Arthro_Character_BP" },
+                { name: "Baryonyx", path: "/Game/PrimalEarth/Dinos/Baryonyx/Baryonyx_Character_BP.Baryonyx_Character_BP" },
+                { name: "Beelzebufo (Frog)", path: "/Game/PrimalEarth/Dinos/Beelzebufo/Toad_Character_BP.Toad_Character_BP" },
+                { name: "Brontosaurus", path: "/Game/PrimalEarth/Dinos/Sauropod/Sauropod_Character_BP.Sauropod_Character_BP" },
+                { name: "Carbonemys (Turtle)", path: "/Game/PrimalEarth/Dinos/Turtle/Turtle_Character_BP.Turtle_Character_BP" },
+                { name: "Carnotaurus (Carno)", path: "/Game/PrimalEarth/Dinos/Carno/Carno_Character_BP.Carno_Character_BP" },
+                { name: "Castoroides (Beaver)", path: "/Game/PrimalEarth/Dinos/Beaver/Beaver_Character_BP.Beaver_Character_BP" },
+                { name: "Compsognathus (Compy)", path: "/Game/PrimalEarth/Dinos/Compsognathus/Compsognathus_Character_BP.Compsognathus_Character_BP" },
+                { name: "Dilophosaur (Dilo)", path: "/Game/PrimalEarth/Dinos/Dilo/Dilo_Character_BP.Dilo_Character_BP" },
+                { name: "Dimetrodon", path: "/Game/PrimalEarth/Dinos/Dimetrodon/Dimetrodon_Character_BP.Dimetrodon_Character_BP" },
+                { name: "Dimorphodon", path: "/Game/PrimalEarth/Dinos/Dimorphodon/Dimorph_Character_BP.Dimorph_Character_BP" },
+                { name: "Dodo", path: "/Game/PrimalEarth/Dinos/Dodo/Dodo_Character_BP.Dodo_Character_BP" },
+                { name: "Doedicurus (Doed)", path: "/Game/PrimalEarth/Dinos/Doed/Doed_Character_BP.Doed_Character_BP" },
+                { name: "Dung Beetle", path: "/Game/PrimalEarth/Dinos/DungBeetle/DungBeetle_Character_BP.DungBeetle_Character_BP" },
+                { name: "Gallimimus (Galli)", path: "/Game/PrimalEarth/Dinos/Galli/Galli_Character_BP.Galli_Character_BP" },
+                { name: "Giganotosaurus (Giga)", path: "/Game/PrimalEarth/Dinos/Gigant/Gigant_Character_BP.Gigant_Character_BP" },
+                { name: "Kairuku (Penguin)", path: "/Game/PrimalEarth/Dinos/Kairuku/Kairuku_Character_BP.Kairuku_Character_BP" },
+                { name: "Kaprosuchus (Kapro)", path: "/Game/PrimalEarth/Dinos/Kaprosuchus/Kaprosuchus_Character_BP.Kaprosuchus_Character_BP" },
+                { name: "Lystrosaurus (Lystro)", path: "/Game/PrimalEarth/Dinos/Lystro/Lystro_Character_BP.Lystro_Character_BP" },
+                { name: "Mammoth", path: "/Game/PrimalEarth/Dinos/Mammoth/Mammoth_Character_BP.Mammoth_Character_BP" },
+                { name: "Megaceros (Deer)", path: "/Game/PrimalEarth/Dinos/Megaceros/Megaceros_Character_BP.Megaceros_Character_BP" },
+                { name: "Megaloceros", path: "/Game/PrimalEarth/Dinos/MegaloCeros/MegaloCeros_Character_BP.MegaloCeros_Character_BP" },
+                { name: "Megalosaurus (Megalo)", path: "/Game/PrimalEarth/Dinos/Megalosaurus/Megalosaurus_Character_BP.Megalosaurus_Character_BP" },
+                { name: "Mesopithecus (Monkey)", path: "/Game/PrimalEarth/Dinos/Monkey/Monkey_Character_BP.Monkey_Character_BP" },
+                { name: "Moschops", path: "/Game/PrimalEarth/Dinos/Moschops/Moschops_Character_BP.Moschops_Character_BP" },
+                { name: "Pachycephalosaurus (Pachy)", path: "/Game/PrimalEarth/Dinos/Pachy/Pachy_Character_BP.Pachy_Character_BP" },
+                { name: "Pachyrhinosaurus (PachyRhino)", path: "/Game/PrimalEarth/Dinos/Pachyrhinosaurus/Pachyrhinosaurus_Character_BP.Pachyrhinosaurus_Character_BP" },
+                { name: "Paraceratherium (Paracer)", path: "/Game/PrimalEarth/Dinos/Paracer/Paracer_Character_BP.Paracer_Character_BP" },
+                { name: "Parasaurolophus (Para)", path: "/Game/PrimalEarth/Dinos/Para/Para_Character_BP.Para_Character_BP" },
+                { name: "Pegomastax (Pego)", path: "/Game/PrimalEarth/Dinos/Pegomastax/Pegomastax_Character_BP.Pegomastax_Character_BP" },
+                { name: "Phiomia", path: "/Game/PrimalEarth/Dinos/Phiomia/Phiomia_Character_BP.Phiomia_Character_BP" },
+                { name: "Procoptodon (Kangaroo)", path: "/Game/PrimalEarth/Dinos/Procoptodon/Procoptodon_Character_BP.Procoptodon_Character_BP" },
+                { name: "Pteranodon (Ptera)", path: "/Game/PrimalEarth/Dinos/Ptero/Ptero_Character_BP.Ptero_Character_BP" },
+                { name: "Pulmonoscorpius (Scorpion)", path: "/Game/PrimalEarth/Dinos/Scorpion/Scorpion_Character_BP.Scorpion_Character_BP" },
+                { name: "Quetzalcoatlus (Quetzal)", path: "/Game/PrimalEarth/Dinos/Quetzal/Quetz_Character_BP.Quetz_Character_BP" },
+                { name: "Raptor", path: "/Game/PrimalEarth/Dinos/Raptor/Raptor_Character_BP.Raptor_Character_BP" },
+                { name: "Rex (Tyrannosaurus)", path: "/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP.Rex_Character_BP" },
+                { name: "Sabertooth (Saber)", path: "/Game/PrimalEarth/Dinos/Sabertooth/Saber_Character_BP.Saber_Character_BP" },
+                { name: "Sarcosuchus (Sarco)", path: "/Game/PrimalEarth/Dinos/Sarco/Sarco_Character_BP.Sarco_Character_BP" },
+                { name: "Spinosaurus (Spino)", path: "/Game/PrimalEarth/Dinos/Spino/Spino_Character_BP.Spino_Character_BP" },
+                { name: "Stegosaurus (Stego)", path: "/Game/PrimalEarth/Dinos/Stego/Stego_Character_BP.Stego_Character_BP" },
+                { name: "Tapejara", path: "/Game/PrimalEarth/Dinos/Tapejara/Tapejara_Character_BP.Tapejara_Character_BP" },
+                { name: "Tek Raptor", path: "/Game/PrimalEarth/Dinos/Raptor/Raptor_Character_BP_Tek.Raptor_Character_BP_Tek" },
+                { name: "Tek Rex", path: "/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP_Tek.Rex_Character_BP_Tek" },
+                { name: "Terror Bird", path: "/Game/PrimalEarth/Dinos/TerrorBird/TerrorBird_Character_BP.TerrorBird_Character_BP" },
+                { name: "Thylacoleo (Thyla)", path: "/Game/PrimalEarth/Dinos/Thylacoleo/Thylacoleo_Character_BP.Thylacoleo_Character_BP" },
+                { name: "Triceratops (Trike)", path: "/Game/PrimalEarth/Dinos/Trike/Trike_Character_BP.Trike_Character_BP" },
+                { name: "Woolly Rhino", path: "/Game/PrimalEarth/Dinos/Rhino/Rhino_Character_BP.Rhino_Character_BP" },
+                { name: "Yutyrannus (Yuty)", path: "/Game/PrimalEarth/Dinos/Yutyrannus/Yutyrannus_Character_BP.Yutyrannus_Character_BP" },
+            ],
+            
+            // --- SCORCHED EARTH (Official) --- (Yellow)
+            "Scorched Earth (Official)": [
+                { name: "Archaeopteryx (Desert)", path: "/Game/ScorchedEarth/Dinos/Archa_D/Archa_Character_BP_D.Archa_Character_BP_D" },
+                { name: "Deathworm", path: "/Game/ScorchedEarth/Dinos/Deathworm/Deathworm_Character_BP.Deathworm_Character_BP" },
+                { name: "Dung Beetle (Desert)", path: "/Game/ScorchedEarth/Dinos/DungBeetle_D/DungBeetle_Character_BP_D.DungBeetle_Character_BP_D" },
+                { name: "Jerboa", path: "/Game/ScorchedEarth/Dinos/Jerboa/Jerboa_Character_BP.Jerboa_Character_BP" },
+                { name: "Mantis", path: "/Game/ScorchedEarth/Dinos/Mantis/Mantis_Character_BP.Mantis_Character_BP" },
+                { name: "Morellatops (Camel)", path: "/Game/ScorchedEarth/Dinos/Morellatops/Morellatops_Character_BP.Morellatops_Character_BP" },
+                { name: "Phoenix", path: "/Game/ScorchedEarth/Dinos/Phoenix/Phoenix_Character_BP.Phoenix_Character_BP" },
+                { name: "Procoptodon (Desert)", path: "/Game/ScorchedEarth/Dinos/Procoptodon_D/Procoptodon_Character_BP_D.Procoptodon_Character_BP_D" },
+                { name: "Rock Elemental (Golem)", path: "/Game/ScorchedEarth/Dinos/RockGolem/RockGolem_Character_BP.RockGolem_Character_BP" },
+                { name: "Roll Rat (Desert)", path: "/Game/ScorchedEarth/Dinos/RollRat_D/RollRat_Character_BP_D.RollRat_Character_BP_D" },
+                { name: "Thorny Dragon", path: "/Game/ScorchedEarth/Dinos/ThornyDragon/ThornyDragon_Character_BP.ThornyDragon_Character_BP" },
+                { name: "Vulture", path: "/Game/ScorchedEarth/Dinos/Vulture/Vulture_Character_BP.Vulture_Character_BP" },
+            ],
 
-            // Re-run command generation to update the output box to the new selected item.
-            generateCommand();
-        }
+            // --- ABERRATION (Official) --- (Light Green)
+            "Aberration (Official)": [
+                { name: "Aberrant Ankylo", path: "/Game/Aberration/Dinos/Ankylo_Aberrant/Ankylo_Character_BP_Aberrant.Ankylo_Character_BP_Aberrant" },
+                { name: "Aberrant Araneo (Spider)", path: "/Game/Aberration/Dinos/Spider_Aberrant/SpiderS_Character_BP_Aberrant.SpiderS_Character_BP_Aberrant" },
+                { name: "Aberrant Arthropluera", path: "/Game/Aberration/Dinos/Arthro_Aberrant/Arthro_Character_BP_Aberrant.Arthro_Character_BP_Aberrant" },
+                { name: "Aberrant Baryonyx", path: "/Game/Aberration/Dinos/Baryonyx_Aberrant/Baryonyx_Character_BP_Aberrant.Baryonyx_Character_BP_Aberrant" },
+                { name: "Aberrant Bulbdog", path: "/Game/Aberration/Dinos/Bulbdog/Bulbdog_Character_BP.Bulbdog_Character_BP" },
+                { name: "Aberrant Carno", path: "/Game/Aberration/Dinos/Carno_Aberrant/Carno_Character_BP_Aberrant.Carno_Character_BP_Aberrant" },
+                { name: "Aberrant Dimorphodon", path: "/Game/Aberration/Dinos/Dimorph_Aberrant/Dimorph_Character_BP_Aberrant.Dimorph_Character_BP_Aberrant" },
+                { name: "Aberrant Dimetrodon", path: "/Game/Aberration/Dinos/Dimetrodon_Aberrant/Dimetrodon_Character_BP_Aberrant.Dimetrodon_Character_BP_Aberrant" },
+                { name: "Aberrant Doedicurus", path: "/Game/Aberration/Dinos/Doed_Aberrant/Doed_Character_BP_Aberrant.Doed_Character_BP_Aberrant" },
+                { name: "Aberrant Electrophorus", path: "/Game/Aberration/Dinos/Eel_Aberrant/Eel_Character_BP_Aberrant.Eel_Character_BP_Aberrant" },
+                { name: "Aberrant Gigantopithecus", path: "/Game/Aberration/Dinos/Gigant_Aberrant/Gigant_Character_BP_Aberrant.Gigant_Character_BP_Aberrant" },
+                { name: "Aberrant Iguanodon", path: "/Game/Aberration/Dinos/Iguanodon_Aberrant/Iguanodon_Character_BP_Aberrant.Iguanodon_Character_BP_Aberrant" },
+                { name: "Aberrant Karkinos", path: "/Game/Aberration/Dinos/Crab/Crab_Character_BP.Crab_Character_BP" },
+                { name: "Aberrant Lystro", path: "/Game/Aberration/Dinos/Lystro_Aberrant/Lystro_Character_BP_Aberrant.Lystro_Character_BP_Aberrant" },
+                { name: "Aberrant Megalania", path: "/Game/Aberration/Dinos/Megalania_Aberrant/Megalania_Character_BP_Aberrant.Megalania_Character_BP_Aberrant" },
+                { name: "Aberrant Megalosaurus", path: "/Game/Aberration/Dinos/Megalosaurus_Aberrant/Megalosaurus_Character_BP_Aberrant.Megalosaurus_Character_BP_Aberrant" },
+                { name: "Aberrant Moschops", path: "/Game/Aberration/Dinos/Moschops_Aberrant/Moschops_Character_BP_Aberrant.Moschops_Character_BP_Aberrant" },
+                { name: "Aberrant Otter", path: "/Game/Aberration/Dinos/Otter_Aberrant/Otter_Character_BP_Aberrant.Otter_Character_BP_Aberrant" },
+                { name: "Aberrant Paracer", path: "/Game/Aberration/Dinos/Paracer_Aberrant/Paracer_Character_BP_Aberrant.Paracer_Character_BP_Aberrant" },
+                { name: "Aberrant Parasaur", path: "/Game/Aberration/Dinos/Para_Aberrant/Para_Character_BP_Aberrant.Para_Character_BP_Aberrant" },
+                { name: "Aberrant Phiomia", path: "/Game/Aberration/Dinos/Phiomia_Aberrant/Phiomia_Character_BP_Aberrant.Phiomia_Character_BP_Aberrant" },
+                { name: "Aberrant Raptor", path: "/Game/Aberration/Dinos/Raptor_Aberrant/Raptor_Character_BP_Aberrant.Raptor_Character_BP_Aberrant" },
+                { name: "Aberrant Rex", path: "/Game/Aberration/Dinos/Rex_Aberrant/Rex_Character_BP_Aberrant.Rex_Character_BP_Aberrant" },
+                { name: "Aberrant Sabertooth", path: "/Game/Aberration/Dinos/Saber_Aberrant/Saber_Character_BP_Aberrant.Saber_Character_BP_Aberrant" },
+                { name: "Aberrant Spino", path: "/Game/Aberration/Dinos/Spino_Aberrant/Spino_Character_BP_Aberrant.Spino_Character_BP_Aberrant" },
+                { name: "Aberrant Stego", path: "/Game/Aberration/Dinos/Stego_Aberrant/Stego_Character_BP_Aberrant.Stego_Character_BP_Aberrant" },
+                { name: "Aberrant Trike", path: "/Game/Aberration/Dinos/Trike_Aberrant/Trike_Character_BP_Aberrant.Trike_Character_BP_Aberrant" },
+                { name: "Basilisk", path: "/Game/Aberration/Dinos/Basilisk/Basilisk_Character_BP.Basilisk_Character_BP" },
+                { name: "Featherlight", path: "/Game/Aberration/Dinos/LanternBird/LanternLizard_Character_BP.LanternLizard_Character_BP" },
+                { name: "Glowtail", path: "/Game/Aberration/Dinos/LanternLizard/LanternLizard_Character_BP.LanternLizard_Character_BP" },
+                { name: "Karkinos (Crab)", path: "/Game/Aberration/Dinos/Crab/Crab_Character_BP.Crab_Character_BP" },
+                { name: "Light Pet (Bulbdog)", path: "/Game/Aberration/Dinos/Bulbdog/Bulbdog_Character_BP.Bulbdog_Character_BP" },
+                { name: "Nameless", path: "/Game/Aberration/Dinos/Nameless/Nameless_Character_BP.Nameless_Character_BP" },
+                { name: "Reaper King", path: "/Game/Aberration/Dinos/Reaper/ReaperKing_Character_BP.ReaperKing_Character_BP" },
+                { name: "Reaper Queen", path: "/Game/Aberration/Dinos/Reaper/ReaperQueen_Character_BP.ReaperQueen_Character_BP" },
+                { name: "Rock Drake", path: "/Game/Aberration/Dinos/RockDrake/RockDrake_Character_BP.RockDrake_Character_BP" },
+                { name: "Roll Rat", path: "/Game/Aberration/Dinos/RollRat/RollRat_Character_BP.RollRat_Character_BP" },
+                { name: "Shinehorn", path: "/Game/Aberration/Dinos/LanternGoat/LanternGoat_Character_BP.LanternGoat_Character_BP" },
+                { name: "Spider (Aberrant)", path: "/Game/Aberration/Dinos/Spider_Aberrant/SpiderS_Character_BP_Aberrant.SpiderS_Character_BP_Aberrant" },
+            ],
+            
+            // --- AQUATIC & MARINE (Official) --- (Cyan/Bright Blue)
+            "Aquatic & Marine (Official)": [
+                { name: "Ammonite", path: "/Game/PrimalEarth/Dinos/Ammonite/Ammonite_Character_BP.Ammonite_Character_BP" },
+                { name: "Anglerfish", path: "/Game/PrimalEarth/Dinos/Anglerfish/Angler_Character_BP.Angler_Character_BP" },
+                { name: "Basilosaurus (Basilo)", path: "/Game/PrimalEarth/Dinos/Basilosaurus/Basilosaurus_Character_BP.Basilosaurus_Character_BP" },
+                { name: "Coelacanth (Coel)", path: "/Game/PrimalEarth/Dinos/Coelacanth/Coel_Character_BP.Coel_Character_BP" },
+                { name: "Cnidaria (Jellyfish)", path: "/Game/PrimalEarth/Dinos/Cnidaria/Cnidaria_Character_BP.Cnidaria_Character_BP" },
+                { name: "Dunkleosteus (Dunkleo)", path: "/Game/PrimalEarth/Dinos/Dunkleosteus/Dunkle_Character_BP.Dunkle_Character_BP" },
+                { name: "Electrophorus (Eel)", path: "/Game/PrimalEarth/Dinos/Eel/Eel_Character_BP.Eel_Character_BP" },
+                { name: "Eurypterid (Sea Scorpion)", path: "/Game/PrimalEarth/Dinos/Euryp/Euryp_Character_BP.Euryp_Character_BP" },
+                { name: "Hesperornis", path: "/Game/PrimalEarth/Dinos/Hesperornis/Hesperornis_Character_BP.Hesperornis_Character_BP" },
+                { name: "Ichthyornis (Icthy)", path: "/Game/PrimalEarth/Dinos/Ichthyornis/Ichthyornis_Character_BP.Ichthyornis_Character_BP" },
+                { name: "Ichthyosaurus (Ichthy)", path: "/Game/PrimalEarth/Dinos/Ichthy/Dolphin_Character_BP.Dolphin_Character_BP" },
+                { name: "Liopleurodon (Lio)", path: "/Game/PrimalEarth/Dinos/Liopleurodon/Liopleurodon_Character_BP.Liopleurodon_Character_BP" },
+                { name: "Manta", path: "/Game/PrimalEarth/Dinos/Manta/Manta_Character_BP.Manta_Character_BP" },
+                { name: "Megalodon (Shark)", path: "/Game/PrimalEarth/Dinos/Megalodon/Megalodon_Character_BP.Megalodon_Character_BP" },
+                { name: "Mosasaurus (Mosa)", path: "/Game/PrimalEarth/Dinos/Mosasaurus/Mosa_Character_BP.Mosa_Character_BP" }, 
+                { name: "Pelagornis (Pela)", path: "/Game/PrimalEarth/Dinos/Pela/Pela_Character_BP.Pela_Character_BP" },
+                { name: "Piranha", path: "/Game/PrimalEarth/Dinos/Piranha/Piranha_Character_BP.Piranha_Character_BP" },
+                { name: "Plesiosaurus (Plesi)", path: "/Game/PrimalEarth/Dinos/Plesiosaur/Plesiosaur_Character_BP.Plesiosaur_Character_BP" },
+            ]
+        };
 
-        // Function to filter the dropdown options based on the search input
-        function filterSaddles() {
-            const filterText = saddleSearchInput.value;
-            populateDropdown(filterText);
-        }
+        // --- Core Functions ---
 
-        // Function to update the custom path input when a dropdown item is selected
-        function updateBlueprintPath() {
-            const selectedPath = blueprintSelector.value;
-            // Only update if it's not the CUSTOM separator and includes the path indicator
-            if (selectedPath !== "CUSTOM" && selectedPath.includes("Blueprint")) { 
-                customBlueprintPathInput.value = selectedPath;
-            } else if (selectedPath === "CUSTOM") {
-                // If CUSTOM is selected, clear the path field to encourage manual input
-                customBlueprintPathInput.value = ""; 
-                customBlueprintPathInput.focus();
+        /**
+         * Maps category names to CSS classes for styling.
+         */
+        const CATEGORY_CLASSES = {
+            "Astraeos Additions (Astral)": "category-astraeos", 
+            "Astraeos (Core)": "category-astraeos-core", 
+            "Extinction (Official)": "category-extinction", 
+            "Amissa Additions (Wyverns)": "category-amissa", 
+            "Modded (Non-S)": "category-modded",
+            "S-Dino Variants": "category-s-variants",
+            "Draconic Chronicles (DC)": "category-draconic",
+            "ASA/New Official (The Island, etc.)": "category-asa",
+            "The Island (Official)": "category-island",
+            "Scorched Earth (Official)": "category-scorched",
+            "Aberration (Official)": "category-aberration",
+            "Aquatic & Marine (Official)": "category-aquatic"
+        };
+        
+        let selectedPath = ""; // Global variable to store the selected blueprint path
+
+        /**
+         * Fills the custom dropdown list with categorized and styled <li> elements.
+         */
+        function populateCreatureSelector() {
+            const listContainer = document.getElementById('creatureList');
+            listContainer.innerHTML = ''; // Clear existing list
+
+            for (const categoryName in CREATURE_BLUEPRINTS) {
+                const categoryClass = CATEGORY_CLASSES[categoryName] || 'category-default';
+                
+                // 1. Create and add the Category Header
+                const headerLi = document.createElement('li');
+                headerLi.className = `dropdown-category-header ${categoryClass}`;
+                headerLi.textContent = `--- ${categoryName} ---`;
+                listContainer.appendChild(headerLi);
+
+
+                // 2. Add the Creature List Items
+                CREATURE_BLUEPRINTS[categoryName].forEach(creature => {
+                    const listItem = document.createElement('li');
+                    
+                    // Apply the category class for color
+                    listItem.className = categoryClass; 
+                    listItem.textContent = creature.name;
+
+                    // Use dataset to store the path and name for click handler
+                    listItem.dataset.path = creature.path;
+                    listItem.dataset.name = creature.name;
+                    
+                    // Add click handler
+                    listItem.onclick = () => selectCreature(creature.path, creature.name);
+
+                    listContainer.appendChild(listItem);
+                });
             }
-            generateCommand();
+        }
+
+        /**
+         * Handles the selection of a creature from the custom list.
+         */
+        function selectCreature(path, name) {
+            selectedPath = path;
+            document.getElementById('selectedBlueprintPath').value = path;
+            document.getElementById('selectedCreatureText').textContent = name;
+            document.getElementById('dropdownContent').style.display = 'none'; // Hide dropdown after selection
+            liveUpdateCommand(); // Update placeholder command
         }
         
-        // Function to build the command string
-        function generateCommand() {
-            const charId = characterIdInput.value.trim();
-            const blueprintPath = customBlueprintPathInput.value.trim();
-            
-            const quantity = 1; 
-            const quality = 100; // Ascendant Quality Index
-            
-            const isBlueprint = isBlueprintCheckbox.checked ? 1 : 0;
-            
-            let command = `GiveItemToPlayer `;
+        /**
+         * Toggles the visibility of the custom dropdown list.
+         */
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdownContent');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
 
-            if (charId) {
-                command += `${charId} `;
+        /**
+         * Closes the dropdown if the user clicks outside of it.
+         */
+        window.onclick = function(event) {
+            if (!event.target.closest('.custom-dropdown-container')) {
+                document.getElementById('dropdownContent').style.display = 'none';
+            }
+        }
+
+
+        /**
+         * Live filters the creature list based on user input.
+         * @param {string} filterText - The text to filter by.
+         */
+        function filterCreatures(filterText) {
+            const list = document.getElementById('creatureList');
+            const items = list.getElementsByTagName('li');
+            const filter = filterText.toUpperCase();
+            
+            // Automatically open the dropdown if searching
+            if (filter.length > 0) {
+                document.getElementById('dropdownContent').style.display = 'block';
+            } else if (filter.length === 0 && !selectedPath) {
+                 // Close dropdown if search is cleared and nothing is selected
+                document.getElementById('dropdownContent').style.display = 'none';
             }
 
-            // Append the Blueprint path, ensuring it is wrapped in double quotes
-            command += `"${blueprintPath}"`;
 
-            // Append the numerical parameters (Quantity 1, Quality 100, Blueprint 0/1)
-            command += ` ${quantity} ${quality} ${isBlueprint}`;
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                const itemText = item.textContent || item.innerText;
 
-            commandOutput.value = command;
+                if (item.classList.contains('dropdown-category-header')) {
+                    // Hide category headers initially
+                    item.style.display = "none";
+                }
+
+                if (!item.classList.contains('dropdown-category-header')) {
+                    if (itemText.toUpperCase().indexOf(filter) > -1) {
+                        item.style.display = "";
+                        // Make parent header visible when a child matches
+                        let parentHeader = item.previousElementSibling;
+                        while (parentHeader && !parentHeader.classList.contains('dropdown-category-header')) {
+                            parentHeader = parentHeader.previousElementSibling;
+                        }
+                        if (parentHeader) {
+                            parentHeader.style.display = "";
+                        }
+                    } else {
+                        item.style.display = "none";
+                    }
+                }
+            }
         }
 
-        // Function to copy the command to clipboard
-        function copyCommand() {
-            commandOutput.select();
-            // Use synchronous document.execCommand('copy') for reliable operation in iframes/local files.
-            document.execCommand('copy');
+
+        /**
+         * Generates the final Scriptcommand SpawnDinoInBall command string.
+         */
+        function generateCommand() {
+            const playerID = document.getElementById('playerInput').value.trim();
+            const selectedBlueprint = selectedPath; // Use the global variable
+            const genderElement = document.querySelector('input[name="genderRadio"]:checked');
+            const genderValue = genderElement ? genderElement.value : '1'; // Default to female if somehow unchecked
+            const outputDiv = document.getElementById('commandOutput');
+
+            // --- Validation ---
+            if (!playerID || playerID.length < 10) {
+                outputDiv.textContent = '❌ ERROR: Enter a valid Player EOS/Steam ID.';
+                outputDiv.style.color = 'red';
+                return;
+            }
+            if (!selectedBlueprint) {
+                outputDiv.textContent = '❌ ERROR: Select a creature from the dropdown menu.';
+                outputDiv.style.color = 'red';
+                return;
+            }
+
+            // --- Fixed Flags ---
+            const FIXED_FLAGS = '-b=1 -i=1 -a=1 -s=255,255,255,255,255,255,255,255';
             
+            // --- Final Command Structure (Using -t=) ---
+            const finalCommand = `Scriptcommand SpawnDinoInBall -p=${playerID} -t=${selectedBlueprint} -f=${genderValue} ${FIXED_FLAGS}`;
 
-            // Show confirmation message
-            copyMessage.textContent = 'Command copied to clipboard!';
-            copyMessage.classList.remove('opacity-0');
-            copyMessage.classList.add('opacity-100');
-
-            setTimeout(() => {
-                copyMessage.classList.remove('opacity-100');
-                copyMessage.classList.add('opacity-0');
-            }, 2000);
+            outputDiv.textContent = finalCommand;
+            outputDiv.style.color = '#FFFFFF'; // Set color to white for valid command
+            
+            // Clear status message after successful generation (in case an error was showing)
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.classList.remove('opacity-100', 'text-red-500', 'text-green-400');
+            statusMessage.textContent = '';
+        }
+        
+        /**
+         * Update the command output automatically (less aggressive than generating a full command)
+         */
+        function liveUpdateCommand() {
+             const playerID = document.getElementById('playerInput').value.trim();
+             const selectedBlueprint = selectedPath; // Use the global variable
+             const outputDiv = document.getElementById('commandOutput');
+             
+             if (playerID && selectedBlueprint) {
+                 outputDiv.textContent = "Click 'Generate Command' to finalize.";
+                 outputDiv.style.color = '#FFA500'; // Orange hint color
+             } else if (!playerID) {
+                 outputDiv.textContent = 'Enter a valid Player EOS/Steam ID.';
+                 outputDiv.style.color = '#FFFFFF'; // White text for initial message
+             } else if (!selectedBlueprint) {
+                 outputDiv.textContent = 'Select a creature from the dropdown menu.';
+                 outputDiv.style.color = '#FFFFFF'; // White text for initial message
+             }
         }
 
-        // Initialize the command output and dropdown safely using DOMContentLoaded
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set the default to item (0)
-            isBlueprintCheckbox.checked = false; 
+        /**
+         * Copies the generated command text to the clipboard.
+         */
+        function copyCommand() {
+            const commandText = document.getElementById('commandOutput').textContent.trim();
+            const statusMessage = document.getElementById('statusMessage');
 
-            // Initialize the dropdown and filter
-            populateDropdown(); 
-            // The initial generateCommand() is now handled inside populateDropdown() to ensure synchronization.
-        });
+            // Check if it's an error/placeholder message
+            if (commandText.includes('Select a creature') || commandText.includes('ERROR:') || commandText.includes('Click \'Generate Command\'')) {
+                statusMessage.textContent = '🚫 Cannot copy: Generate a valid command first.';
+                statusMessage.classList.add('text-red-500', 'opacity-100');
+                setTimeout(() => statusMessage.classList.remove('opacity-100', 'text-red-500'), 2000);
+                return;
+            }
+
+            // Copy logic
+            navigator.clipboard.writeText(commandText).then(() => {
+                statusMessage.textContent = '✅ Command Copied to Clipboard!';
+                statusMessage.classList.add('text-green-400', 'opacity-100');
+                
+                // Reset status message after a delay
+                setTimeout(() => {
+                    statusMessage.classList.remove('opacity-100', 'text-green-400');
+                    statusMessage.textContent = '';
+                }, 2000);
+            }).catch(err => {
+                statusMessage.textContent = '❌ Failed to copy command: ' + err;
+                statusMessage.classList.add('text-red-500', 'opacity-100');
+                setTimeout(() => statusMessage.classList.remove('opacity-100', 'text-red-500'), 2000);
+            });
+        }
+
+        // --- Initialization ---
+        window.onload = () => {
+            populateCreatureSelector();
+            liveUpdateCommand(); // Initialize the command message
+        };
 
     </script>
 </body>
