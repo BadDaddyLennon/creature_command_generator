@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArkLegendsPVE Saddle Command Generator (Vibrant Edition)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    // Custom colors for a vibrant, pleasing theme
+                    colors: {
+                        'ark-accent': '#1e90ff', // Electric Blue (Accent/Focus)
+                        'ark-secondary': '#5f27cd', // Deep Purple (Primary background contrast)
+                        'ark-primary': '#1c1729', // Very Dark Purple/Black Background
+                        'ark-card': '#2e274b', // Slightly lighter Card Background
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        // Soft glow for the new theme
+                        '3xl': '0 15px 30px -10px rgba(0, 0, 0, 0.4), 0 0 15px rgba(30, 144, 255, 0.5)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        .container {
+            max-width: 800px;
+        }
+        /* Custom styling for the Select element to match inputs */
+        #blueprintSelector {
+            appearance: none;
+            /* Update arrow color to match new theme */
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23d1d5db'%3E%3Cpath d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 0.8em;
+        }
+        .body-bg-gradient {
+            background-image: linear-gradient(135deg, #1c1729 0%, #2e274b 100%);
+        }
+        /* Style for the search input to match other inputs */
+        #saddleSearch {
+            color: white;
+        }
+        /* Hide options that don't match the search filter */
+        .hidden-option {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="body-bg-gradient min-h-screen p-4 sm:p-8 font-sans text-white">
+    <div class="container mx-auto bg-ark-card shadow-3xl rounded-xl p-6 md:p-10 border-2 border-ark-accent/50">
+
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">
+                <span class="text-ark-accent">ArkLegendsPVE</span> Saddle Command Generator
+            </h1>
+            <p class="text-gray-300 text-lg">
+                Generates **Ascendant** commands for verified saddles (Base Game & Mods). 
+            </p>
+        </header>
+
+        <section class="mb-8 p-4 bg-ark-secondary rounded-lg border border-ark-accent/50">
+            <h2 class="text-xl font-bold text-white mb-3">🛠️ How to Use:</h2>
+            <ol class="list-decimal list-inside space-y-2 text-gray-200 ml-4">
+                <li>Insert player's **Specimen/Implant Number** into the top box.</li>
+                <li>Use the **Search Bar** to quickly find your saddle.</li>
+                <li>Select the desired saddle from the **dropdown menu**.</li>
+                <li>Hit the **Generate Admin Command** button.</li>
+                <li>**Copy Command** to be used as an RCON command in Discord/Server Console.</li>
+            </ol>
+        </section>
+
+        <section class="space-y-6">
+            
+            <div>
+                <label for="characterId" class="block text-sm font-medium text-gray-300 mb-1">Target Character ID (Specimen/Implant Number - Optional for Self)</label>
+                <input type="text" id="characterId" value="" placeholder="e.g., 123456789 (Leave empty to target yourself)"
+                    class="w-full px-4 py-3 border border-ark-accent/30 rounded-lg focus:ring-ark-accent focus:border-ark-accent shadow-inner bg-ark-primary text-white">
+            </div>
+
+            <div id="blueprintPathContainer">
+                <label for="saddleSearch" class="block text-sm font-medium text-gray-300 mb-1">Search/Filter Saddles</label>
+                <input type="text" id="saddleSearch" placeholder="Type a creature name to filter the list..." onkeyup="filterSaddles()"
+                       class="w-full px-4 py-3 border border-ark-accent/30 rounded-lg focus:ring-ark-accent focus:border-ark-accent shadow-inner bg-ark-primary text-white mb-4">
+                
+                <label for="blueprintSelector" class="block text-sm font-medium text-gray-300 mb-1">Select Verified Saddle Blueprint Path</label>
+                <select id="blueprintSelector" onchange="updateBlueprintPath()"
+                    class="w-full px-4 py-3 border border-ark-accent/30 rounded-lg focus:ring-ark-accent focus:border-ark-accent shadow-inner bg-ark-primary text-white cursor-pointer">
+                    </select>
+            </div>
+
+            <div>
+                <label for="customBlueprintPath" class="block text-sm font-medium text-gray-300 mb-1">Current/Custom Blueprint Path</label>
+                <input type="text" id="customBlueprintPath" 
+                    value="Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_ArgentavisSaddle.PrimalItemArmor_ArgentavisSaddle'"
+                    placeholder="Enter a custom blueprint path here..."
+                    class="w-full px-4 py-3 border border-ark-accent/30 rounded-lg bg-ark-primary/80 focus:ring-ark-accent focus:border-ark-accent shadow-inner text-sm text-gray-100">
+                <p class="text-xs text-gray-400 mt-1">
+                    The command will use this path.
+                </p>
+            </div>
+
+            <div class="mt-8">
+                <div class="grid grid-cols-3 gap-6 text-center text-sm font-semibold text-gray-200 p-3 bg-ark-secondary rounded-lg border border-ark-accent/50">
+                    <span>Quantity: <strong class="text-ark-accent">1</strong></span>
+                    <span>Quality Index: <strong class="text-ark-accent">100 (Ascendant)</strong></span>
+                    <div class="flex items-center justify-center">
+                        <input type="checkbox" id="isBlueprint"
+                            class="h-5 w-5 text-ark-accent bg-ark-card border-ark-accent/50 rounded focus:ring-ark-accent">
+                        <label for="isBlueprint" class="ml-2 font-semibold">
+                            Generate as Blueprint (<strong class="text-ark-accent">1</strong>)
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+        
+        <div class="mt-8 text-center">
+             <button onclick="generateCommand()"
+                class="w-full sm:w-auto bg-ark-accent hover:bg-blue-600 text-white text-lg font-bold py-3 px-8 rounded-lg transition duration-200 shadow-xl transform hover:scale-[1.02] active:scale-[0.98] border border-white/20">
+                🚀 Generate Admin Command 
+            </button>
+        </div>
+        <div class="mt-10">
+            <h2 class="text-xl font-bold text-gray-100 mb-4">Generated Command</h2>
+            
+            <div class="relative">
+                <textarea id="commandOutput" rows="3" readonly
+                    class="w-full p-4 text-sm font-mono bg-ark-primary/50 text-ark-accent rounded-lg border-2 border-ark-accent resize-none shadow-lg"></textarea>
+            </div>
+            
+            <div class="mt-4 text-center">
+                <button onclick="copyCommand()" 
+                    class="w-full sm:w-auto bg-ark-accent hover:bg-blue-600 text-white font-bold py-2 px-8 rounded-lg transition duration-200 shadow-xl transform hover:scale-[1.03] active:scale-[0.98]">
+                    Copy Command
+                </button>
+            </div>
+            <p id="copyMessage" class="text-sm text-center text-ark-accent mt-2 opacity-0 transition duration-300 h-4"></p>
+        </div>
+    </div>
+
+    <script>
+        const commandOutput = document.getElementById('commandOutput');
+        const characterIdInput = document.getElementById('characterId');
+        const blueprintSelector = document.getElementById('blueprintSelector');
+        const customBlueprintPathInput = document.getElementById('customBlueprintPath');
+        const isBlueprintCheckbox = document.getElementById('isBlueprint');
+        const copyMessage = document.getElementById('copyMessage');
+        const saddleSearchInput = document.getElementById('saddleSearch');
+
+        // *************** VERIFIED ARK: SURVIVAL ASCENDED (ASA) SADDLE BLUEPRINT PATHS ***************
+        const saddleBlueprints = [
+            // ----------------------------------------------------------------------
+            // --- BASE GAME: THE ISLAND / CORE CREATURES ---------------------------
+            // ----------------------------------------------------------------------
+            { name: "--- THE ISLAND (CORE) SADDLES ---", path: "ISLAND_HEADER", isSeparator: true },
+            { name: "Allosaurus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_AlloSaddle.PrimalItemArmor_AlloSaddle'" },
+            { name: "Ankylosaurus Saddle (Ankylo)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_AnkyloSaddle.PrimalItemArmor_AnkyloSaddle'" },
+            { name: "Argentavis Saddle (Default)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_ArgentavisSaddle.PrimalItemArmor_ArgentavisSaddle'" },
+            { name: "Baryonyx Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_BaryonyxSaddle.PrimalItemArmor_BaryonyxSaddle'" },
+            { name: "Basilosaurus Saddle (Basilo)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_BasilosaurusSaddle.PrimalItemArmor_BasilosaurusSaddle'" },
+            { name: "Beelzebufo Saddle (Frog)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_ToadSaddle.PrimalItemArmor_ToadSaddle'" },
+            { name: "Brontosaurus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_BrontoSaddle.PrimalItemArmor_BrontoSaddle'" },
+            { name: "Carcharodontosaurus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_CarchaSaddle.PrimalItemArmor_CarchaSaddle'" },
+            { name: "Castoroides Saddle (Beaver)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_BeaverSaddle.PrimalItemArmor_BeaverSaddle'" },
+            { name: "Doedicurus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_DoedicurusSaddle.PrimalItemArmor_DoedicurusSaddle'" },
+            { name: "Dunkleosteus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_DunkleosteusSaddle.PrimalItemArmor_DunkleosteusSaddle'" },
+            { name: "Giganotosaurus Saddle (Giga)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_GigantSaddle.PrimalItemArmor_GigantSaddle'" },
+            { name: "Helicoprion Saddle", path: "Blueprint'/Game/ASA/Dinos/Helicoprion/Saddle/PrimalItemArmor_Helicoprion.PrimalItemArmor_Helicoprion'" },
+            { name: "Ichthyosaurus Saddle (Ichy)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_IchthySaddle.PrimalItemArmor_IchthySaddle'" },
+            { name: "Karkinos Saddle (Aberration)", path: "Blueprint'/Game/Aberration/Dinos/Crab/PrimalItemArmor_CrabSaddle.PrimalItemArmor_CrabSaddle'" }, 
+            { name: "Mammoth Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MammothSaddle.PrimalItemArmor_MammothSaddle'" },
+            { name: "Megalodon Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MegalodonSaddle_Tek.PrimalItemArmor_MegalodonSaddle_Tek'" },
+            { name: "Megatherium Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MegatheriumSaddle.PrimalItemArmor_MegatheriumSaddle'" },
+            { name: "Mosasaurus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MosaSaddle.PrimalItemArmor_MosaSaddle'" },
+            { name: "Paraceratherium Saddle (Paracer)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_ParacerSaddle.PrimalItemArmor_ParacerSaddle'" },
+            { name: "Pteranodon Saddle (Ptera)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_PteraSaddle.PrimalItemArmor_PteraSaddle'" },
+            { name: "Quetzalcoatlus Saddle (Quetzal)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_QuetzSaddle.PrimalItemArmor_QuetzSaddle'" },
+            { name: "Rex Saddle (T-Rex)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_RexSaddle.PrimalItemArmor_RexSaddle'" },
+            { name: "Rhyniognatha Saddle (ASA Exclusive)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_RhynioSaddle.PrimalItemArmor_RhynioSaddle'" }, 
+            { name: "Sabertooth Saddle (Saber)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_SaberSaddle.PrimalItemArmor_SaberSaddle'" },
+            { name: "Sarcosuchus Saddle (Sarco)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_SarcoSaddle.PrimalItemArmor_SarcoSaddle'" },
+            { name: "Spinosaurus Saddle (Spino)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_SpinoSaddle.PrimalItemArmor_SpinoSaddle'" },
+            { name: "Stegosaurus Saddle (Stego)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_StegoSaddle.PrimalItemArmor_StegoSaddle'" },
+            { name: "Tapejara Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_TapejaraSaddle.PrimalItemArmor_TapejaraSaddle'" },
+            { name: "Triceratops Saddle (Trike)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_TrikeSaddle.PrimalItemArmor_TrikeSaddle'" },
+            { name: "Woolly Rhino Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_RhinoSaddle.PrimalItemArmor_RhinoSaddle'" },
+            
+            // ----------------------------------------------------------------------
+            // --- BASE GAME: SCORCHED EARTH / EXCLUSIVE CREATURES ------------------
+            // ----------------------------------------------------------------------
+            { name: "--- SCORCHED EARTH SADDLES ---", path: "SCORCHED_HEADER", isSeparator: true },
+            { name: "Mantis Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MantisSaddle.PrimalItemArmor_MantisSaddle'" },
+            { name: "Morellatops Saddle (Camel)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_CamelsaurusSaddle.PrimalItemArmor_CamelsaurusSaddle'" },
+            { name: "Rock Elemental Saddle (Golems)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_GolemsSaddle.PrimalItemArmor_GolemsSaddle'" },
+            { name: "Vulture Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_VultureSaddle.PrimalItemArmor_VultureSaddle'" },
+            { name: "Wyvern Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_WyvernSaddle.PrimalItemArmor_WyvernSaddle'" },
+            
+            // ----------------------------------------------------------------------
+            // --- ABERRATION CREATURES ---------------------------------------------
+            // ----------------------------------------------------------------------
+            { name: "--- ABERRATION SADDLES ---", path: "ABERRATION_HEADER", isSeparator: true },
+            { name: "Bulbdog Saddle (Shoulder)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_BulbdogSaddle.PrimalItemArmor_BulbdogSaddle'" },
+            { name: "Lightpet Glider/Saddle (Vines)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_LightpetSaddle.PrimalItemArmor_LightpetSaddle'" },
+            { name: "Rock Drake Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_RockDrakeSaddle.PrimalItemArmor_RockDrakeSaddle'" },
+            
+            // ----------------------------------------------------------------------
+            // --- EXPANSION VARIANTS -----------------------------------------------
+            // ----------------------------------------------------------------------
+            { name: "--- ABERRATION/EXTINCTION VARIANTS ---", path: "VARIANTS_HEADER", isSeparator: true },
+            { name: "Velonasaur Saddle (Extinction)", path: "Blueprint'/Game/Extinction/CoreBlueprints/Items/Saddle/PrimalItemArmor_SpindlesSaddle.PrimalItemArmor_SpindlesSaddle'" }, 
+            { name: "Spinolosurus Saddle (Ab. Spino Variant)", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_SpinolosaurSaddle.PrimalItemArmor_SpinolosaurSaddle'" }, 
+            
+            // ----------------------------------------------------------------------
+            // --- PLATFORM SADDLES -------------------------------------------------
+            // ----------------------------------------------------------------------
+            { name: "--- PLATFORM SADDLES ---", path: "PLATFORM_HEADER", isSeparator: true },
+            { name: "Bronto Platform Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_BrontoSaddle_Platform.PrimalItemArmor_BrontoSaddle_Platform'" },
+            { name: "Paracer Platform Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_ParacerSaddle_Platform.PrimalItemArmor_ParacerSaddle_Platform'" },
+            { name: "Quetzal Platform Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_QuetzSaddle_Platform.PrimalItemArmor_QuetzSaddle_Platform'" },
+            
+            // ----------------------------------------------------------------------
+            // --- TEK SADDLES ------------------------------------------------------
+            // ----------------------------------------------------------------------
+            { name: "--- TEK SADDLES ---", path: "TEK_HEADER", isSeparator: true },
+            { name: "Tek Megalodon Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MegalodonSaddle_Tek.PrimalItemArmor_MegalodonSaddle_Tek'" },
+            { name: "Tek Mosasaurus Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_MosaSaddle_Tek.PrimalItemArmor_MosaSaddle_Tek'" },
+            { name: "Tek Rex Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_RexSaddle_Tek.PrimalItemArmor_RexSaddle_Tek'" },
+            { name: "Tek Tapejara Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_TapejaraSaddle_Tek.PrimalItemArmor_TapejaraSaddle_Tek'" },
+            { name: "Tek Trike Saddle", path: "Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_TrikeSaddle_Tek.PrimalItemArmor_TrikeSaddle_Tek'" },
+            
+            // ----------------------------------------------------------------------
+            // --- MODDED SADDLES ---------------------------------------------------
+            // ----------------------------------------------------------------------
+            { name: "--- MODDED SADDLES ---", path: "MODDED_HEADER", isSeparator: true },
+            { name: "Snow Monster Saddle (Lost Colony Mod)", path: "Blueprint'/Game/LostColony/Dinos/SnowMonster/PrimalItemArmor_SnowMonsterSaddle.PrimalItemArmor_SnowMonsterSaddle'" },
+            { name: "Glaucus Saddle (MODDED)", path: "Blueprint'/Glaucus/Content/Saddle/PrimalItemArmor_GlaucusSaddle.PrimalItemArmor_GlaucusSaddle'" },
+
+            // --- DRACONIC CHRONICLES SADDLES ---
+            { name: "--- DRACONIC CHRONICLES SADDLES ---", path: "DC_HEADER", isSeparator: true },
+            { name: "Fire Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/FireWyvern/PrimalItemArmor_FireWyvernArmor.PrimalItemArmor_FireWyvernArmor'" },
+            { name: "Lightning Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/LightningWyvern/PrimalItemArmor_LightningWyvernArmor.PrimalItemArmor_LightningWyvernArmor'" },
+            { name: "Poison Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/PoisonWyvern/PrimalItemArmor_PoisonWyvernArmor.PrimalItemArmor_PoisonWyvernArmor'" },
+            { name: "Ice Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/IceWyvern/PrimalItemArmor_IceWyvernArmor.PrimalItemArmor_IceWyvernArmor'" },
+            { name: "Blood Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/BloodWyvern/PrimalItemArmor_BloodArmor.PrimalItemArmor_BloodArmor'" },
+            { name: "Ember Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/EmberWyvern/PrimalItemArmor_EmberArmor.PrimalItemArmor_EmberArmor'" },
+            { name: "Tropical Wyvern Armor (DC)", path: "Blueprint'/DraconicChronicles/Saddles/TropicalWyvern/PrimalItemArmor_TropicalWyvernArmor.PrimalItemArmor_TropicalWyvernArmor'" },
+            { name: "Sand Dragon Saddle (DC)", path: "Blueprint'/DraconicChronicles/Saddles/SandDragon/PrimalItemArmor_SandDragonSaddle.PrimalItemArmor_SandDragonSaddle'" },
+            { name: "Polar Dragon Platform Saddle (DC)", path: "Blueprint'/DraconicChronicles/Saddles/PolarSaddle/PrimalItemArmor_PolarDragonSaddle_Platform.PrimalItemArmor_PolarDragonSaddle_Platform'" },
+            { name: "Blood Storm Dragon Saddle (DC)", path: "Blueprint'/DraconicChronicles/Saddles/BloodStorm/PrimalItemArmor_BloodStormDragonSaddle.PrimalItemArmor_BloodStormDragonSaddle'" },
+            { name: "Flameforge Dragon Saddle (DC)", path: "Blueprint'/DraconicChronicles/Saddles/FlameforgeDragon/PrimalItemArmor_FlameforgeDragonSaddle.PrimalItemArmor_FlameforgeDragonSaddle'" },
+            { name: "Dragonkin Saddle (DC)", path: "Blueprint'/DraconicChronicles/Saddles/Dragonkin/PrimalItemArmor_DragonkinSaddle.PrimalItemArmor_DragonkinSaddle'" },
+            
+            // --- S-VARIANT SADDLES (Only Desmodus Remaining) ---
+            { name: "--- S-VARIANTS SADDLES ---", path: "S_VARIANTS_HEADER", isSeparator: true },
+            { name: "S-Desmodus Saddle", path: "Blueprint'/SDinoVariants/S-Desmodus/PrimalItemArmor_S-DesmodusSaddle.PrimalItemArmor_S-DesmodusSaddle'" },
+            
+            // ----------------------------------------------------------------------
+            // --- END LIST ---------------------------------------------------------
+            // ----------------------------------------------------------------------
+            { name: "--- CUSTOM PATH (Use box below) ---", path: "CUSTOM", isSeparator: true },
+        ];
+
+
+        // Function to populate the dropdown
+        function populateDropdown(filterText = '') {
+            const selector = blueprintSelector;
+            const fragment = document.createDocumentFragment();
+            const filter = filterText.toLowerCase();
+            let isFirstOption = true; // Flag to track the first non-separator option for default selection
+
+            // Clear existing options
+            selector.innerHTML = '';
+            
+            saddleBlueprints.forEach(item => {
+                const optionNameLower = item.name.toLowerCase();
+                const option = document.createElement('option');
+
+                // Logic to handle filtering: Skip non-separator items that don't match the filter
+                if (!item.isSeparator && filter && optionNameLower.indexOf(filter) === -1) {
+                    return;
+                }
+                
+                // Logic to handle separator visibility
+                if (item.isSeparator && filter) {
+                    // When actively filtering, only show separators if their name matches the filter
+                    if (optionNameLower.indexOf(filter) === -1) {
+                        return;
+                    }
+                }
+
+                option.value = item.path;
+                option.textContent = item.name;
+                
+                if (item.isSeparator) {
+                    option.disabled = true;
+                    option.style.fontWeight = 'bold';
+                    option.style.backgroundColor = '#5f27cd'; // Darker color for separators
+                    option.style.color = '#e0e0e0'; // Light gray text for separators
+                } else if (isFirstOption) {
+                    // Automatically select the first visible (non-separator) option
+                    option.selected = true;
+                    isFirstOption = false;
+                    // Update the custom path input on initial load/filter, but only if we have a valid path
+                    if (item.path !== "CUSTOM") {
+                        customBlueprintPathInput.value = item.path;
+                    }
+                }
+                
+                fragment.appendChild(option);
+            });
+            
+            selector.appendChild(fragment);
+
+            // Re-run command generation to update the output box to the new selected item.
+            generateCommand();
+        }
+
+        // Function to filter the dropdown options based on the search input
+        function filterSaddles() {
+            const filterText = saddleSearchInput.value;
+            populateDropdown(filterText);
+        }
+
+        // Function to update the custom path input when a dropdown item is selected
+        function updateBlueprintPath() {
+            const selectedPath = blueprintSelector.value;
+            // Only update if it's not the CUSTOM separator and includes the path indicator
+            if (selectedPath !== "CUSTOM" && selectedPath.includes("Blueprint")) { 
+                customBlueprintPathInput.value = selectedPath;
+            } else if (selectedPath === "CUSTOM") {
+                // If CUSTOM is selected, clear the path field to encourage manual input
+                customBlueprintPathInput.value = ""; 
+                customBlueprintPathInput.focus();
+            }
+            generateCommand();
+        }
+        
+        // Function to build the command string
+        function generateCommand() {
+            const charId = characterIdInput.value.trim();
+            const blueprintPath = customBlueprintPathInput.value.trim();
+            
+            const quantity = 1; 
+            const quality = 100; // Ascendant Quality Index
+            
+            const isBlueprint = isBlueprintCheckbox.checked ? 1 : 0;
+            
+            let command = `GiveItemToPlayer `;
+
+            if (charId) {
+                command += `${charId} `;
+            }
+
+            // Append the Blueprint path, ensuring it is wrapped in double quotes
+            command += `"${blueprintPath}"`;
+
+            // Append the numerical parameters (Quantity 1, Quality 100, Blueprint 0/1)
+            command += ` ${quantity} ${quality} ${isBlueprint}`;
+
+            commandOutput.value = command;
+        }
+
+        // Function to copy the command to clipboard
+        function copyCommand() {
+            commandOutput.select();
+            // Use synchronous document.execCommand('copy') for reliable operation in iframes/local files.
+            document.execCommand('copy');
+            
+
+            // Show confirmation message
+            copyMessage.textContent = 'Command copied to clipboard!';
+            copyMessage.classList.remove('opacity-0');
+            copyMessage.classList.add('opacity-100');
+
+            setTimeout(() => {
+                copyMessage.classList.remove('opacity-100');
+                copyMessage.classList.add('opacity-0');
+            }, 2000);
+        }
+
+        // Initialize the command output and dropdown safely using DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set the default to item (0)
+            isBlueprintCheckbox.checked = false; 
+
+            // Initialize the dropdown and filter
+            populateDropdown(); 
+            // The initial generateCommand() is now handled inside populateDropdown() to ensure synchronization.
+        });
+
+    </script>
+</body>
+</html>
