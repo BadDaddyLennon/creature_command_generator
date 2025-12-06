@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArkLegendsPvE Creature Command Generator</title>
+    <title>ArkLegendsPvE Creature Command Generator (Mobile Styled)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -62,7 +62,7 @@
             word-break: break-all;
             cursor: pointer;
             min-height: 4rem;
-            color: #FFFFFF; /* White for the Final Command */
+            color: #FFFFFF; /* Now White for the Final Command */
             transition: all 0.2s;
         }
         .command-output:hover {
@@ -304,12 +304,11 @@
     </div>
 
     <script>
-        // Data structure (Includes new Extinction and Corrupted creatures)
+        // Data structure (Includes all current creature lists and updates)
         const CREATURE_BLUEPRINTS = {
             
             // --- ASTRAEOS ADDITIONS (TEAL) ---
             "Astraeos Additions (Astral)": [
-                // Astral Creatures (BP_C suffix removed, Mosasaur folder name corrected)
                 { name: "Astral Argentavis", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Argentavis/AstralArgent_Character_BP.AstralArgent_Character_BP" },
                 { name: "Astral Carnotaurus", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Carno/AstralCarno_Character_BP.AstralCarno_Character_BP" },
                 { name: "Astral Deinosuchus", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Deinosuchus/AstralDeinosuchusASA_Character_BP.AstralDeinosuchusASA_Character_BP" },
@@ -383,8 +382,8 @@
                 { name: "Drakara (Standard)", path: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP.Drakara_Character_BP" },
                 { name: "Drakara (Dwarfs)", path: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP_Dwarfs.Drakara_Character_BP_Dwarfs" },
                 { name: "Drakara (Aberrant)", path: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP_Aberrant.Drakara_Character_BP_Aberrant" },
-                { name: "Drakara (Bloodfang)", path: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Bloodfang.Drakara_Character_BP_Bloodfang" },
-                { name: "Drakara (Arctic)", path: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Arctic.Drakara_Character_BP_Arctic" },
+                { name: "Drakara (Bloodfang)", path: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP_Bloodfang.Drakara_Character_BP_Bloodfang" },
+                { name: "Drakara (Arctic)", path: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP_Arctic.Drakara_Character_BP_Arctic" },
 
                 // Moros Variants
                 { name: "Moro Raptor", path: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/MoroRaptor_Character_BP.MoroRaptor_Character_BP" },
@@ -477,10 +476,10 @@
             // --- ASA/New Official Creatures (Default - Cyan) ---
             "ASA/New Official (The Island, etc.)": [
                 { name: "Helicoprion", path: "/Game/ASA/Dinos/Helicoprion/Helicoprion_Character_BP.Helicoprion_Character_BP" }, 
-                { name: "Vibis (Summer)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Summer.ShoulderDragon_Character_BP_Summer" },
-                { name: "Vibis (Spring)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Spring.ShoulderDragon_Character_BP_Spring" },
-                { name: "Vibis (Winter)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Winter.ShoulderDragon_Character_BP_Winter" },
-                { name: "Vibis (Autumn)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Autumn.ShoulderDragon_Character_BP_Autumn" },
+                { name: "Drakeling (Summer)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Summer.ShoulderDragon_Character_BP_Summer" },
+                { name: "Drakeling (Spring)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Spring.ShoulderDragon_Character_BP_Spring" },
+                { name: "Drakeling (Winter)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Winter.ShoulderDragon_Character_BP_Winter" },
+                { name: "Drakeling (Autumn)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Autumn.ShoulderDragon_Character_BP_Autumn" },
                 { name: "Fire Lion (Official)", path: "/Game/ASA/Dinos/FireLion/FireLion_Character_BP.FireLion_Character_BP" }, 
                 { name: "Dark Pegasus (Official)", path: "/Game/ASA/Dinos/DarkPegasus/DarkPegasus_Character_BP.DarkPegasus_Character_BP" }, 
                 { name: "Carcharodontosaurus (Carcha)", path: "/Game/PrimalEarth/Dinos/Carcharodontosaurus/Carcha_Character_BP.Carcha_Character_BP" },
