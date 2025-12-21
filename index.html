@@ -21,16 +21,9 @@
             border-radius: 12px;
             box-shadow: 0 0 20px rgba(0, 255, 133, 0.1); 
         }
-        
-        .neon-heading {
-            color: #00FF85; 
-            text-shadow: 0 0 5px rgba(0, 255, 133, 0.5);
-        }
-        
+        .neon-heading { color: #00FF85; text-shadow: 0 0 5px rgba(0, 255, 133, 0.5); }
         .instruction-step { color: #1E90FF; }
-        .instruction-text { color: #e6e6e6; }
         .input-label { color: #1E90FF; }
-
         .input-style {
             background-color: #0d1117;
             border: 1px solid #30363d;
@@ -38,7 +31,6 @@
             border-radius: 8px;
             padding: 0.75rem;
         }
-
         .command-output {
             background-color: #0d1117;
             border: 1px solid #30363d;
@@ -49,10 +41,8 @@
             min-height: 4rem;
             color: #FFFFFF; 
         }
-
         .button-primary { background-color: #00FF85; color: #0d1117; font-weight: 700; }
         .button-copy { background-color: #1E90FF; color: #0d1117; margin-top: 0.5rem; font-weight: 700; }
-        
         .radio-label {
             display: inline-flex;
             align-items: center;
@@ -73,7 +63,7 @@
             position: absolute;
             background-color: #161b22;
             width: 100%;
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
             border: 1px solid #30363d;
             border-radius: 8px;
@@ -85,11 +75,17 @@
         .dropdown-category-header { padding: 10px 12px; font-weight: 700; border-top: 2px solid #30363d; pointer-events: none; }
 
         /* Category Colors */
-        .category-lostcolony, .category-lostcolony li { color: #C0C0C0; } /* Silver/Grey */
+        .category-lostcolony, .category-lostcolony li { color: #E5E4E2; } /* Platinum */
         .category-astraeos, .category-astraeos li { color: #008080; } 
         .category-extinction, .category-extinction li { color: #FFA500; } 
+        .category-amissa, .category-amissa li { color: #8A2BE2; } 
+        .category-modded, .category-modded li { color: #FF69B4; } 
         .category-s-variants, .category-s-variants li { color: #ADD8E6; } 
         .category-draconic, .category-draconic li { color: #FF0000; } 
+        .category-island, .category-island li { color: #00FF00; } 
+        .category-scorched, .category-scorched li { color: #FFFF00; } 
+        .category-aberration, .category-aberration li { color: #90EE90; } 
+        .category-aquatic, .category-aquatic li { color: #00FFFF; } 
         .category-asa, .category-asa li { color: #00FFFF; } 
     </style>
 </head>
@@ -98,6 +94,11 @@
     <div class="container-card w-full">
         <h1 class="text-3xl font-bold text-center mb-6 neon-heading">ArkLegendsPvE Command Generator</h1>
 
+        <div class="mb-6 p-4 border border-gray-700 rounded-lg bg-gray-900/50 text-sm">
+            <h2 class="font-bold mb-2 instruction-step">✅ Quick-Start:</h2>
+            <p>1. Paste <b>EOS ID</b> | 2. Choose <b>Creature</b> | 3. Hit <b>Generate</b></p>
+        </div>
+
         <div class="mb-4">
             <label class="block text-sm font-medium mb-2 input-label">1. Target Player EOS ID:</label>
             <input type="text" id="playerInput" value="00024953ec774cf98878f25e96eca484" oninput="liveUpdateCommand()" class="w-full input-style">
@@ -105,7 +106,7 @@
         
         <div class="mb-4">
             <label class="block text-sm font-medium mb-2 input-label">Search Creature:</label>
-            <input type="text" id="creatureSearch" oninput="filterCreatures(this.value)" class="w-full input-style" placeholder="Type to filter...">
+            <input type="text" id="creatureSearch" oninput="filterCreatures(this.value)" class="w-full input-style" placeholder="Type to filter list...">
         </div>
 
         <div class="mb-4 custom-dropdown-container">
@@ -132,7 +133,7 @@
 
         <div class="mb-4">
             <label class="block text-sm font-medium mb-2 input-label">4. Generated Command:</label>
-            <div id="commandOutput" class="command-output p-3 rounded-lg text-sm" onclick="copyCommand()">Select a creature to begin.</div>
+            <div id="commandOutput" class="command-output p-3 rounded-lg text-sm" onclick="copyCommand()">Select a creature.</div>
         </div>
         
         <button onclick="generateCommand()" class="button-primary w-full py-3 rounded-xl mb-2">Generate Command</button>
@@ -144,24 +145,75 @@
         const CREATURE_BLUEPRINTS = {
             "Lost Colony": [
                 { name: "Gloon", path: "/Game/LostColony/Dinos/LostChargePet/LostCharge_LanternPet_Char_BP.LostCharge_LanternPet_Char_BP" },
-                { name: "Aureliax", path: "/Game/LostColony/Dinos/SnowDragon/SnowDragon_Character_BP.SnowDragon_Character_BP" },
-                { name: "Ossidon", path: "/Game/LostColony/Dinos/SnowMonster/SnowMonster_Character_BP.SnowMonster_Character_BP" }
+                { name: "Aureliax", path: "/Game/LostColony/Dinos/SnowDragon/SnowDragon_Character_BP.SnowDragon_Character_BP" }
             ],
             "ASA / New Official": [
                 { name: "Cryolophosaurus", path: "/Game/ASA/Dinos/Cryolophosaurus/Cryolophosaurus_Character_BP.Cryolophosaurus_Character_BP" },
-                { name: "Helicoprion", path: "/Game/ASA/Dinos/Helicoprion/Helicoprion_Character_BP.Helicoprion_Character_BP" }
+                { name: "Helicoprion", path: "/Game/ASA/Dinos/Helicoprion/Helicoprion_Character_BP.Helicoprion_Character_BP" },
+                { name: "Drakeling (Summer)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Summer.ShoulderDragon_Character_BP_Summer" },
+                { name: "Drakeling (Spring)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Spring.ShoulderDragon_Character_BP_Spring" },
+                { name: "Drakeling (Winter)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Winter.ShoulderDragon_Character_BP_Winter" },
+                { name: "Drakeling (Autumn)", path: "/Game/ASA/Dinos/ShoulderDragon/ShoulderDragon_Character_BP_Autumn.ShoulderDragon_Character_BP_Autumn" }
+            ],
+            "Draconic Chronicles (DC)": [
+                { name: "DC: Dragonkin Brawler", path: "/DraconicChronicles/Dino/Dragonkin/DragonKin_BrawlerBP.DragonKin_BrawlerBP" },
+                { name: "DC: Hydro Dragon", path: "/DraconicChronicles/Dino/HydroDragon/HydroDragonBP.HydroDragonBP" },
+                { name: "DC: Undead Wyvern", path: "/DraconicChronicles/Dino/UndeadWyvern/UndeadWyvern_BP.UndeadWyvern_BP" },
+                { name: "DC: Glowveil Dragon", path: "/DraconicChronicles/Dino/GlowveilDragon/GlowveilDragon_BP.GlowveilDragon_BP" },
+                { name: "DC: Undead Dragon (Tamed)", path: "/DraconicChronicles/Dino/UndeadDragon/UndeadDragonBP_Tamed.UndeadDragonBP_Tamed" },
+                { name: "DC: Headless Hydra", path: "/DraconicChronicles/Dino/HeadlessHydra/HeadlessHydraBP.HeadlessHydraBP" },
+                { name: "DC: Elder Wyvern", path: "/DraconicChronicles/Dino/Dragon/ElderWyvernBP.ElderWyvernBP" },
+                { name: "DC: Shadow Wyvern", path: "/DraconicChronicles/Dino/ShadowWyvern/ShadowWyvern_BP.ShadowWyvern_BP" },
+                { name: "DC: Lightning Wyvern", path: "/DraconicChronicles/Dino/LightningWyvern/Wyvern_Character_BP_Lightning1.Wyvern_Character_BP_Lightning1" },
+                { name: "DC: Ember Wyvern", path: "/DraconicChronicles/Dino/EmberWyvern/CrystalWyvern_Character_BP_Ember1.CrystalWyvern_Character_BP_Ember1" }
+            ],
+            "Astraeos Additions": [
+                { name: "Astral Argentavis", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Argentavis/AstralArgent_Character_BP.AstralArgent_Character_BP" },
+                { name: "Astral Carnotaurus", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Carno/AstralCarno_Character_BP.AstralCarno_Character_BP" },
+                { name: "Astral T-Rex", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Rex/AstralRex_Character_BP.AstralRex_Character_BP" }
+            ],
+            "Aberration (Official)": [
+                { name: "Bulbdog", path: "/Game/Aberration/Dinos/LanternPug/LanternPug_Character_BP.LanternPug_Character_BP" },
+                { name: "Featherlight", path: "/Game/Aberration/Dinos/LanternBird/LanternBird_Character_BP.LanternBird_Character_BP" },
+                { name: "Reaper King (Tamed)", path: "/Game/Aberration/Dinos/Nameless/Xenomorph_Character_BP_Male_Tamed.Xenomorph_Character_BP_Male_Tamed" }
             ],
             "Extinction (Official)": [
                 { name: "Corrupt Reaper King (Tamed)", path: "/Game/Extinction/Dinos/Corrupt/Nameless/Xenomorph_Character_BP_Male_Tamed_Corrupt.Xenomorph_Character_BP_Male_Tamed_Corrupt" },
                 { name: "Managarmr", path: "/Game/Extinction/Dinos/IceJumper/IceJumper_Character_BP.IceJumper_Character_BP" }
+            ],
+            "The Island (Official)": [
+                { name: "Argentavis", path: "/Game/PrimalEarth/Dinos/Argentavis/Argent_Character_BP.Argent_Character_BP" },
+                { name: "Giganotosaurus", path: "/Game/PrimalEarth/Dinos/Gigant/Gigant_Character_BP.Gigant_Character_BP" },
+                { name: "Rex", path: "/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP.Rex_Character_BP" }
+            ],
+            "Aquatic & Marine": [
+                { name: "Tusoteuthis (Squid)", path: "/Game/PrimalEarth/Dinos/Tusoteuthis/Tusoteuthis_Character_BP.Tusoteuthis_Character_BP" },
+                { name: "Mosasaurus", path: "/Game/PrimalEarth/Dinos/Mosasaurus/Mosa_Character_BP.Mosa_Character_BP" }
+            ],
+            "S-Dino Variants": [
+                { name: "S-Fire Wyvern", path: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Fire.S-Wyvern_Character_BP_Fire" },
+                { name: "S-Lightning Wyvern", path: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Lightning.S-Wyvern_Character_BP_Lightning" },
+                { name: "S-Rex", path: "/SDinoVariants/S-Rex/S-Rex_Character_BP.S-Rex_Character_BP" }
             ]
         };
 
-        const CATEGORY_CLASSES = { "Lost Colony": "category-lostcolony", "ASA / New Official": "category-asa", "Extinction (Official)": "category-extinction" };
+        const CATEGORY_CLASSES = { 
+            "Lost Colony": "category-lostcolony", 
+            "ASA / New Official": "category-asa", 
+            "Draconic Chronicles (DC)": "category-draconic",
+            "Astraeos Additions": "category-astraeos",
+            "Aberration (Official)": "category-aberration",
+            "Extinction (Official)": "category-extinction",
+            "The Island (Official)": "category-island",
+            "Aquatic & Marine": "category-aquatic",
+            "S-Dino Variants": "category-s-variants"
+        };
+
         let selectedPath = ""; 
 
         function populateCreatureSelector() {
             const listContainer = document.getElementById('creatureList');
+            listContainer.innerHTML = '';
             for (const cat in CREATURE_BLUEPRINTS) {
                 const header = document.createElement('li');
                 header.className = `dropdown-category-header ${CATEGORY_CLASSES[cat]}`;
@@ -188,6 +240,16 @@
             d.style.display = d.style.display === 'block' ? 'none' : 'block';
         }
 
+        function filterCreatures(val) {
+            const items = document.getElementById('creatureList').getElementsByTagName('li');
+            document.getElementById('dropdownContent').style.display = 'block';
+            for (let i = 0; i < items.length; i++) {
+                if (!items[i].classList.contains('dropdown-category-header')) {
+                    items[i].style.display = items[i].textContent.toLowerCase().includes(val.toLowerCase()) ? "" : "none";
+                }
+            }
+        }
+
         function generateCommand() {
             const id = document.getElementById('playerInput').value;
             const gender = document.querySelector('input[name="genderRadio"]:checked').value;
@@ -196,22 +258,18 @@
             document.getElementById('commandOutput').textContent = cmd;
         }
 
+        function liveUpdateCommand() {
+            if(selectedPath) generateCommand();
+        }
+
         function copyCommand() {
             const text = document.getElementById('commandOutput').textContent;
+            if (text.includes("Select")) return;
             navigator.clipboard.writeText(text);
             const status = document.getElementById('statusMessage');
             status.textContent = "✅ Copied!";
             status.style.opacity = "1";
             setTimeout(() => status.style.opacity = "0", 2000);
-        }
-
-        function filterCreatures(val) {
-            const items = document.getElementById('creatureList').getElementsByTagName('li');
-            for (let i = 0; i < items.length; i++) {
-                if (!items[i].classList.contains('dropdown-category-header')) {
-                    items[i].style.display = items[i].textContent.toLowerCase().includes(val.toLowerCase()) ? "" : "none";
-                }
-            }
         }
 
         window.onload = populateCreatureSelector;
