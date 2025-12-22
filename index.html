@@ -7,21 +7,67 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0d1117; color: #e6e6e6; }
-        .container-card { max-width: 90%; margin: 2rem auto; padding: 1.5rem; background-color: #161b22; border-radius: 12px; box-shadow: 0 0 20px rgba(0, 255, 133, 0.1); }
-        .neon-heading { color: #00FF85; text-shadow: 0 0 5px rgba(0, 255, 133, 0.5); }
-        .input-label { color: #1E90FF; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; display: block; }
-        .input-style { background-color: #0d1117; border: 1px solid #30363d; color: #00FF85; border-radius: 8px; padding: 0.75rem; width: 100%; }
-        .command-output { background-color: #0d1117; border: 1px solid #30363d; font-family: monospace; white-space: pre-wrap; word-break: break-all; cursor: pointer; min-height: 4rem; color: #FFFFFF; padding: 1rem; border-radius: 8px; margin-top: 0.5rem; }
-        .button-primary { background-color: #00FF85; color: #0d1117; font-weight: 700; width: 100%; py: 0.75rem; border-radius: 12px; margin-top: 1rem; }
-        .button-copy { background-color: #1E90FF; color: #0d1117; font-weight: 700; width: 100%; py: 0.75rem; border-radius: 12px; margin-top: 0.5rem; }
+        /* Base Colors - Dark & Modern */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117;
+            color: #e6e6e6;
+        }
+        .container-card {
+            max-width: 90%;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: #161b22;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 255, 133, 0.1);
+        }
+        .neon-heading {
+            color: #00FF85;
+            text-shadow: 0 0 5px rgba(0, 255, 133, 0.5);
+        }
+        .input-label { color: #1E90FF; font-weight: 600; margin-bottom: 0.5rem; display: block; }
+        .input-style {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            color: #00FF85;
+            border-radius: 8px;
+            padding: 0.75rem;
+            width: 100%;
+        }
+        .command-output {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            cursor: pointer;
+            min-height: 4rem;
+            color: #FFFFFF;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .button-primary { background-color: #00FF85; color: #0d1117; font-weight: 700; width: 100%; padding: 0.75rem; border-radius: 12px; margin-top: 1rem; }
+        .button-copy { background-color: #1E90FF; color: #0d1117; font-weight: 700; width: 100%; padding: 0.75rem; border-radius: 12px; margin-top: 0.5rem; }
         
+        /* Custom Dropdown */
         .custom-dropdown-container { position: relative; }
         #dropdownDisplay { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .dropdown-content { display: none; position: absolute; background-color: #161b22; width: 100%; max-height: 400px; overflow-y: auto; border: 1px solid #30363d; border-radius: 8px; z-index: 100; margin-top: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .dropdown-content li { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #1a202a; font-size: 0.9rem; }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #161b22;
+            width: 100%;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            z-index: 100;
+            margin-top: 4px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .dropdown-content li { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #1a202a; }
         .dropdown-content li:hover { background-color: #30363d; }
-        .dropdown-category-header { padding: 10px 12px; font-weight: 800; border-top: 2px solid #30363d; background-color: #0d1117; pointer-events: none; position: sticky; top: 0; }
+        .dropdown-category-header { padding: 10px 12px; font-weight: 800; border-top: 2px solid #30363d; background-color: #0d1117; pointer-events: none; }
 
         /* Category Colors */
         .category-lostcolony, .category-lostcolony li { color: #E5E4E2; }
@@ -32,6 +78,7 @@
         .category-s-variants, .category-s-variants li { color: #ADD8E6; } 
         .category-draconic, .category-draconic li { color: #FF0000; } 
         .category-island, .category-island li { color: #00FF00; } 
+        .category-scorched, .category-scorched li { color: #FFFF00; } 
         .category-aberration, .category-aberration li { color: #90EE90; } 
         .category-aquatic, .category-aquatic li { color: #00FFFF; } 
         .category-asa, .category-asa li { color: #00FFFF; }
@@ -48,19 +95,19 @@
 
         <div class="mb-4">
             <label class="input-label">1. Target Player EOS ID:</label>
-            <input type="text" id="playerInput" value="00024953ec774cf98878f25e96eca484" class="input-style">
+            <input type="text" id="playerInput" value="00024953ec774cf98878f25e96eca484" oninput="liveUpdateCommand()" class="input-style">
         </div>
         
         <div class="mb-4">
             <label class="input-label">Search Creature:</label>
-            <input type="text" id="creatureSearch" oninput="filterCreatures(this.value)" class="input-style" placeholder="Search...">
+            <input type="text" id="creatureSearch" oninput="filterCreatures(this.value)" class="input-style" placeholder="Type to filter...">
         </div>
 
         <div class="mb-4 custom-dropdown-container">
             <label class="input-label">2. Select Creature:</label>
             <div id="dropdownDisplay" class="input-style" onclick="toggleDropdown()">
                 <span id="selectedCreatureText">--- Choose a Dino ---</span>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
             </div>
             <div id="dropdownContent" class="dropdown-content">
                 <ul id="creatureList"></ul>
@@ -70,21 +117,21 @@
         <div class="mb-6">
             <label class="input-label">3. Creature Gender:</label>
             <div class="flex">
-                <input type="radio" id="genderFemale" name="genderRadio" value="1" checked class="hidden">
+                <input type="radio" id="genderFemale" name="genderRadio" value="1" checked onchange="liveUpdateCommand()" class="hidden">
                 <label for="genderFemale" class="radio-label">♀️ Female</label>
-                <input type="radio" id="genderMale" name="genderRadio" value="0" class="hidden">
+                <input type="radio" id="genderMale" name="genderRadio" value="0" onchange="liveUpdateCommand()" class="hidden">
                 <label for="genderMale" class="radio-label">♂️ Male</label>
             </div>
         </div>
 
         <div class="mb-4">
-            <label class="input-label">4. Final Command:</label>
-            <div id="commandOutput" class="command-output" onclick="copyCommand()">Select a creature to generate.</div>
+            <label class="input-label">4. Generated Command:</label>
+            <div id="commandOutput" class="command-output" onclick="copyCommand()">Select a creature.</div>
         </div>
         
-        <button onclick="generateCommand()" class="button-primary py-3 px-4">Generate Command</button>
-        <button onclick="copyCommand()" class="button-copy py-3 px-4">Copy Command</button>
-        <div id="statusMessage" class="mt-4 text-center text-sm opacity-0"></div>
+        <button onclick="generateCommand()" class="button-primary">Generate Command</button>
+        <button onclick="copyCommand()" class="button-copy">Copy Command</button>
+        <div id="statusMessage" class="mt-4 text-center text-sm opacity-0 transition-opacity"></div>
     </div>
 
     <script>
@@ -115,15 +162,14 @@
                 { name: "DC: Headless Hydra", path: "/DraconicChronicles/Dino/HeadlessHydra/HeadlessHydraBP.HeadlessHydraBP" },
                 { name: "DC: Elder Wyvern", path: "/DraconicChronicles/Dino/Dragon/ElderWyvernBP.ElderWyvernBP" },
                 { name: "DC: Shadow Wyvern", path: "/DraconicChronicles/Dino/ShadowWyvern/ShadowWyvern_BP.ShadowWyvern_BP" },
+                { name: "DC: Lightning Wyvern", path: "/DraconicChronicles/Dino/LightningWyvern/Wyvern_Character_BP_Lightning1.Wyvern_Character_BP_Lightning1" },
+                { name: "DC: Ember Wyvern", path: "/DraconicChronicles/Dino/EmberWyvern/CrystalWyvern_Character_BP_Ember1.CrystalWyvern_Character_BP_Ember1" },
                 { name: "DC: Blood Storm Dragon", path: "/DraconicChronicles/Dino/Gigant/BloodStormDragon.BloodStormDragon" },
                 { name: "DC: Blood Wyvern", path: "/DraconicChronicles/Dino/BloodWyvern/CrystalWyvern_Character_BP_Blood1.CrystalWyvern_Character_BP_Blood1" },
                 { name: "DC: Dragonkin", path: "/DraconicChronicles/Dino/Dragonkin/DragonKinBP.DragonKinBP" },
-                { name: "DC: Ember Wyvern", path: "/DraconicChronicles/Dino/EmberWyvern/CrystalWyvern_Character_BP_Ember1.CrystalWyvern_Character_BP_Ember1" },
-                { name: "DC: Fire Wyvern", path: "/DraconicChronicles/Dino/FireWyvern/Wyvern_Character_BP_Fire1.Wyvern_Character_BP_Fire1" },
                 { name: "DC: Flameforge Dragon", path: "/DraconicChronicles/Dino/FlameforgeDragon/FlameforgeDragonBP.FlameforgeDragonBP" },
                 { name: "DC: Frost Wyvern", path: "/DraconicChronicles/Dino/FrostWyvern/Ragnarok_Wyvern_Override_Ice1.Ragnarok_Wyvern_Override_Ice1" },
                 { name: "DC: Inferno Wyvern", path: "/DraconicChronicles/Dino/Wyvern/InfernoWyvernBP.InfernoWyvernBP" },
-                { name: "DC: Lightning Wyvern", path: "/DraconicChronicles/Dino/LightningWyvern/Wyvern_Character_BP_Lightning1.Wyvern_Character_BP_Lightning1" },
                 { name: "DC: Poison Wyvern", path: "/DraconicChronicles/Dino/PoisonWyvern/Wyvern_Character_BP_Poison1.Wyvern_Character_BP_Poison1" },
                 { name: "DC: Polar Dragon", path: "/DraconicChronicles/Dino/PolarDragon/PolarDragonBP.PolarDragonBP" },
                 { name: "DC: Rejuvenating Dragon", path: "/DraconicChronicles/Dino/RejuvenatingDragon/RejuvenatingDragonBP.RejuvenatingDragonBP" },
@@ -148,21 +194,36 @@
                 { name: "Seahorse", path: "/AstraeosCreatures/Seahorse/Seahorse_Character_BP.Seahorse_Character_BP" },
                 { name: "Cyclops", path: "/AstraeosCreatures/Cyclops/Cyclops_Character_BP.Cyclops_Character_BP" }
             ],
-            "Modded / Others": [
-                { name: "Thorax Spider (Jungle)", path: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/JungleThoraxSpider_Character_BP.JungleThoraxSpider_Character_BP" },
-                { name: "Thorax Spider (Snow)", path: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/SnowThoraxSpider_Character_BP.SnowThoraxSpider_Character_BP" },
-                { name: "Thorax Spider (Cute)", path: "/CyrusJumpingSpider/Content/Spider/Jumper/CuteThoraxSpider_Character_BP.CuteThoraxSpider_Character_BP" },
-                { name: "Glaucus (Sea Slug)", path: "/Glaucus/Content/Glaucus_Character_BP.Glaucus_Character_BP" },
-                { name: "Drakara (Standard)", path: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP.Drakara_Character_BP" },
-                { name: "Drakara (Dwarfs)", path: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Dwarfs.Drakara_Character_BP_Dwarfs" },
-                { name: "Drakara (Aberrant)", path: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Aberrant.Drakara_Character_BP_Aberrant" },
-                { name: "Drakara (Bloodfang)", path: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Bloodfang.Drakara_Character_BP_Bloodfang" },
-                { name: "Drakara (Arctic)", path: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Arctic.Drakara_Character_BP_Arctic" },
-                { name: "Moro Raptor", path: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/MoroRaptor_Character_BP.MoroRaptor_Character_BP" },
-                { name: "Moro Raptor (Gen 2)", path: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/Gen2MoroRaptor.Gen2MoroRaptor" },
-                { name: "Moros Rex", path: "/Moros_Indomitable_Duo/IndominusRex/Models/MorosRex_Character_BP.MorosRex_Character_BP" },
-                { name: "Moros Rex (Gen 2)", path: "/Moros_Indomitable_Duo/MoroRex_Gen2/Blueprints/MoroRexGen2_Character_BP.MoroRexGen2_Character_BP" },
-                { name: "Moros Nothosaurus", path: "/Moros_Nothosaurus/Dinos/Blueprints/MorosNothosaurus_Character_BP.MorosNothosaurus_Character_BP" }
+            "The Island (Official)": [
+                { name: "Achatina", path: "/Game/PrimalEarth/Dinos/Achatina/Achatina_Character_BP.Achatina_Character_BP" },
+                { name: "Ankylosaurus", path: "/Game/PrimalEarth/Dinos/Ankylo/Ankylo_Character_BP.Ankylo_Character_BP" },
+                { name: "Araneo (Spider)", path: "/Game/PrimalEarth/Dinos/Spider-Araneo/SpiderS_Character_BP.SpiderS_Character_BP" },
+                { name: "Archaeopteryx", path: "/Game/PrimalEarth/Dinos/Archaeopteryx/Archa_Character_BP.Archa_Character_BP" },
+                { name: "Argentavis", path: "/Game/PrimalEarth/Dinos/Argentavis/Argent_Character_BP.Argent_Character_BP" },
+                { name: "Arthropluera", path: "/Game/PrimalEarth/Dinos/Arthropluera/Arthro_Character_BP.Arthro_Character_BP" },
+                { name: "Baryonyx", path: "/Game/PrimalEarth/Dinos/Baryonyx/Baryonyx_Character_BP.Baryonyx_Character_BP" },
+                { name: "Beelzebufo", path: "/Game/PrimalEarth/Dinos/Beelzebufo/Toad_Character_BP.Toad_Character_BP" },
+                { name: "Brontosaurus", path: "/Game/PrimalEarth/Dinos/Sauropod/Sauropod_Character_BP.Sauropod_Character_BP" },
+                { name: "Carbonemys", path: "/Game/PrimalEarth/Dinos/Turtle/Turtle_Character_BP.Turtle_Character_BP" },
+                { name: "Carnotaurus", path: "/Game/PrimalEarth/Dinos/Carno/Carno_Character_BP.Carno_Character_BP" },
+                { name: "Castoroides", path: "/Game/PrimalEarth/Dinos/Beaver/Beaver_Character_BP.Beaver_Character_BP" },
+                { name: "Dilophosaur", path: "/Game/PrimalEarth/Dinos/Dilo/Dilo_Character_BP.Dilo_Character_BP" },
+                { name: "Dimetrodon", path: "/Game/PrimalEarth/Dinos/Dimetrodon/Dimetrodon_Character_BP.Dimetrodon_Character_BP" },
+                { name: "Dimorphodon", path: "/Game/PrimalEarth/Dinos/Dimorphodon/Dimorph_Character_BP.Dimorph_Character_BP" },
+                { name: "Dodo", path: "/Game/PrimalEarth/Dinos/Dodo/Dodo_Character_BP.Dodo_Character_BP" },
+                { name: "Doedicurus", path: "/Game/PrimalEarth/Dinos/Doed/Doed_Character_BP.Doed_Character_BP" },
+                { name: "Dung Beetle", path: "/Game/PrimalEarth/Dinos/DungBeetle/DungBeetle_Character_BP.DungBeetle_Character_BP" },
+                { name: "Giganotosaurus", path: "/Game/PrimalEarth/Dinos/Gigant/Gigant_Character_BP.Gigant_Character_BP" },
+                { name: "Mammoth", path: "/Game/PrimalEarth/Dinos/Mammoth/Mammoth_Character_BP.Mammoth_Character_BP" },
+                { name: "Megalosaurus", path: "/Game/PrimalEarth/Dinos/Megalosaurus/Megalosaurus_Character_BP.Megalosaurus_Character_BP" },
+                { name: "Rex", path: "/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP.Rex_Character_BP" },
+                { name: "Spinosaurus", path: "/Game/PrimalEarth/Dinos/Spino/Spino_Character_BP.Spino_Character_BP" },
+                { name: "Stegosaurus", path: "/Game/PrimalEarth/Dinos/Stego/Stego_Character_BP.Stego_Character_BP" },
+                { name: "Tek Rex", path: "/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP_Tek.Rex_Character_BP_Tek" },
+                { name: "Thylacoleo", path: "/Game/PrimalEarth/Dinos/Thylacoleo/Thylacoleo_Character_BP.Thylacoleo_Character_BP" },
+                { name: "Triceratops", path: "/Game/PrimalEarth/Dinos/Trike/Trike_Character_BP.Trike_Character_BP" },
+                { name: "Woolly Rhino", path: "/Game/PrimalEarth/Dinos/Rhino/Rhino_Character_BP.Rhino_Character_BP" },
+                { name: "Yutyrannus", path: "/Game/PrimalEarth/Dinos/Yutyrannus/Yutyrannus_Character_BP.Yutyrannus_Character_BP" }
             ],
             "Aberration (Official)": [
                 { name: "Bulbdog", path: "/Game/Aberration/Dinos/LanternPug/LanternPug_Character_BP.LanternPug_Character_BP" },
@@ -184,13 +245,20 @@
                 { name: "Snow Owl", path: "/Game/Extinction/Dinos/SnowOwl/SnowOwl_Character_BP.SnowOwl_Character_BP" },
                 { name: "Velonasaur", path: "/Game/Extinction/Dinos/Spiker/Spiker_Character_BP.Spiker_Character_BP" }
             ],
-            "The Island / Aquatic": [
-                { name: "Argentavis", path: "/Game/PrimalEarth/Dinos/Argentavis/Argent_Character_BP.Argent_Character_BP" },
-                { name: "Ankylosaurus", path: "/Game/PrimalEarth/Dinos/Ankylo/Ankylo_Character_BP.Ankylo_Character_BP" },
-                { name: "Rex", path: "/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP.Rex_Character_BP" },
-                { name: "Giganotosaurus", path: "/Game/PrimalEarth/Dinos/Gigant/Gigant_Character_BP.Gigant_Character_BP" },
+            "Scorched Earth (Official)": [
+                { name: "Deathworm", path: "/Game/ScorchedEarth/Dinos/Deathworm/Deathworm_Character_BP.Deathworm_Character_BP" },
+                { name: "Jerboa", path: "/Game/ScorchedEarth/Dinos/Jerboa/Jerboa_Character_BP.Jerboa_Character_BP" },
+                { name: "Mantis", path: "/Game/ScorchedEarth/Dinos/Mantis/Mantis_Character_BP.Mantis_Character_BP" },
+                { name: "Morellatops", path: "/Game/ScorchedEarth/Dinos/Morellatops/Morellatops_Character_BP.Morellatops_Character_BP" },
+                { name: "Phoenix", path: "/Game/ScorchedEarth/Dinos/Phoenix/Phoenix_Character_BP.Phoenix_Character_BP" },
+                { name: "Rock Elemental", path: "/Game/ScorchedEarth/Dinos/RockGolem/RockGolem_Character_BP.RockGolem_Character_BP" }
+            ],
+            "Aquatic & Marine": [
                 { name: "Tusoteuthis (Squid)", path: "/Game/PrimalEarth/Dinos/Tusoteuthis/Tusoteuthis_Character_BP.Tusoteuthis_Character_BP" },
-                { name: "Mosasaurus", path: "/Game/PrimalEarth/Dinos/Mosasaurus/Mosa_Character_BP.Mosas_Character_BP" }
+                { name: "Mosasaurus", path: "/Game/PrimalEarth/Dinos/Mosasaurus/Mosa_Character_BP.Mosas_Character_BP" },
+                { name: "Basilosaurus", path: "/Game/PrimalEarth/Dinos/Basilosaurus/Basilosaurus_Character_BP.Basilosaurus_Character_BP" },
+                { name: "Megalodon", path: "/Game/PrimalEarth/Dinos/Megalodon/Megalodon_Character_BP.Megalodon_Character_BP" },
+                { name: "Plesiosaurus", path: "/Game/PrimalEarth/Dinos/Plesiosaur/Plesiosaur_Character_BP.Plesiosaur_Character_BP" }
             ],
             "S-Dino Variants": [
                 { name: "S-Fire Lion", path: "/SDinoVariantsFantasticTames/Assets/CoreBlueprints/Creatures/S-FireLion/S-FireLion_Character_BP.S-FireLion_Character_BP" },
@@ -204,7 +272,21 @@
                 { name: "S-Fire Wyvern", path: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Fire.S-Wyvern_Character_BP_Fire" },
                 { name: "S-Lightning Wyvern", path: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Lightning.S-Wyvern_Character_BP_Lightning" },
                 { name: "S-Ice Wyvern", path: "/SDinoVariants/S-IceWyvern/S-Wyvern_Character_BP_Ice.S-Wyvern_Character_BP_Ice" },
-                { name: "S-Poison Wyvern", path: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Poison.S-Wyvern_Character_BP_Poison" }
+                { name: "S-Poison Wyvern", path: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Poison.S-Wyvern_Character_BP_Poison" },
+                { name: "S-Rockdrake", path: "/SDinoVariants/S-Rockdrake/S-RockDrake_Character_BP.S-RockDrake_Character_BP" }
+            ],
+            "Modded / Others": [
+                { name: "Gen 2 Moro Raptor", path: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/Gen2MoroRaptor.Gen2MoroRaptor" },
+                { name: "Gen 2 Moros Rex", path: "/Moros_Indomitable_Duo/MoroRex_Gen2/Blueprints/MoroRexGen2_Character_BP.MoroRexGen2_Character_BP" },
+                { name: "Moro Raptor", path: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/MoroRaptor_Character_BP.MoroRaptor_Character_BP" },
+                { name: "Moros Rex", path: "/Moros_Indomitable_Duo/IndominusRex/Models/MorosRex_Character_BP.MorosRex_Character_BP" },
+                { name: "Thorax Spider (Jungle)", path: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/JungleThoraxSpider_Character_BP.JungleThoraxSpider_Character_BP" },
+                { name: "Thorax Spider (Snow)", path: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/SnowThoraxSpider_Character_BP.SnowThoraxSpider_Character_BP" },
+                { name: "Thorax Spider (Cute)", path: "/CyrusJumpingSpider/Content/Spider/Jumper/CuteThoraxSpider_Character_BP.CuteThoraxSpider_Character_BP" },
+                { name: "Glaucus (Sea Slug)", path: "/Glaucus/Content/Glaucus_Character_BP.Glaucus_Character_BP" },
+                { name: "Drakara (Standard)", path: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP.Drakara_Character_BP" },
+                { name: "Drakara (Bloodfang)", path: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Bloodfang.Drakara_Character_BP_Bloodfang" },
+                { name: "Moros Nothosaurus", path: "/Moros_Nothosaurus/Dinos/Blueprints/MorosNothosaurus_Character_BP.MorosNothosaurus_Character_BP" }
             ]
         };
 
@@ -213,11 +295,13 @@
             "ASA / New Official": "category-asa",
             "Draconic Chronicles (DC)": "category-draconic",
             "Astraeos Additions": "category-astraeos",
-            "Modded / Others": "category-modded",
             "Aberration (Official)": "category-aberration",
             "Extinction (Official)": "category-extinction",
-            "The Island / Aquatic": "category-island",
-            "S-Dino Variants": "category-s-variants"
+            "The Island (Official)": "category-island",
+            "Scorched Earth (Official)": "category-scorched",
+            "Aquatic & Marine": "category-aquatic",
+            "S-Dino Variants": "category-s-variants",
+            "Modded / Others": "category-modded"
         };
 
         let selectedPath = ""; 
@@ -270,6 +354,8 @@
             const cmd = `Scriptcommand SpawnDinoInBall -p=${id} -t=${selectedPath} -f=${gender} -b=1 -i=1 -a=1 -s=255,255,255,255,255,255,255,255`;
             document.getElementById('commandOutput').textContent = cmd;
         }
+
+        function liveUpdateCommand() { if(selectedPath) generateCommand(); }
 
         function copyCommand() {
             const text = document.getElementById('commandOutput').textContent;
