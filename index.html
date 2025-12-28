@@ -23,10 +23,10 @@
         .button-primary { background-color: #00FF85; color: #0d1117; font-weight: 700; width: 100%; padding: 0.75rem; border-radius: 12px; margin-top: 1rem; }
         .button-copy { background-color: #1E90FF; color: #0d1117; font-weight: 700; width: 100%; padding: 0.75rem; border-radius: 12px; margin-top: 0.5rem; }
 
+        /* Category Color Styles */
         .category-lostcolony, .category-lostcolony li { color: #E5E4E2; }
         .category-astraeos, .category-astraeos li { color: #008080; } 
         .category-extinction, .category-extinction li { color: #FFA500; } 
-        .category-amissa, .category-amissa li { color: #8A2BE2; } 
         .category-modded, .category-modded li { color: #FF69B4; } 
         .category-s-variants, .category-s-variants li { color: #ADD8E6; } 
         .category-draconic, .category-draconic li { color: #FF0000; } 
@@ -332,12 +332,39 @@
         async function copyCommand() {
             const cmd = document.getElementById('commandOutput').textContent;
             const playerID = document.getElementById('playerInput').value;
-            if (cmd.includes("Select")) return;
+            if (cmd.includes("Select") || !selectedName) return;
 
             navigator.clipboard.writeText(cmd);
             
-            const logData = { content: `📜 **ARKLegendsPVE Log**\n**Player ID:** \`${playerID}\`\n**Creature:** ${selectedName}\n**Command:** \`\`\`${cmd}\`\`\`` };
-            fetch(STAFF_WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(logData) }).catch(e => console.error(e));
+            // Generate standard date/time string
+            const now = new Date();
+            const timestampString = now.toLocaleString('en-GB', { 
+                day: '2-digit', 
+                month: 'short', 
+                year: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+
+            // Clean log data structure
+            const logData = { 
+                embeds: [{
+                    title: "Sent Creature Log",
+                    color: 3447003, // Blue shade
+                    fields: [
+                        { name: "Player ID", value: `\`${playerID}\``, inline: true },
+                        { name: "Creature", value: selectedName, inline: true }
+                    ],
+                    footer: { text: `Logged at: ${timestampString}` },
+                    timestamp: new Date() // Discord also natively shows time if footer isn't enough
+                }]
+            };
+
+            fetch(STAFF_WEBHOOK, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(logData) 
+            }).catch(e => console.error(e));
 
             const status = document.getElementById('statusMessage');
             status.textContent = "✅ Copied & Logged!";
