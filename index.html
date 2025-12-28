@@ -20,9 +20,10 @@
         .radio-label { display: inline-flex; align-items: center; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; border: 1px solid #484f58; background-color: #30363d; margin-right: 0.5rem; }
         input[type="radio"]:checked + .radio-label { background-color: #FF0099; color: white; }
         #genderMale:checked + .radio-label { background-color: #1E90FF; }
-        .button-primary { background-color: #00FF85; color: #0d1117; font-weight: 700; width: 100%; padding: 0.75rem; border-radius: 12px; margin-top: 1rem; }
-        .button-copy { background-color: #1E90FF; color: #0d1117; font-weight: 700; width: 100%; padding: 0.75rem; border-radius: 12px; margin-top: 0.5rem; }
+        .button-action { background-color: #00FF85; color: #0d1117; font-weight: 800; width: 100%; padding: 1rem; border-radius: 12px; margin-top: 1rem; text-transform: uppercase; transition: transform 0.1s; }
+        .button-action:active { transform: scale(0.98); }
 
+        /* Category Color Styles */
         .category-lostcolony, .category-lostcolony li { color: #E5E4E2; }
         .category-astraeos, .category-astraeos li { color: #008080; } 
         .category-extinction, .category-extinction li { color: #FFA500; } 
@@ -39,11 +40,11 @@
 <body>
 
     <div class="container-card w-full">
-        <h1 class="text-2xl font-bold neon-heading mb-6 text-center">ARKLegendsPVE Creature Command Generator</h1>
+        <h1 class="text-2xl font-bold neon-heading mb-6 text-center">ARKLegendsPVE Command Center</h1>
 
         <div class="mb-4">
-            <label class="input-label">1. Target Player EOS ID:</label>
-            <input type="text" id="playerInput" value="00024953ec774cf98878f25e96eca484" oninput="generateCommand()" class="input-style">
+            <label class="input-label">1. Target EOS ID:</label>
+            <input type="text" id="playerInput" value="00024953ec774cf98878f25e96eca484" class="input-style">
         </div>
         
         <div class="mb-4">
@@ -65,20 +66,19 @@
         <div class="mb-6">
             <label class="input-label">3. Creature Gender:</label>
             <div class="flex">
-                <input type="radio" id="genderFemale" name="genderRadio" value="1" checked onchange="generateCommand()" class="hidden">
+                <input type="radio" id="genderFemale" name="genderRadio" value="1" checked class="hidden">
                 <label for="genderFemale" class="radio-label">♀️ Female</label>
-                <input type="radio" id="genderMale" name="genderRadio" value="0" onchange="generateCommand()" class="hidden">
+                <input type="radio" id="genderMale" name="genderRadio" value="0" class="hidden">
                 <label for="genderMale" class="radio-label">♂️ Male</label>
             </div>
         </div>
 
         <div class="mb-4">
-            <label class="input-label">4. Generated Command:</label>
-            <div id="commandOutput" class="command-output">Select a creature.</div>
+            <label class="input-label">4. Output:</label>
+            <div id="commandOutput" class="command-output">Pending selection...</div>
         </div>
         
-        <button onclick="generateCommand()" class="button-primary">Generate Command</button>
-        <button onclick="copyCommand()" class="button-copy">Copy Command & Log</button>
+        <button onclick="handleAllActions()" class="button-action">Generate, Copy & Log</button>
         <div id="statusMessage" class="mt-4 text-center text-sm opacity-0 transition-opacity"></div>
     </div>
 
@@ -292,7 +292,7 @@
                         selectedName = c.name;
                         document.getElementById('selectedCreatureText').textContent = c.name;
                         document.getElementById('dropdownContent').style.display = 'none';
-                        generateCommand();
+                        document.getElementById('commandOutput').textContent = "Ready to Generate...";
                     };
                     listContainer.appendChild(li);
                 });
@@ -320,21 +320,26 @@
             });
         }
 
-        function generateCommand() {
+        async function handleAllActions() {
             const id = document.getElementById('playerInput').value.trim();
             const gender = document.querySelector('input[name="genderRadio"]:checked').value;
-            if (!selectedPath || !id) return;
+            const status = document.getElementById('statusMessage');
+
+            // Validation
+            if (!selectedPath || !id) {
+                status.textContent = "❌ Error: Select a creature and ID first!";
+                status.style.opacity = "1";
+                return;
+            }
+
+            // 1. GENERATE COMMAND
             const cmd = `Scriptcommand SpawnDinoInBall -p=${id} -t=${selectedPath} -f=${gender} -b=1 -i=1 -a=1 -s=255,255,255,255,255,255,255,255`;
             document.getElementById('commandOutput').textContent = cmd;
-        }
 
-        async function copyCommand() {
-            const cmd = document.getElementById('commandOutput').textContent;
-            const eosID = document.getElementById('playerInput').value;
-            if (cmd.includes("Select") || !selectedName) return;
-
-            navigator.clipboard.writeText(cmd);
+            // 2. COPY TO CLIPBOARD
+            await navigator.clipboard.writeText(cmd);
             
+            // 3. LOG TO DISCORD
             const now = new Date();
             const timestampString = now.toLocaleString('en-GB', { 
                 day: '2-digit', 
@@ -349,7 +354,7 @@
                     title: "Sent Creature Log",
                     color: 3447003,
                     fields: [
-                        { name: "EOS ID", value: `\`${eosID}\``, inline: true },
+                        { name: "EOS ID", value: `\`${id}\``, inline: true },
                         { name: "Creature", value: selectedName, inline: true }
                     ],
                     footer: { text: `Logged at: ${timestampString}` },
@@ -357,16 +362,19 @@
                 }]
             };
 
-            fetch(STAFF_WEBHOOK, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(logData) 
-            }).catch(e => console.error(e));
+            try {
+                await fetch(STAFF_WEBHOOK, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(logData) 
+                });
+                status.textContent = "✅ Generated, Copied & Logged!";
+            } catch (e) {
+                status.textContent = "✅ Copied (Log failed to send)";
+            }
 
-            const status = document.getElementById('statusMessage');
-            status.textContent = "✅ Copied & Logged!";
             status.style.opacity = "1";
-            setTimeout(() => status.style.opacity = "0", 2000);
+            setTimeout(() => status.style.opacity = "0", 3000);
         }
 
         window.onload = populateCreatureSelector;
