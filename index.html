@@ -20,6 +20,7 @@
         input[type="radio"]:checked + .radio-label { background-color: #FF0099; color: white; }
         #genderMale:checked + .radio-label { background-color: #1E90FF; }
         .button-action { background-color: #00FF85; color: #0d1117; font-weight: 800; width: 100%; padding: 1rem; border-radius: 12px; margin-top: 1rem; text-transform: uppercase; cursor: pointer; }
+        
         .c-col { color: #E5E4E2; } .c-isl { color: #00FF00; } .c-sco { color: #FFFF00; } .c-abe { color: #90EE90; } .c-ext { color: #FFA500; } .c-mar { color: #00FFFF; } .c-sva { color: #ADD8E6; } .c-dra { color: #FF0000; } .c-ast { color: #008080; } .c-mod { color: #FF69B4; }
     </style>
 </head>
@@ -27,17 +28,17 @@
     <div class="container-card">
         <h1 class="text-2xl font-bold neon-heading mb-6 text-center">ArkLegendsPVE Master Generator</h1>
         <div class="mb-4"><label class="input-label">1. Target EOS ID:</label><input type="text" id="pId" value="00024953ec774cf98878f25e96eca484" class="input-style"></div>
-        <div class="mb-4"><label class="input-label">Search Dino:</label><input type="text" id="sBox" oninput="filterList(this.value)" class="input-style" placeholder="Type Dino name..."></div>
+        <div class="mb-4"><label class="input-label">Search Dino:</label><input type="text" id="sBox" oninput="filterList(this.value)" class="input-style" placeholder="Type name..."></div>
         <div class="mb-4 relative"><label class="input-label">2. Select Creature:</label>
             <div id="dBox" class="input-style flex justify-between items-center" onclick="toggleD()"><span id="sText">--- Choose a Dino ---</span><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg></div>
-            <div id="dList" class="dropdown-content"><ul id="cItems"></ul></div>
+            <div id="dLi" class="dropdown-content"><ul id="cItems"></ul></div>
         </div>
         <div class="mb-6"><label class="input-label">3. Creature Gender:</label><div class="flex">
             <input type="radio" id="f" name="g" value="1" checked class="hidden"><label for="f" class="radio-label">♀️ Female</label>
             <input type="radio" id="m" name="g" value="0" class="hidden"><label for="m" class="radio-label">♂️ Male</label>
         </div></div>
         <div class="mb-4"><label class="input-label">4. Generated Command:</label><div id="oBox" class="command-output">Ready...</div></div>
-        <button onclick="execute()" class="button-action">Generate, Copy & Log</button>
+        <button id="mainBtn" onclick="execute()" class="button-action">Generate, Copy & Log</button>
         <div id="status" class="mt-4 text-center text-sm opacity-0 transition-opacity"></div>
     </div>
 <script>
@@ -132,10 +133,10 @@ const MASTER_DATA = {
   {n: "Mantis", p: "/Game/ScorchedEarth/Dinos/Mantis/Mantis_Character_BP.Mantis_Character_BP", c: "c-sco"},
   {n: "Morellatops", p: "/Game/ScorchedEarth/Dinos/Morellatops/Morellatops_Character_BP.Morellatops_Character_BP", c: "c-sco"},
   {n: "Phoenix", p: "/Game/ScorchedEarth/Dinos/Phoenix/Phoenix_Character_BP.Phoenix_Character_BP", c: "c-sco"},
-  {n: "Rock Golem", p: "/Game/ScorchedEarth/Dinos/RockGolem/RockGolem_Character_BP.RockGolem_Character_BP", c: "c-sco"},
+  {n: "Golem", p: "/Game/ScorchedEarth/Dinos/RockGolem/RockGolem_Character_BP.RockGolem_Character_BP", c: "c-sco"},
   {n: "Thorny Dragon", p: "/Game/ScorchedEarth/Dinos/SpinyLizard/SpinyLizard_Character_BP.SpinyLizard_Character_BP", c: "c-sco"},
   {n: "Fire Wyvern", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Fire.Wyvern_Character_BP_Fire", c: "c-sco"},
-  {n: "Lightning Wyvern", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Lightning.Wyvern_Character_BP_Lightning", c: "c-sco"},
+  {n: "Light Wyvern", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Lightning.Wyvern_Character_BP_Lightning", c: "c-sco"},
   {n: "Poison Wyvern", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Poison.Wyvern_Character_BP_Poison", c: "c-sco"}
  ],
  "Aberration": [
@@ -204,7 +205,7 @@ const MASTER_DATA = {
   {n: "S-Doed", p: "/SDinoVariants/S-Doedicurus/S-Doed_Character_BP.S-Doed_Character_BP", c: "c-sva"},
   {n: "S-Dunkle", p: "/SDinoVariants/S-Dunkleosteus/S-Dunkle_Character_BP.S-Dunkle_Character_BP", c: "c-sva"},
   {n: "S-Fasola", p: "/SDinoVariants/S-Fasolasuchus/S-Fasola_Character_BP.S-Fasola_Character_BP", c: "c-sva"},
-  {n: "S-Wyvern Fire", p: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Fire.S-Wyvern_Character_BP_Fire", c: "c-sva"},
+  {n: "S-Fire Wyvern", p: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Fire.S-Wyvern_Character_BP_Fire", c: "c-sva"},
   {n: "S-Light Wyvern", p: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Lightning.S-Wyvern_Character_BP_Lightning", c: "c-sva"},
   {n: "S-Poison Wyvern", p: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Poison.S-Wyvern_Character_BP_Poison", c: "c-sva"},
   {n: "S-Ice Wyvern", p: "/SDinoVariants/S-IceWyvern/S-Wyvern_Character_BP_Ice.S-Wyvern_Character_BP_Ice", c: "c-sva"},
@@ -238,7 +239,7 @@ const MASTER_DATA = {
   {n: "Brawler", p: "/DraconicChronicles/Dino/Dragonkin/DragonKin_BrawlerBP.DragonKin_BrawlerBP", c: "c-dra"},
   {n: "Hydro Dragon", p: "/DraconicChronicles/Dino/HydroDragon/HydroDragonBP.HydroDragonBP", c: "c-dra"},
   {n: "Undead Wyvern", p: "/DraconicChronicles/Dino/UndeadWyvern/UndeadWyvern_BP.UndeadWyvern_BP", c: "c-dra"},
-  {n: "Glowveil Dragon", p: "/DraconicChronicles/Dino/GlowveilDragon/GlowveilDragon_BP.GlowveilDragon_BP", c: "c-dra"},
+  {n: "Glowveil", p: "/DraconicChronicles/Dino/GlowveilDragon/GlowveilDragon_BP.GlowveilDragon_BP", c: "c-dra"},
   {n: "Undead Dragon", p: "/DraconicChronicles/Dino/UndeadDragon/UndeadDragonBP_Tamed.UndeadDragonBP_Tamed", c: "c-dra"},
   {n: "Hydra", p: "/DraconicChronicles/Dino/HeadlessHydra/HeadlessHydraBP.HeadlessHydraBP", c: "c-dra"},
   {n: "Elder Wyvern", p: "/DraconicChronicles/Dino/Dragon/ElderWyvernBP.ElderWyvernBP", c: "c-dra"},
@@ -289,35 +290,50 @@ const MASTER_DATA = {
   {n: "Nothosaurus", p: "/Moros_Nothosaurus/Dinos/Blueprints/MorosNothosaurus_Character_BP.MorosNothosaurus_Character_BP", c: "c-mod"}
  ]
 };
-let selP="", selN="";
-function populate() {
+
+let selP="", selN="", logLocked=false;
+
+function populateList() {
     const list = document.getElementById('cItems'); list.innerHTML = '';
     Object.keys(MASTER_DATA).sort().forEach(cat => {
         const h = document.createElement('li'); h.className = 'dropdown-category-header'; h.textContent = `--- ${cat} ---`; list.appendChild(h);
         MASTER_DATA[cat].sort((a,b)=>a.n.localeCompare(b.n)).forEach(c => {
             const li = document.createElement('li'); li.className = c.c; li.textContent = c.n;
-            li.onclick = (e) => { e.stopPropagation(); selP = c.p; selN = c.n; document.getElementById('sText').textContent = c.n; document.getElementById('dList').style.display = 'none'; };
+            li.onclick = (e) => { e.stopPropagation(); selP = c.p; selN = c.n; document.getElementById('sText').textContent = c.n; document.getElementById('dLi').style.display = 'none'; };
             list.appendChild(li);
         });
     });
 }
-function toggleD() { const d = document.getElementById('dList'); d.style.display = (d.style.display === 'block') ? 'none' : 'block'; }
+function toggleD() { const d = document.getElementById('dLi'); d.style.display = (d.style.display === 'block') ? 'none' : 'block'; }
 function filterList(val) {
-    const items = document.querySelectorAll('#cItems li'); document.getElementById('dList').style.display = 'block';
+    const items = document.querySelectorAll('#cItems li'); document.getElementById('dLi').style.display = 'block';
     items.forEach(i => { if(!i.classList.contains('dropdown-category-header')) i.style.display = i.textContent.toLowerCase().includes(val.toLowerCase()) ? "" : "none"; });
 }
 async function execute() {
     const id = document.getElementById('pId').value.trim(), g = document.querySelector('input[name="g"]:checked').value, st = document.getElementById('status');
     if(!selP || !id) { st.textContent = "❌ Selection missing!"; st.style.opacity = "1"; return; }
+    
     const cmd = `Scriptcommand SpawnDinoInBall -p=${id} -t=${selP} -f=${g} -b=1 -i=1 -a=1 -s=255,255,255,255,255,255,255,255`;
-    document.getElementById('oBox').textContent = cmd; await navigator.clipboard.writeText(cmd);
+    document.getElementById('oBox').textContent = cmd;
+    await navigator.clipboard.writeText(cmd);
+
+    if (logLocked) return;
+    logLocked = true;
+
     const log = { embeds: [{ title: "Sent Creature Log", color: 3447003, fields: [{ name: "EOS ID", value: id, inline: true }, { name: "Creature", value: selN, inline: true }], footer: { text: `Logged: ${new Date().toLocaleString('en-GB')}` }, timestamp: new Date() }] };
-    try { await fetch(WH, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(log) }); st.textContent = "✅ Generated, Copied & Logged!"; } 
-    catch(e) { st.textContent = "✅ Copied (Log failed)"; }
-    st.style.opacity = "1"; setTimeout(() => st.style.opacity = "0", 3000);
+    
+    try { 
+        await fetch(WH, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(log) }); 
+        st.textContent = "✅ Generated, Copied & Logged!"; 
+    } catch(e) { 
+        st.textContent = "✅ Copied (Log failed)"; 
+    }
+    
+    st.style.opacity = "1"; 
+    setTimeout(() => { st.style.opacity = "0"; logLocked = false; }, 3000);
 }
-window.onclick = e => { if (!e.target.closest('#dBox')) document.getElementById('dList').style.display = 'none'; };
-window.onload = populate;
+window.onclick = e => { if (!e.target.closest('#dBox')) document.getElementById('dLi').style.display = 'none'; };
+window.onload = populateList;
 </script>
 </body>
 </html>
