@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ArkLegendsPVE Command Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -13,386 +12,308 @@
         .input-label { color: #1E90FF; font-weight: 600; margin-bottom: 0.5rem; display: block; }
         .input-style { background-color: #0d1117; border: 1px solid #30363d; color: #00FF85; border-radius: 8px; padding: 0.75rem; width: 100%; cursor: pointer; }
         .command-output { background-color: #0d1117; border: 1px solid #30363d; font-family: monospace; white-space: pre-wrap; word-break: break-all; min-height: 4rem; color: #FFFFFF; padding: 1rem; border-radius: 8px; }
-        .dropdown-content { display: none; position: absolute; background-color: #161b22; width: 100%; max-height: 400px; overflow-y: auto; border: 1px solid #30363d; border-radius: 8px; z-index: 1000; margin-top: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .dropdown-content li { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #1a202a; font-size: 0.9rem; list-style: none; }
+        .dropdown-content { display: none; position: absolute; background-color: #161b22; width: 100%; max-height: 500px; overflow-y: auto; border: 1px solid #30363d; border-radius: 8px; z-index: 1000; margin-top: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .dropdown-content li { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #1a202a; font-size: 0.85rem; list-style: none; }
         .dropdown-content li:hover { background-color: #30363d; }
         .dropdown-category-header { padding: 10px 12px; font-weight: 800; border-top: 2px solid #30363d; background-color: #0d1117; color: #ffffff !important; pointer-events: none; position: sticky; top: 0; }
         .radio-label { display: inline-flex; align-items: center; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; border: 1px solid #484f58; background-color: #30363d; margin-right: 0.5rem; }
         input[type="radio"]:checked + .radio-label { background-color: #FF0099; color: white; }
         #genderMale:checked + .radio-label { background-color: #1E90FF; }
-        .button-action { background-color: #00FF85; color: #0d1117; font-weight: 800; width: 100%; padding: 1rem; border-radius: 12px; margin-top: 1rem; text-transform: uppercase; transition: transform 0.1s; cursor: pointer; }
-        .button-action:active { transform: scale(0.98); }
-
-        .category-lostcolony, .category-lostcolony li { color: #E5E4E2; }
-        .category-astraeos, .category-astraeos li { color: #008080; } 
-        .category-extinction, .category-extinction li { color: #FFA500; } 
-        .category-modded, .category-modded li { color: #FF69B4; } 
-        .category-s-variants, .category-s-variants li { color: #ADD8E6; } 
-        .category-draconic, .category-draconic li { color: #FF0000; } 
-        .category-island, .category-island li { color: #00FF00; } 
-        .category-scorched, .category-scorched li { color: #FFFF00; } 
-        .category-aberration, .category-aberration li { color: #90EE90; } 
-        .category-aquatic, .category-aquatic li { color: #00FFFF; } 
-        .category-asa, .category-asa li { color: #00FFFF; }
+        .button-action { background-color: #00FF85; color: #0d1117; font-weight: 800; width: 100%; padding: 1rem; border-radius: 12px; margin-top: 1rem; text-transform: uppercase; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <div class="container-card w-full">
         <h1 class="text-2xl font-bold neon-heading mb-6 text-center">ArkLegendsPVE Command Generator</h1>
-
-        <div class="mb-4">
-            <label class="input-label">1. Target EOS ID:</label>
-            <input type="text" id="playerInput" value="00024953ec774cf98878f25e96eca484" class="input-style">
+        <div class="mb-4"><label class="input-label">1. Target EOS ID:</label><input type="text" id="playerInput" value="00024953ec774cf98878f25e96eca484" class="input-style"></div>
+        <div class="mb-4"><label class="input-label">Search:</label><input type="text" id="creatureSearch" oninput="filterCreatures(this.value)" class="input-style" placeholder="Type to filter..."></div>
+        <div class="mb-4 relative"><label class="input-label">2. Select Creature:</label>
+            <div id="dropdownDisplay" class="input-style flex justify-between items-center" onclick="toggleDropdown()"><span id="selectedCreatureText">--- Choose a Dino ---</span><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg></div>
+            <div id="dropdownContent" class="dropdown-content"><ul id="creatureList"></ul></div>
         </div>
-        
-        <div class="mb-4">
-            <label class="input-label">Search Creature:</label>
-            <input type="text" id="creatureSearch" oninput="filterCreatures(this.value)" class="input-style" placeholder="Type to filter...">
-        </div>
-
-        <div class="mb-4 relative">
-            <label class="input-label">2. Select Creature:</label>
-            <div id="dropdownDisplay" class="input-style flex justify-between items-center" onclick="toggleDropdown()">
-                <span id="selectedCreatureText">--- Choose a Dino ---</span>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
-            </div>
-            <div id="dropdownContent" class="dropdown-content">
-                <ul id="creatureList" class="p-0 m-0"></ul>
-            </div>
-        </div>
-        
-        <div class="mb-6">
-            <label class="input-label">3. Creature Gender:</label>
-            <div class="flex">
-                <input type="radio" id="genderFemale" name="genderRadio" value="1" checked class="hidden">
-                <label for="genderFemale" class="radio-label">♀️ Female</label>
-                <input type="radio" id="genderMale" name="genderRadio" value="0" class="hidden">
-                <label for="genderMale" class="radio-label">♂️ Male</label>
-            </div>
-        </div>
-
-        <div class="mb-4">
-            <label class="input-label">4. Output Box:</label>
-            <div id="commandOutput" class="command-output">Pending selection...</div>
-        </div>
-        
+        <div class="mb-6"><label class="input-label">3. Gender:</label><div class="flex">
+            <input type="radio" id="genderFemale" name="genderRadio" value="1" checked class="hidden"><label for="genderFemale" class="radio-label">♀️ Female</label>
+            <input type="radio" id="genderMale" name="genderRadio" value="0" class="hidden"><label for="genderMale" class="radio-label">♂️ Male</label>
+        </div></div>
+        <div class="mb-4"><label class="input-label">4. Output Box:</label><div id="commandOutput" class="command-output">Pending selection...</div></div>
         <button onclick="handleAllActions()" class="button-action">Generate, Copy & Log</button>
         <div id="statusMessage" class="mt-4 text-center text-sm opacity-0 transition-opacity"></div>
     </div>
+<script>
+const STAFF_WEBHOOK = "https://discord.com/api/webhooks/1452903052947361986/ed0mhejPa-kyQo7AAH69NK67DcJIVL8QzTve-1V_gb8CmW1kpIMkA8UMcg_jZRHLxdie";
+const DATA = {
+ "Lost Colony": [
+  {n: "Gigadesmodus", p: "/Game/LostColony/Dinos/BossBat/BossBat_Character_BP.BossBat_Character_BP"},
+  {n: "Gloon", p: "/Game/LostColony/Dinos/LostChargePet/LostCharge_LanternPet_Char_BP.LostCharge_LanternPet_Char_BP"},
+  {n: "Aureliax", p: "/Game/LostColony/Dinos/SnowDragon/SnowDragon_Character_BP.SnowDragon_Character_BP"},
+  {n: "Ossidon", p: "/Game/LostColony/Dinos/SnowMonster/SnowMonster_Character_BP.SnowMonster_Character_BP"},
+  {n: "Solwyn", p: "/Game/LostColony/Dinos/AngelFox/AngelFox_Character_BP.AngelFox_Character_BP"},
+  {n: "Lost Malwyn", p: "/Game/LostColony/Dinos/DevilFox/DevilFox_Character_BP.DevilFox_Character_BP"},
+  {n: "Revenant Malwyn", p: "/Game/LostColony/Dinos/ZombieDino/DevilFox/DevilFox_Character_BP_Corrupt_Zombie.DevilFox_Character_BP_Corrupt_Zombie"}
+ ],
+ "The Island": [
+  {n: "Achatina", p: "/Game/PrimalEarth/Dinos/Achatina/Achatina_Character_BP.Achatina_Character_BP"},
+  {n: "Allosaurus", p: "/Game/PrimalEarth/Dinos/Allosaurus/Allo_Character_BP.Allo_Character_BP"},
+  {n: "Ankylosaurus", p: "/Game/PrimalEarth/Dinos/Ankylo/Ankylo_Character_BP.Ankylo_Character_BP"},
+  {n: "Araneo", p: "/Game/PrimalEarth/Dinos/Spider-Araneo/SpiderS_Character_BP.SpiderS_Character_BP"},
+  {n: "Archaeopteryx", p: "/Game/PrimalEarth/Dinos/Archaeopteryx/Archa_Character_BP.Archaeopteryx_Character_BP"},
+  {n: "Argentavis", p: "/Game/PrimalEarth/Dinos/Argentavis/Argent_Character_BP.Argent_Character_BP"},
+  {n: "Arthropluera", p: "/Game/PrimalEarth/Dinos/Arthropluera/Arthro_Character_BP.Arthro_Character_BP"},
+  {n: "Baryonyx", p: "/Game/PrimalEarth/Dinos/Baryonyx/Baryonyx_Character_BP.Baryonyx_Character_BP"},
+  {n: "Beelzebufo", p: "/Game/PrimalEarth/Dinos/Beelzebufo/Toad_Character_BP.Toad_Character_BP"},
+  {n: "Brontosaurus", p: "/Game/PrimalEarth/Dinos/Sauropod/Sauropod_Character_BP.Sauropod_Character_BP"},
+  {n: "Carbonemys", p: "/Game/PrimalEarth/Dinos/Turtle/Turtle_Character_BP.Turtle_Character_BP"},
+  {n: "Carnotaurus", p: "/Game/PrimalEarth/Dinos/Carno/Carno_Character_BP.Carno_Character_BP"},
+  {n: "Castoroides", p: "/Game/PrimalEarth/Dinos/Beaver/Beaver_Character_BP.Beaver_Character_BP"},
+  {n: "Compsognathus", p: "/Game/PrimalEarth/Dinos/Compsognathus/Compsognathus_Character_BP.Compsognathus_Character_BP"},
+  {n: "Daeodon", p: "/Game/PrimalEarth/Dinos/Daeodon/Daeodon_Character_BP.Daeodon_Character_BP"},
+  {n: "Dilophosaur", p: "/Game/PrimalEarth/Dinos/Dilo/Dilo_Character_BP.Dilo_Character_BP"},
+  {n: "Dimetrodon", p: "/Game/PrimalEarth/Dinos/Dimetrodon/Dimetrodon_Character_BP.Dimetrodon_Character_BP"},
+  {n: "Dimorphodon", p: "/Game/PrimalEarth/Dinos/Dimorphodon/Dimorph_Character_BP.Dimorph_Character_BP"},
+  {n: "Diplodocus", p: "/Game/PrimalEarth/Dinos/Diplodocus/Diplodocus_Character_BP.Diplodocus_Character_BP"},
+  {n: "Dodo", p: "/Game/PrimalEarth/Dinos/Dodo/Dodo_Character_BP.Dodo_Character_BP"},
+  {n: "Doedicurus", p: "/Game/PrimalEarth/Dinos/Doed/Doed_Character_BP.Doed_Character_BP"},
+  {n: "Dung Beetle", p: "/Game/PrimalEarth/Dinos/DungBeetle/DungBeetle_Character_BP.DungBeetle_Character_BP"},
+  {n: "Equus", p: "/Game/PrimalEarth/Dinos/Equus/Equus_Character_BP.Equus_Character_BP"},
+  {n: "Gallimimus", p: "/Game/PrimalEarth/Dinos/Galli/Galli_Character_BP.Galli_Character_BP"},
+  {n: "Giganotosaurus", p: "/Game/PrimalEarth/Dinos/Gigant/Gigant_Character_BP.Gigant_Character_BP"},
+  {n: "Hesperornis", p: "/Game/PrimalEarth/Dinos/Hesperornis/Hesperornis_Character_BP.Hesperornis_Character_BP"},
+  {n: "Hyenadon", p: "/Game/PrimalEarth/Dinos/Hyaenodon/Hyaenodon_Character_BP.Hyaenodon_Character_BP"},
+  {n: "Kairuku", p: "/Game/PrimalEarth/Dinos/Kairuku/Kairuku_Character_BP.Kairuku_Character_BP"},
+  {n: "Kaprosuchus", p: "/Game/PrimalEarth/Dinos/Kaprosuchus/Kaprosuchus_Character_BP.Kaprosuchus_Character_BP"},
+  {n: "Lystrosaurus", p: "/Game/PrimalEarth/Dinos/Lystro/Lystro_Character_BP.Lystro_Character_BP"},
+  {n: "Mammoth", p: "/Game/PrimalEarth/Dinos/Mammoth/Mammoth_Character_BP.Mammoth_Character_BP"},
+  {n: "Megaloceros", p: "/Game/PrimalEarth/Dinos/Stag/Stag_Character_BP.Stag_Character_BP"},
+  {n: "Megalosaurus", p: "/Game/PrimalEarth/Dinos/Megalosaurus/Megalosaurus_Character_BP.Megalosaurus_Character_BP"},
+  {n: "Megatherium", p: "/Game/PrimalEarth/Dinos/Megatherium/Megatherium_Character_BP.Megatherium_Character_BP"},
+  {n: "Mesopithecus", p: "/Game/PrimalEarth/Dinos/Monkey/Monkey_Character_BP.Monkey_Character_BP"},
+  {n: "Microraptor", p: "/Game/PrimalEarth/Dinos/Microraptor/Microraptor_Character_BP.Microraptor_Character_BP"},
+  {n: "Moschops", p: "/Game/PrimalEarth/Dinos/Moschops/Moschops_Character_BP.Moschops_Character_BP"},
+  {n: "Onyc", p: "/Game/PrimalEarth/Dinos/Bat/Bat_Character_BP.Bat_Character_BP"},
+  {n: "Otter", p: "/Game/PrimalEarth/Dinos/Otter/Otter_Character_BP.Otter_Character_BP"},
+  {n: "Oviraptor", p: "/Game/PrimalEarth/Dinos/Oviraptor/Oviraptor_Character_BP.Oviraptor_Character_BP"},
+  {n: "Ovis", p: "/Game/PrimalEarth/Dinos/Sheep/Sheep_Character_BP.Sheep_Character_BP"},
+  {n: "Pachy", p: "/Game/PrimalEarth/Dinos/Pachy/Pachy_Character_BP.Pachy_Character_BP"},
+  {n: "Pachyrhino", p: "/Game/PrimalEarth/Dinos/Pachyrhinosaurus/Pachyrhino_Character_BP.Pachyrhino_Character_BP"},
+  {n: "Paracer", p: "/Game/PrimalEarth/Dinos/Paraceratherium/Paracer_Character_BP.Paracer_Character_BP"},
+  {n: "Parasaur", p: "/Game/PrimalEarth/Dinos/Para/Para_Character_BP.Para_Character_BP"},
+  {n: "Pegomastax", p: "/Game/PrimalEarth/Dinos/Pegomastax/Pegomastax_Character_BP.Pegomastax_Character_BP"},
+  {n: "Phiomia", p: "/Game/PrimalEarth/Dinos/Phiomia/Phiomia_Character_BP.Phiomia_Character_BP"},
+  {n: "Procoptodon", p: "/Game/PrimalEarth/Dinos/Procoptodon/Procoptodon_Character_BP.Procoptodon_Character_BP"},
+  {n: "Pteranodon", p: "/Game/PrimalEarth/Dinos/Ptero/Ptero_Character_BP.Ptero_Character_BP"},
+  {n: "Pulmonoscorpius", p: "/Game/PrimalEarth/Dinos/Scorpion/Scorpion_Character_BP.Scorpion_Character_BP"},
+  {n: "Purlovia", p: "/Game/PrimalEarth/Dinos/Purlovia/Purlovia_Character_BP.Purlovia_Character_BP"},
+  {n: "Quetzal", p: "/Game/PrimalEarth/Dinos/Quetzalcoatlus/Quetz_Character_BP.Quetz_Character_BP"},
+  {n: "Raptor", p: "/Game/PrimalEarth/Dinos/Raptor/Raptor_Character_BP.Raptor_Character_BP"},
+  {n: "Rex", p: "/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP.Rex_Character_BP"},
+  {n: "Sabertooth", p: "/Game/PrimalEarth/Dinos/Saber/Saber_Character_BP.Saber_Character_BP"},
+  {n: "Sarcosuchus", p: "/Game/PrimalEarth/Dinos/Sarco/Sarco_Character_BP.Sarco_Character_BP"},
+  {n: "Spinosaurus", p: "/Game/PrimalEarth/Dinos/Spino/Spino_Character_BP.Spino_Character_BP"},
+  {n: "Stegosaurus", p: "/Game/PrimalEarth/Dinos/Stego/Stego_Character_BP.Stego_Character_BP"},
+  {n: "Tapejara", p: "/Game/PrimalEarth/Dinos/Tapejara/Tapejara_Character_BP.Tapejara_Character_BP"},
+  {n: "Terror Bird", p: "/Game/PrimalEarth/Dinos/TerrorBird/TerrorBird_Character_BP.TerrorBird_Character_BP"},
+  {n: "Therizinosaur", p: "/Game/PrimalEarth/Dinos/Therizinosaurus/Therizino_Character_BP.Therizino_Character_BP"},
+  {n: "Thylacoleo", p: "/Game/PrimalEarth/Dinos/Thylacoleo/Thylacoleo_Character_BP.Thylacoleo_Character_BP"},
+  {n: "Titanoboa", p: "/Game/PrimalEarth/Dinos/Snake/Snake_Character_BP.Snake_Character_BP"},
+  {n: "Titanosaur", p: "/Game/PrimalEarth/Dinos/Titanosaur/Titanosaur_Character_BP.Titanosaur_Character_BP"},
+  {n: "Triceratops", p: "/Game/PrimalEarth/Dinos/Trike/Trike_Character_BP.Trike_Character_BP"},
+  {n: "Troodon", p: "/Game/PrimalEarth/Dinos/Troodon/Troodon_Character_BP.Troodon_Character_BP"},
+  {n: "Woolly Rhino", p: "/Game/PrimalEarth/Dinos/Rhino/Rhino_Character_BP.Rhino_Character_BP"},
+  {n: "Yutyrannus", p: "/Game/PrimalEarth/Dinos/Yutyrannus/Yutyrannus_Character_BP.Yutyrannus_Character_BP"}
+ ],
+ "Scorched Earth": [
+  {n: "Deathworm", p: "/Game/ScorchedEarth/Dinos/Deathworm/Deathworm_Character_BP.Deathworm_Character_BP"},
+  {n: "Fasolasuchus", p: "/Game/ASA/Dinos/Fasolasuchus/Fasola_Character_BP.Fasola_Character_BP"},
+  {n: "Jerboa", p: "/Game/ScorchedEarth/Dinos/Jerboa/Jerboa_Character_BP.Jerboa_Character_BP"},
+  {n: "Lymantria", p: "/Game/ScorchedEarth/Dinos/Moth/Moth_Character_BP.Moth_Character_BP"},
+  {n: "Mantis", p: "/Game/ScorchedEarth/Dinos/Mantis/Mantis_Character_BP.Mantis_Character_BP"},
+  {n: "Morellatops", p: "/Game/ScorchedEarth/Dinos/Morellatops/Morellatops_Character_BP.Morellatops_Character_BP"},
+  {n: "Phoenix", p: "/Game/ScorchedEarth/Dinos/Phoenix/Phoenix_Character_BP.Phoenix_Character_BP"},
+  {n: "Rock Elemental", p: "/Game/ScorchedEarth/Dinos/RockGolem/RockGolem_Character_BP.RockGolem_Character_BP"},
+  {n: "Thorny Dragon", p: "/Game/ScorchedEarth/Dinos/SpinyLizard/SpinyLizard_Character_BP.SpinyLizard_Character_BP"},
+  {n: "Wyvern Fire", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Fire.Wyvern_Character_BP_Fire"},
+  {n: "Wyvern Lightning", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Lightning.Wyvern_Character_BP_Lightning"},
+  {n: "Wyvern Poison", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Poison.Wyvern_Character_BP_Poison"}
+ ],
+ "Aberration": [
+  {n: "Ab Ankylo", p: "/Game/Aberration/Dinos/Ankylo_Aberrant/Ankylo_Character_BP_Aberrant.Ankylo_Character_BP_Aberrant"},
+  {n: "Ab Arthro", p: "/Game/Aberration/Dinos/Arthropluera/Arthro_Character_BP_Aberrant.Arthro_Character_BP_Aberrant"},
+  {n: "Ab Baryonyx", p: "/Game/Aberration/Dinos/Baryonyx/Baryonyx_Character_BP_Aberrant.Baryonyx_Character_BP_Aberrant"},
+  {n: "Ab Carno", p: "/Game/Aberration/Dinos/Carno/Carno_Character_BP_Aberrant.Carno_Character_BP_Aberrant"},
+  {n: "Ab Megalodon", p: "/Game/Aberration/Dinos/Megalodon/Megalodon_Character_BP_Aberrant.Megalodon_Character_BP_Aberrant"},
+  {n: "Ab Megalosaur", p: "/Game/Aberration/Dinos/Megalosaurus/Megalosaurus_Character_BP_Aberrant.Megalosaurus_Character_BP_Aberrant"},
+  {n: "Ab Otter", p: "/Game/Aberration/Dinos/Otter/Otter_Character_BP_Aberrant.Otter_Character_BP_Aberrant"},
+  {n: "Ab Paracer", p: "/Game/Aberration/Dinos/Paracer/Paracer_Character_BP_Aberrant.Paracer_Character_BP_Aberrant"},
+  {n: "Ab Scorpion", p: "/Game/Aberration/Dinos/Scorpion/Scorpion_Character_BP_Aberrant.Scorpion_Character_BP_Aberrant"},
+  {n: "Ab Spino", p: "/Game/Aberration/Dinos/Spino_Aberrant/Spino_Character_BP_Aberrant.Spino_Character_BP_Aberrant"},
+  {n: "Ab Stego", p: "/Game/Aberration/Dinos/Stego/Stego_Character_BP_Aberrant.Stego_Character_BP_Aberrant"},
+  {n: "Ab Trike", p: "/Game/Aberration/Dinos/Trike/Trike_Character_BP_Aberrant.Trike_Character_BP_Aberrant"},
+  {n: "Basilisk", p: "/Game/Aberration/Dinos/Basilisk/Basilisk_Character_BP.Basilisk_Character_BP"},
+  {n: "Bulbdog", p: "/Game/Aberration/Dinos/LanternPug/LanternPug_Character_BP.LanternPug_Character_BP"},
+  {n: "Featherlight", p: "/Game/Aberration/Dinos/LanternBird/LanternBird_Character_BP.LanternBird_Character_BP"},
+  {n: "Glowtail", p: "/Game/Aberration/Dinos/LanternLizard/LanternLizard_Character_BP.LanternLizard_Character_BP"},
+  {n: "Karkinos", p: "/Game/Aberration/Dinos/Crab/Crab_Character_BP.Crab_Character_BP"},
+  {n: "Ravager", p: "/Game/Aberration/Dinos/CaveWolf/CaveWolf_Character_BP.CaveWolf_Character_BP"},
+  {n: "Reaper King", p: "/Game/Aberration/Dinos/Nameless/Xenomorph_Character_BP_Male_Tamed.Xenomorph_Character_BP_Male_Tamed"},
+  {n: "Reaper Queen", p: "/Game/Aberration/Dinos/Reaper/ReaperQueen_Character_BP.ReaperQueen_Character_BP"},
+  {n: "Rock Drake", p: "/Game/Aberration/Dinos/RockDrake/RockDrake_Character_BP.RockDrake_Character_BP"},
+  {n: "Roll Rat", p: "/Game/Aberration/Dinos/RollRat/RollRat_Character_BP.RollRat_Character_BP"},
+  {n: "Shinehorn", p: "/Game/Aberration/Dinos/LanternGoat/LanternGoat_Character_BP.LanternGoat_Character_BP"}
+ ],
+ "Extinction": [
+  {n: "Enforcer", p: "/Game/Extinction/Dinos/Enforcer/Enforcer_Character_BP.Enforcer_Character_BP"},
+  {n: "Gacha", p: "/Game/Extinction/Dinos/Gacha/Gacha_Character_BP.Gacha_Character_BP"},
+  {n: "Gasbags", p: "/Game/Extinction/Dinos/Gasbags/Gasbags_Character_BP.Gasbags_Character_BP"},
+  {n: "Managarmr", p: "/Game/Extinction/Dinos/IceJumper/IceJumper_Character_BP.IceJumper_Character_BP"},
+  {n: "Snow Owl", p: "/Game/Extinction/Dinos/SnowOwl/SnowOwl_Character_BP.SnowOwl_Character_BP"},
+  {n: "Velonasaur", p: "/Game/Extinction/Dinos/Spiker/Spiker_Character_BP.Spiker_Character_BP"}
+ ],
+ "Aquatic": [
+  {n: "Anglerfish", p: "/Game/PrimalEarth/Dinos/Anglerfish/Angler_Character_BP.Angler_Character_BP"},
+  {n: "Basilosaurus", p: "/Game/PrimalEarth/Dinos/Basilosaurus/Basilosaurus_Character_BP.Basilosaurus_Character_BP"},
+  {n: "Dunkleosteus", p: "/Game/PrimalEarth/Dinos/Dunkleosteus/Dunkle_Character_BP.Dunkle_Character_BP"},
+  {n: "Eel", p: "/Game/PrimalEarth/Dinos/Electrophorus/Electrophorus_Character_BP.Electrophorus_Character_BP"},
+  {n: "Ichthyosaurus", p: "/Game/PrimalEarth/Dinos/Ichthyosaurus/Ichthy_Character_BP.Ichthy_Character_BP"},
+  {n: "Leedsichthys", p: "/Game/PrimalEarth/Dinos/Leedsichthys/Leedsichthys_Character_BP.Leedsichthys_Character_BP"},
+  {n: "Liopleurodon", p: "/Game/PrimalEarth/Dinos/Liopleurodon/Liopleurodon_Character_BP.Liopleurodon_Character_BP"},
+  {n: "Manta", p: "/Game/PrimalEarth/Dinos/Manta/Manta_Character_BP.Manta_Character_BP"},
+  {n: "Megalodon", p: "/Game/PrimalEarth/Dinos/Megalodon/Megalodon_Character_BP.Megalodon_Character_BP"},
+  {n: "Mosasaurus", p: "/Game/PrimalEarth/Dinos/Mosasaurus/Mosa_Character_BP.Mosasaurus_Character_BP"},
+  {n: "Plesiosaurus", p: "/Game/PrimalEarth/Dinos/Plesiosaur/Plesiosaur_Character_BP.Plesiosaur_Character_BP"},
+  {n: "Tusoteuthis", p: "/Game/PrimalEarth/Dinos/Tusoteuthis/Tusoteuthis_Character_BP.Tusoteuthis_Character_BP"}
+ ],
+ "S-Variants": [
+  {n: "S-Allo", p: "/SDinoVariants/S-Allosaurus/S-Allo_Character_BP.S-Allo_Character_BP"},
+  {n: "S-Anky", p: "/SDinoVariants/S-Ankylosaurus/S-Ankylo_Character_BP.S-Ankylo_Character_BP"},
+  {n: "S-Andrews", p: "/SDinoVariants/S-Andrewsarchus/S-Andrewsarchus_Character_BP.S-Andrewsarchus_Character_BP"},
+  {n: "S-Basilo", p: "/SDinoVariants/S-Basilosaurus/S-Basilosaurus_Character_BP.S-Basilosaurus_Character_BP"},
+  {n: "S-Carcha", p: "/SDinoVariants/S-Carcha/S-Carcha_Character_BP.S-Carcha_Character_BP"},
+  {n: "S-Cat", p: "/SDinoVariants/S-Cat/S-Cat_Character_BP.S-Cat_Character_BP"},
+  {n: "S-Cerato", p: "/SDinoVariants/S-Cerato/S-Ceratosaurus_Character_BP_ASA.S-Ceratosaurus_Character_BP_ASA"},
+  {n: "S-Daeodon", p: "/SDinoVariants/S-Daeodon/S-Daeodon_Character_BP.S-Daeodon_Character_BP"},
+  {n: "S-Deinon", p: "/SDinoVariants/S-Deinonychus/S-Deinonychus_Character_BP.S-Deinonychus_Character_BP"},
+  {n: "S-Deino", p: "/SDinoVariants/S-Deinosuchus/S-DeinosuchusASA_Character_BP.S-DeinosuchusASA_Character_BP"},
+  {n: "S-Desmo", p: "/SDinoVariants/S-Desmodus/S-Desmodus_Character_BP.S-Desmodus_Character_BP"},
+  {n: "S-Direbear", p: "/SDinoVariants/S-Direbear/S-Direbear_Character_BP.S-Direbear_Character_BP"},
+  {n: "S-Direwolf", p: "/SDinoVariants/S-Direwolf/S-Direwolf_Character_BP.S-Direwolf_Character_BP"},
+  {n: "S-Doed", p: "/SDinoVariants/S-Doedicurus/S-Doed_Character_BP.S-Doed_Character_BP"},
+  {n: "S-Dunkle", p: "/SDinoVariants/S-Dunkleosteus/S-Dunkle_Character_BP.S-Dunkle_Character_BP"},
+  {n: "S-Fasola", p: "/SDinoVariants/S-Fasolasuchus/S-Fasola_Character_BP.S-Fasola_Character_BP"},
+  {n: "S-Fire Wyvern", p: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Fire.S-Wyvern_Character_BP_Fire"},
+  {n: "S-Light Wyvern", p: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Lightning.S-Wyvern_Character_BP_Lightning"},
+  {n: "S-Poison Wyvern", p: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Poison.S-Wyvern_Character_BP_Poison"},
+  {n: "S-Ice Wyvern", p: "/SDinoVariants/S-IceWyvern/S-Wyvern_Character_BP_Ice.S-Wyvern_Character_BP_Ice"},
+  {n: "S-Fenrir", p: "/SDinoVariants/S-Fenrir/S-Fenrir_Character_BP.S-Fenrir_Character_BP"},
+  {n: "S-Griffin", p: "/SDinoVariants/S-Griffin/S-Griffin_Character_BP.S-Griffin_Character_BP"},
+  {n: "S-Maeguana", p: "/SDinoVariants/S-Maeguana/S-Maelizard_Character_BP.S-Maelizard_Character_BP"},
+  {n: "S-Maewing", p: "/SDinoVariants/S-Maewing/S-MilkGlider_Character_BP.S-MilkGlider_Character_BP"},
+  {n: "S-Mantis", p: "/SDinoVariants/S-Mantis/S-Mantis_Character_BP.S-Mantis_Character_BP"},
+  {n: "S-Megalodon", p: "/SDinoVariants/S-Megalodon/S-Megalodon_Character_BP.S-Megalodon_Character_BP"},
+  {n: "S-Megalosaur", p: "/SDinoVariants/S-Megalosaurus/S-Megalosaurus_Character_BP.S-Megalosaurus_Character_BP"},
+  {n: "S-Megaraptor", p: "/SDinoVariants/S-Megaraptor/S-Megaraptor_Character_BP.S-Megaraptor_Character_BP"},
+  {n: "S-Mosasaur", p: "/SDinoVariants/S-Mosa/S-Mosa_Character_BP.S-Mosa_Character_BP"},
+  {n: "S-Otter", p: "/SDinoVariants/S-Otter/S-Otter_Character_BP.S-Otter_Character_BP"},
+  {n: "S-Plesio", p: "/SDinoVariants/S-Plesiosaur/S-Plesiosaur_Character_BP.S-Plesiosaur_Character_BP"},
+  {n: "S-Queen Bee", p: "/SDinoVariants/S-Bee/S-QueenBee_Character_BP.S-QueenBee_Character_BP"},
+  {n: "S-Rex", p: "/SDinoVariants/S-Rex/S-Rex_Character_BP.S-Rex_Character_BP"},
+  {n: "S-Reaper M", p: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Male_Tamed.S-Xenomorph_Character_BP_Male_Tamed"},
+  {n: "S-Reaper F", p: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Female.S-Xenomorph_Character_BP_Female"},
+  {n: "S-Rhynio", p: "/SDinoVariants/S-Rhynio/S-Rhynio_Character_BP.S-Rhynio_Character_BP"},
+  {n: "S-Rock Drake", p: "/SDinoVariants/S-Rockdrake/S-RockDrake_Character_BP.S-RockDrake_Character_BP"},
+  {n: "S-Shinehorn", p: "/SDinoVariants/S-Shinehorn/S-LanternGoat_Character_BP.S-LanternGoat_Character_BP"},
+  {n: "S-Snow Owl", p: "/SDinoVariants/S-SnowOwl/S-Owl_Character_BP.S-Owl_Character_BP"},
+  {n: "S-Spino", p: "/SDinoVariants/S-Spinosaurus/S-Spino_Character_BP.S-Spino_Character_BP"},
+  {n: "S-Therizino", p: "/SDinoVariants/S-Therizinosaur/S-Therizino_Character_BP.S-Therizino_Character_BP"},
+  {n: "S-Thyla", p: "/SDinoVariants/S-Thylacoleo/S-Thylacoleo_Character_BP.S-Thylacoleo_Character_BP"},
+  {n: "S-Trike", p: "/SDinoVariants/S-Trike/S-Trike_Character_BP.S-Trike_Character_BP"},
+  {n: "S-Unicorn", p: "/SDinoVariants/S-Unicorn/S-Equus_Character_BP_Unicorn.S-Equus_Character_BP_Unicorn"},
+  {n: "S-Velona", p: "/SDinoVariants/S-Velonasaur/S-Spindles_Character_BP.S-Spindles_Character_BP"}
+ ],
+ "Draconic Chronicles": [
+  {n: "Brawler", p: "/DraconicChronicles/Dino/Dragonkin/DragonKin_BrawlerBP.DragonKin_BrawlerBP"},
+  {n: "Hydro Dragon", p: "/DraconicChronicles/Dino/HydroDragon/HydroDragonBP.HydroDragonBP"},
+  {n: "Undead Wyvern", p: "/DraconicChronicles/Dino/UndeadWyvern/UndeadWyvern_BP.UndeadWyvern_BP"},
+  {n: "Glowveil", p: "/DraconicChronicles/Dino/GlowveilDragon/GlowveilDragon_BP.GlowveilDragon_BP"},
+  {n: "Undead Dragon", p: "/DraconicChronicles/Dino/UndeadDragon/UndeadDragonBP_Tamed.UndeadDragonBP_Tamed"},
+  {n: "Headless Hydra", p: "/DraconicChronicles/Dino/HeadlessHydra/HeadlessHydraBP.HeadlessHydraBP"},
+  {n: "Elder Wyvern", p: "/DraconicChronicles/Dino/Dragon/ElderWyvernBP.ElderWyvernBP"},
+  {n: "Shadow Wyvern", p: "/DraconicChronicles/Dino/ShadowWyvern/ShadowWyvern_BP.ShadowWyvern_BP"},
+  {n: "Lightning Wyvern", p: "/DraconicChronicles/Dino/LightningWyvern/Wyvern_Character_BP_Lightning1.Wyvern_Character_BP_Lightning1"},
+  {n: "Ember Wyvern", p: "/DraconicChronicles/Dino/EmberWyvern/CrystalWyvern_Character_BP_Ember1.CrystalWyvern_Character_BP_Ember1"},
+  {n: "Blood Storm", p: "/DraconicChronicles/Dino/Gigant/BloodStormDragon.BloodStormDragon"},
+  {n: "Blood Wyvern", p: "/DraconicChronicles/Dino/BloodWyvern/CrystalWyvern_Character_BP_Blood1.CrystalWyvern_Character_BP_Blood1"},
+  {n: "Dragonkin", p: "/DraconicChronicles/Dino/Dragonkin/DragonKinBP.DragonKinBP"},
+  {n: "Flameforge", p: "/DraconicChronicles/Dino/FlameforgeDragon/FlameforgeDragonBP.FlameforgeDragonBP"},
+  {n: "Frost Wyvern", p: "/DraconicChronicles/Dino/FrostWyvern/Ragnarok_Wyvern_Override_Ice1.Ragnarok_Wyvern_Override_Ice1"},
+  {n: "Inferno Wyvern", p: "/DraconicChronicles/Dino/Wyvern/InfernoWyvernBP.InfernoWyvernBP"},
+  {n: "Poison Wyvern", p: "/DraconicChronicles/Dino/PoisonWyvern/Wyvern_Character_BP_Poison1.Wyvern_Character_BP_Poison1"},
+  {n: "Polar Dragon", p: "/DraconicChronicles/Dino/PolarDragon/PolarDragonBP.PolarDragonBP"},
+  {n: "Rejuvenating", p: "/DraconicChronicles/Dino/RejuvenatingDragon/RejuvenatingDragonBP.RejuvenatingDragonBP"},
+  {n: "Sand Dragon", p: "/DraconicChronicles/Dino/SandDragon/SandDragonBP.SandDragonBP"},
+  {n: "Tidal Dragon", p: "/DraconicChronicles/Dino/TidalDragon/TidalDragon_BP.TidalDragon_BP"},
+  {n: "Tropical Wyvern", p: "/DraconicChronicles/Dino/TropicalWyvern/CrystalWyvernTropicalBP.CrystalWyvernTropicalBP"},
+  {n: "Wyrm", p: "/DraconicChronicles/Dino/Wyrm/WyrmBP.WyrmBP"},
+  {n: "Wyvernicorn", p: "/DraconicChronicles/Dino/Wyvernicorn/Wyvernicorn_BP.Wyvernicorn_BP"}
+ ],
+ "Astraeos Additions": [
+  {n: "Astral Argent", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Argentavis/AstralArgent_Character_BP.AstralArgent_Character_BP"},
+  {n: "Astral Carno", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Carno/AstralCarno_Character_BP.AstralCarno_Character_BP"},
+  {n: "Astral Deino", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Deinosuchus/AstralDeinosuchusASA_Character_BP.AstralDeinosuchusASA_Character_BP"},
+  {n: "Astral Wolf", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Direwolf/AstralDirewolf_Character_BP.AstralDirewolf_Character_BP"},
+  {n: "Astral Mammoth", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Mammoth/AstralMammoth_Character_BP.AstralMammoth_Character_BP"},
+  {n: "Astral Megalodon", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Megalodon/AstralMegalodon_Character_BP.AstralMegalodon_Character_BP"},
+  {n: "Astral Mosasaur", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Mosasaurus/Astral_Mosa_Character_BP.Astral_Mosa_Character_BP"},
+  {n: "Astral Raptor", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Raptor/AstralRaptor_Character_BP.AstralRaptor_Character_BP"},
+  {n: "Astral Rex", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Rex/AstralRex_Character_BP.AstralRex_Character_BP"},
+  {n: "Astral Squid", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Tusoteuthis/AstralTusoteuthis_Character_BP.AstralTusoteuthis_Character_BP"},
+  {n: "Minotaur", p: "/AstraeosCreatures/Minotaur/Minotaur_Character_BP.Minotaur_Character_BP"},
+  {n: "Seahorse", p: "/AstraeosCreatures/Seahorse/Seahorse_Character_BP.Seahorse_Character_BP"},
+  {n: "Cyclops", p: "/AstraeosCreatures/Cyclops/Cyclops_Character_BP.Cyclops_Character_BP"}
+ ],
+ "Modded / Others": [
+  {n: "Gen 2 Moro Raptor", p: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/Gen2MoroRaptor.Gen2MoroRaptor"},
+  {n: "Gen 2 Moro Rex", p: "/Moros_Indomitable_Duo/MoroRex_Gen2/Blueprints/MoroRexGen2_Character_BP.MoroRexGen2_Character_BP"},
+  {n: "Moro Raptor", p: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/MoroRaptor_Character_BP.MoroRaptor_Character_BP"},
+  {n: "Moro Rex", p: "/Moros_Indomitable_Duo/IndominusRex/Models/MorosRex_Character_BP.MorosRex_Character_BP"},
+  {n: "Thorax Spider Jungle", p: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/JungleThoraxSpider_Character_BP.JungleThoraxSpider_Character_BP"},
+  {n: "Thorax Spider Snow", p: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/SnowThoraxSpider_Character_BP.SnowThoraxSpider_Character_BP"},
+  {n: "Thorax Spider Cute", p: "/CyrusJumpingSpider/Content/Spider/Jumper/CuteThoraxSpider_Character_BP.CuteThoraxSpider_Character_BP"},
+  {n: "Glaucus", p: "/Glaucus/Content/Glaucus_Character_BP.Glaucus_Character_BP"},
+  {n: "Drakara Standard", p: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP.Drakara_Character_BP"},
+  {n: "Drakara Bloodfang", p: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Bloodfang.Drakara_Character_BP_Bloodfang"},
+  {n: "Moros Nothosaurus", p: "/Moros_Nothosaurus/Dinos/Blueprints/MorosNothosaurus_Character_BP.MorosNothosaurus_Character_BP"}
+ ]
+};
 
-    <script>
-        const STAFF_WEBHOOK = "https://discord.com/api/webhooks/1452903052947361986/ed0mhejPa-kyQo7AAH69NK67DcJIVL8QzTve-1V_gb8CmW1kpIMkA8UMcg_jZRHLxdie";
-
-        const CREATURE_BLUEPRINTS = {
-            "Lost Colony": [
-                { name: "Gigadesmodus", path: "/Game/LostColony/Dinos/BossBat/BossBat_Character_BP.BossBat_Character_BP" },
-                { name: "Gloon", path: "/Game/LostColony/Dinos/LostChargePet/LostCharge_LanternPet_Char_BP.LostCharge_LanternPet_Char_BP" },
-                { name: "Aureliax", path: "/Game/LostColony/Dinos/SnowDragon/SnowDragon_Character_BP.SnowDragon_Character_BP" },
-                { name: "Ossidon", path: "/Game/LostColony/Dinos/SnowMonster/SnowMonster_Character_BP.SnowMonster_Character_BP" },
-                { name: "Solwyn", path: "/Game/LostColony/Dinos/AngelFox/AngelFox_Character_BP.AngelFox_Character_BP" },
-                { name: "Lost Malwyn", path: "/Game/LostColony/Dinos/DevilFox/DevilFox_Character_BP.DevilFox_Character_BP" },
-                { name: "Revenant Malwyn", path: "/Game/LostColony/Dinos/ZombieDino/DevilFox/DevilFox_Character_BP_Corrupt_Zombie.DevilFox_Character_BP_Corrupt_Zombie" }
-            ],
-            "The Island (Official)": [
-                { name: "Achatina", path: "/Game/PrimalEarth/Dinos/Achatina/Achatina_Character_BP.Achatina_Character_BP" },
-                { name: "Allosaurus", path: "/Game/PrimalEarth/Dinos/Allosaurus/Allo_Character_BP.Allo_Character_BP" },
-                { name: "Ankylosaurus", path: "/Game/PrimalEarth/Dinos/Ankylo/Ankylo_Character_BP.Ankylo_Character_BP" },
-                { name: "Araneo (Spider)", path: "/Game/PrimalEarth/Dinos/Spider-Araneo/SpiderS_Character_BP.SpiderS_Character_BP" },
-                { name: "Archaeopteryx", path: "/Game/PrimalEarth/Dinos/Archaeopteryx/Archa_Character_BP.Archaeopteryx_Character_BP" },
-                { name: "Argentavis", path: "/Game/PrimalEarth/Dinos/Argentavis/Argent_Character_BP.Argent_Character_BP" },
-                { name: "Arthropluera", path: "/Game/PrimalEarth/Dinos/Arthropluera/Arthro_Character_BP.Arthro_Character_BP" },
-                { name: "Baryonyx", path: "/Game/PrimalEarth/Dinos/Baryonyx/Baryonyx_Character_BP.Baryonyx_Character_BP" },
-                { name: "Beelzebufo", path: "/Game/PrimalEarth/Dinos/Beelzebufo/Toad_Character_BP.Toad_Character_BP" },
-                { name: "Brontosaurus", path: "/Game/PrimalEarth/Dinos/Sauropod/Sauropod_Character_BP.Sauropod_Character_BP" },
-                { name: "Carbonemys", path: "/Game/PrimalEarth/Dinos/Turtle/Turtle_Character_BP.Turtle_Character_BP" },
-                { name: "Carnotaurus", path: "/Game/PrimalEarth/Dinos/Carno/Carno_Character_BP.Carno_Character_BP" },
-                { name: "Castoroides", path: "/Game/PrimalEarth/Dinos/Beaver/Beaver_Character_BP.Beaver_Character_BP" },
-                { name: "Compsognathus", path: "/Game/PrimalEarth/Dinos/Compsognathus/Compsognathus_Character_BP.Compsognathus_Character_BP" },
-                { name: "Daeodon", path: "/Game/PrimalEarth/Dinos/Daeodon/Daeodon_Character_BP.Daeodon_Character_BP" },
-                { name: "Dilophosaur", path: "/Game/PrimalEarth/Dinos/Dilo/Dilo_Character_BP.Dilo_Character_BP" },
-                { name: "Dimetrodon", path: "/Game/PrimalEarth/Dinos/Dimetrodon/Dimetrodon_Character_BP.Dimetrodon_Character_BP" },
-                { name: "Dimorphodon", path: "/Game/PrimalEarth/Dinos/Dimorphodon/Dimorph_Character_BP.Dimorph_Character_BP" },
-                { name: "Dodo", path: "/Game/PrimalEarth/Dinos/Dodo/Dodo_Character_BP.Dodo_Character_BP" },
-                { name: "Doedicurus", path: "/Game/PrimalEarth/Dinos/Doed/Doed_Character_BP.Doed_Character_BP" },
-                { name: "Dung Beetle", path: "/Game/PrimalEarth/Dinos/DungBeetle/DungBeetle_Character_BP.DungBeetle_Character_BP" },
-                { name: "Gallimimus", path: "/Game/PrimalEarth/Dinos/Galli/Galli_Character_BP.Galli_Character_BP" },
-                { name: "Giganotosaurus", path: "/Game/PrimalEarth/Dinos/Gigant/Gigant_Character_BP.Gigant_Character_BP" },
-                { name: "Kairuku", path: "/Game/PrimalEarth/Dinos/Kairuku/Kairuku_Character_BP.Kairuku_Character_BP" },
-                { name: "Kaprosuchus", path: "/Game/PrimalEarth/Dinos/Kaprosuchus/Kaprosuchus_Character_BP.Kaprosuchus_Character_BP" },
-                { name: "Lystrosaurus", path: "/Game/PrimalEarth/Dinos/Lystro/Lystro_Character_BP.Lystro_Character_BP" },
-                { name: "Mammoth", path: "/Game/PrimalEarth/Dinos/Mammoth/Mammoth_Character_BP.Mammoth_Character_BP" },
-                { name: "Megalosaurus", path: "/Game/PrimalEarth/Dinos/Megalosaurus/Megalosaurus_Character_BP.Megalosaurus_Character_BP" },
-                { name: "Megatherium", path: "/Game/PrimalEarth/Dinos/Megatherium/Megatherium_Character_BP.Megatherium_Character_BP" },
-                { name: "Pteranodon", path: "/Game/PrimalEarth/Dinos/Ptero/Ptero_Character_BP.Ptero_Character_BP" },
-                { name: "Quetzal", path: "/Game/PrimalEarth/Dinos/Quetzalcoatlus/Quetz_Character_BP.Quetz_Character_BP" },
-                { name: "Rex", path: "/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP.Rex_Character_BP" },
-                { name: "Spinosaurus", path: "/Game/PrimalEarth/Dinos/Spino/Spino_Character_BP.Spino_Character_BP" },
-                { name: "Stegosaurus", path: "/Game/PrimalEarth/Dinos/Stego/Stego_Character_BP.Stego_Character_BP" },
-                { name: "Therizinosaur", path: "/Game/PrimalEarth/Dinos/Therizinosaurus/Therizino_Character_BP.Therizino_Character_BP" },
-                { name: "Thylacoleo", path: "/Game/PrimalEarth/Dinos/Thylacoleo/Thylacoleo_Character_BP.Thylacoleo_Character_BP" },
-                { name: "Triceratops", path: "/Game/PrimalEarth/Dinos/Trike/Trike_Character_BP.Trike_Character_BP" },
-                { name: "Woolly Rhino", path: "/Game/PrimalEarth/Dinos/Rhino/Rhino_Character_BP.Rhino_Character_BP" },
-                { name: "Yutyrannus", path: "/Game/PrimalEarth/Dinos/Yutyrannus/Yutyrannus_Character_BP.Yutyrannus_Character_BP" }
-            ],
-            "Scorched Earth (Official)": [
-                { name: "Deathworm", path: "/Game/ScorchedEarth/Dinos/Deathworm/Deathworm_Character_BP.Deathworm_Character_BP" },
-                { name: "Fasolasuchus", path: "/Game/ASA/Dinos/Fasolasuchus/Fasola_Character_BP.Fasola_Character_BP" },
-                { name: "Jerboa", path: "/Game/ScorchedEarth/Dinos/Jerboa/Jerboa_Character_BP.Jerboa_Character_BP" },
-                { name: "Lymantria", path: "/Game/ScorchedEarth/Dinos/Moth/Moth_Character_BP.Moth_Character_BP" },
-                { name: "Mantis", path: "/Game/ScorchedEarth/Dinos/Mantis/Mantis_Character_BP.Mantis_Character_BP" },
-                { name: "Morellatops", path: "/Game/ScorchedEarth/Dinos/Morellatops/Morellatops_Character_BP.Morellatops_Character_BP" },
-                { name: "Phoenix", path: "/Game/ScorchedEarth/Dinos/Phoenix/Phoenix_Character_BP.Phoenix_Character_BP" },
-                { name: "Rock Elemental", path: "/Game/ScorchedEarth/Dinos/RockGolem/RockGolem_Character_BP.RockGolem_Character_BP" },
-                { name: "Thorny Dragon", path: "/Game/ScorchedEarth/Dinos/SpinyLizard/SpinyLizard_Character_BP.SpinyLizard_Character_BP" },
-                { name: "Wyvern (Fire)", path: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Fire.Wyvern_Character_BP_Fire" },
-                { name: "Wyvern (Lightning)", path: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Lightning.Wyvern_Character_BP_Lightning" },
-                { name: "Wyvern (Poison)", path: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Poison.Wyvern_Character_BP_Poison" }
-            ],
-            "Aberration (Official)": [
-                { name: "Aberrant Ankylo", path: "/Game/Aberration/Dinos/Ankylo_Aberrant/Ankylo_Character_BP_Aberrant.Ankylo_Character_BP_Aberrant" },
-                { name: "Aberrant Arthropluera", path: "/Game/Aberration/Dinos/Arthropluera/Arthro_Character_BP_Aberrant.Arthro_Character_BP_Aberrant" },
-                { name: "Aberrant Baryonyx", path: "/Game/Aberration/Dinos/Baryonyx/Baryonyx_Character_BP_Aberrant.Baryonyx_Character_BP_Aberrant" },
-                { name: "Aberrant Carnotaurus", path: "/Game/Aberration/Dinos/Carno/Carno_Character_BP_Aberrant.Carno_Character_BP_Aberrant" },
-                { name: "Aberrant Megalodon", path: "/Game/Aberration/Dinos/Megalodon/Megalodon_Character_BP_Aberrant.Megalodon_Character_BP_Aberrant" },
-                { name: "Aberrant Megalosaurus", path: "/Game/Aberration/Dinos/Megalosaurus/Megalosaurus_Character_BP_Aberrant.Megalosaurus_Character_BP_Aberrant" },
-                { name: "Aberrant Spino", path: "/Game/Aberration/Dinos/Spino_Aberrant/Spino_Character_BP_Aberrant.Spino_Character_BP_Aberrant" },
-                { name: "Basilisk", path: "/Game/Aberration/Dinos/Basilisk/Basilisk_Character_BP.Basilisk_Character_BP" },
-                { name: "Bulbdog", path: "/Game/Aberration/Dinos/LanternPug/LanternPug_Character_BP.LanternPug_Character_BP" },
-                { name: "Featherlight", path: "/Game/Aberration/Dinos/LanternBird/LanternBird_Character_BP.LanternBird_Character_BP" },
-                { name: "Glowtail", path: "/Game/Aberration/Dinos/LanternLizard/LanternLizard_Character_BP.LanternLizard_Character_BP" },
-                { name: "Karkinos", path: "/Game/Aberration/Dinos/Crab/Crab_Character_BP.Crab_Character_BP" },
-                { name: "Ravager", path: "/Game/Aberration/Dinos/CaveWolf/CaveWolf_Character_BP.CaveWolf_Character_BP" },
-                { name: "Reaper Queen", path: "/Game/Aberration/Dinos/Reaper/ReaperQueen_Character_BP.ReaperQueen_Character_BP" },
-                { name: "Rock Drake", path: "/Game/Aberration/Dinos/RockDrake/RockDrake_Character_BP.RockDrake_Character_BP" },
-                { name: "Roll Rat", path: "/Game/Aberration/Dinos/RollRat/RollRat_Character_BP.RollRat_Character_BP" },
-                { name: "Shinehorn", path: "/Game/Aberration/Dinos/LanternGoat/LanternGoat_Character_BP.LanternGoat_Character_BP" }
-            ],
-            "Extinction (Official)": [
-                { name: "Enforcer", path: "/Game/Extinction/Dinos/Enforcer/Enforcer_Character_BP.Enforcer_Character_BP" },
-                { name: "Gacha", path: "/Game/Extinction/Dinos/Gacha/Gacha_Character_BP.Gacha_Character_BP" },
-                { name: "Gasbags", path: "/Game/Extinction/Dinos/Gasbags/Gasbags_Character_BP.Gasbags_Character_BP" },
-                { name: "Managarmr", path: "/Game/Extinction/Dinos/IceJumper/IceJumper_Character_BP.IceJumper_Character_BP" },
-                { name: "Snow Owl", path: "/Game/Extinction/Dinos/SnowOwl/SnowOwl_Character_BP.SnowOwl_Character_BP" },
-                { name: "Velonasaur", path: "/Game/Extinction/Dinos/Spiker/Spiker_Character_BP.Spiker_Character_BP" }
-            ],
-            "Aquatic & Marine": [
-                { name: "Anglerfish", path: "/Game/PrimalEarth/Dinos/Anglerfish/Angler_Character_BP.Angler_Character_BP" },
-                { name: "Basilosaurus", path: "/Game/PrimalEarth/Dinos/Basilosaurus/Basilosaurus_Character_BP.Basilosaurus_Character_BP" },
-                { name: "Dunkleosteus", path: "/Game/PrimalEarth/Dinos/Dunkleosteus/Dunkle_Character_BP.Dunkle_Character_BP" },
-                { name: "Electrophorus (Eel)", path: "/Game/PrimalEarth/Dinos/Electrophorus/Electrophorus_Character_BP.Electrophorus_Character_BP" },
-                { name: "Ichthyosaurus", path: "/Game/PrimalEarth/Dinos/Ichthyosaurus/Ichthy_Character_BP.Ichthy_Character_BP" },
-                { name: "Leedsichthys", path: "/Game/PrimalEarth/Dinos/Leedsichthys/Leedsichthys_Character_BP.Leedsichthys_Character_BP" },
-                { name: "Liopleurodon", path: "/Game/PrimalEarth/Dinos/Liopleurodon/Liopleurodon_Character_BP.Liopleurodon_Character_BP" },
-                { name: "Manta", path: "/Game/PrimalEarth/Dinos/Manta/Manta_Character_BP.Manta_Character_BP" },
-                { name: "Megalodon", path: "/Game/PrimalEarth/Dinos/Megalodon/Megalodon_Character_BP.Megalodon_Character_BP" },
-                { name: "Mosasaurus", path: "/Game/PrimalEarth/Dinos/Mosasaurus/Mosa_Character_BP.Mosasaurus_Character_BP" },
-                { name: "Plesiosaurus", path: "/Game/PrimalEarth/Dinos/Plesiosaur/Plesiosaur_Character_BP.Plesiosaur_Character_BP" },
-                { name: "Tusoteuthis (Squid)", path: "/Game/PrimalEarth/Dinos/Tusoteuthis/Tusoteuthis_Character_BP.Tusoteuthis_Character_BP" }
-            ],
-            "Draconic Chronicles (DC)": [
-                { name: "DC: Dragonkin Brawler", path: "/DraconicChronicles/Dino/Dragonkin/DragonKin_BrawlerBP.DragonKin_BrawlerBP" },
-                { name: "DC: Hydro Dragon", path: "/DraconicChronicles/Dino/HydroDragon/HydroDragonBP.HydroDragonBP" },
-                { name: "DC: Undead Wyvern", path: "/DraconicChronicles/Dino/UndeadWyvern/UndeadWyvern_BP.UndeadWyvern_BP" },
-                { name: "DC: Glowveil Dragon", path: "/DraconicChronicles/Dino/GlowveilDragon/GlowveilDragon_BP.GlowveilDragon_BP" },
-                { name: "DC: Undead Dragon (Tamed)", path: "/DraconicChronicles/Dino/UndeadDragon/UndeadDragonBP_Tamed.UndeadDragonBP_Tamed" },
-                { name: "DC: Headless Hydra", path: "/DraconicChronicles/Dino/HeadlessHydra/HeadlessHydraBP.HeadlessHydraBP" },
-                { name: "DC: Elder Wyvern", path: "/DraconicChronicles/Dino/Dragon/ElderWyvernBP.ElderWyvernBP" },
-                { name: "DC: Shadow Wyvern", path: "/DraconicChronicles/Dino/ShadowWyvern/ShadowWyvern_BP.ShadowWyvern_BP" },
-                { name: "DC: Lightning Wyvern", path: "/DraconicChronicles/Dino/LightningWyvern/Wyvern_Character_BP_Lightning1.Wyvern_Character_BP_Lightning1" },
-                { name: "DC: Ember Wyvern", path: "/DraconicChronicles/Dino/EmberWyvern/CrystalWyvern_Character_BP_Ember1.CrystalWyvern_Character_BP_Ember1" },
-                { name: "DC: Blood Storm Dragon", path: "/DraconicChronicles/Dino/Gigant/BloodStormDragon.BloodStormDragon" },
-                { name: "DC: Blood Wyvern", path: "/DraconicChronicles/Dino/BloodWyvern/CrystalWyvern_Character_BP_Blood1.CrystalWyvern_Character_BP_Blood1" },
-                { name: "DC: Dragonkin", path: "/DraconicChronicles/Dino/Dragonkin/DragonKinBP.DragonKinBP" },
-                { name: "DC: Flameforge Dragon", path: "/DraconicChronicles/Dino/FlameforgeDragon/FlameforgeDragonBP.FlameforgeDragonBP" },
-                { name: "DC: Frost Wyvern", path: "/DraconicChronicles/Dino/FrostWyvern/Ragnarok_Wyvern_Override_Ice1.Ragnarok_Wyvern_Override_Ice1" },
-                { name: "DC: Inferno Wyvern", path: "/DraconicChronicles/Dino/Wyvern/InfernoWyvernBP.InfernoWyvernBP" },
-                { name: "DC: Poison Wyvern", path: "/DraconicChronicles/Dino/PoisonWyvern/Wyvern_Character_BP_Poison1.Wyvern_Character_BP_Poison1" },
-                { name: "DC: Polar Dragon", path: "/DraconicChronicles/Dino/PolarDragon/PolarDragonBP.PolarDragonBP" },
-                { name: "DC: Rejuvenating Dragon", path: "/DraconicChronicles/Dino/RejuvenatingDragon/RejuvenatingDragonBP.RejuvenatingDragonBP" },
-                { name: "DC: Sand Dragon", path: "/DraconicChronicles/Dino/SandDragon/SandDragonBP.SandDragonBP" },
-                { name: "DC: Tidal Dragon", path: "/DraconicChronicles/Dino/TidalDragon/TidalDragon_BP.TidalDragon_BP" },
-                { name: "DC: Tropical Wyvern", path: "/DraconicChronicles/Dino/TropicalWyvern/CrystalWyvernTropicalBP.CrystalWyvernTropicalBP" },
-                { name: "DC: Wyrm", path: "/DraconicChronicles/Dino/Wyrm/WyrmBP.WyrmBP" },
-                { name: "DC: Wyvernicorn", path: "/DraconicChronicles/Dino/Wyvernicorn/Wyvernicorn_BP.Wyvernicorn_BP" }
-            ],
-            "Astraeos Additions": [
-                { name: "Astral Argentavis", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Argentavis/AstralArgent_Character_BP.AstralArgent_Character_BP" },
-                { name: "Astral Carnotaurus", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Carno/AstralCarno_Character_BP.AstralCarno_Character_BP" },
-                { name: "Astral Deinosuchus", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Deinosuchus/AstralDeinosuchusASA_Character_BP.AstralDeinosuchusASA_Character_BP" },
-                { name: "Astral Direwolf", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Direwolf/AstralDirewolf_Character_BP.AstralDirewolf_Character_BP" },
-                { name: "Astral Mammoth", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Mammoth/AstralMammoth_Character_BP.AstralMammoth_Character_BP" },
-                { name: "Astral Megalodon", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Megalodon/AstralMegalodon_Character_BP.AstralMegalodon_Character_BP" },
-                { name: "Astral Mosasaur", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Mosasaurus/Astral_Mosa_Character_BP.Astral_Mosa_Character_BP" },
-                { name: "Astral Raptor", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Raptor/AstralRaptor_Character_BP.AstralRaptor_Character_BP" },
-                { name: "Astral T-Rex", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Rex/AstralRex_Character_BP.AstralRex_Character_BP" },
-                { name: "Astral Tusoteuthis", path: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Tusoteuthis/AstralTusoteuthis_Character_BP.AstralTusoteuthis_Character_BP" },
-                { name: "Minotaur", path: "/AstraeosCreatures/Minotaur/Minotaur_Character_BP.Minotaur_Character_BP" },
-                { name: "Seahorse", path: "/AstraeosCreatures/Seahorse/Seahorse_Character_BP.Seahorse_Character_BP" },
-                { name: "Cyclops", path: "/AstraeosCreatures/Cyclops/Cyclops_Character_BP.Cyclops_Character_BP" }
-            ],
-            "S-Dino Variants": [
-                { name: "S-Allosaurus", path: "/SDinoVariants/S-Allosaurus/S-Allo_Character_BP.S-Allo_Character_BP" },
-                { name: "S-Ankylosaurus", path: "/SDinoVariants/S-Ankylosaurus/S-Ankylo_Character_BP.S-Ankylo_Character_BP" },
-                { name: "S-Andrewsarchus", path: "/SDinoVariants/S-Andrewsarchus/S-Andrewsarchus_Character_BP.S-Andrewsarchus_Character_BP" },
-                { name: "S-Basilosaurus", path: "/SDinoVariants/S-Basilosaurus/S-Basilosaurus_Character_BP.S-Basilosaurus_Character_BP" },
-                { name: "S-Carcharodontosaurus", path: "/SDinoVariants/S-Carcha/S-Carcha_Character_BP.S-Carcha_Character_BP" },
-                { name: "S-Cat", path: "/SDinoVariants/S-Cat/S-Cat_Character_BP.S-Cat_Character_BP" },
-                { name: "S-Ceratosaurus", path: "/SDinoVariants/S-Cerato/S-Ceratosaurus_Character_BP_ASA.S-Ceratosaurus_Character_BP_ASA" },
-                { name: "S-Daeodon", path: "/SDinoVariants/S-Daeodon/S-Daeodon_Character_BP.S-Daeodon_Character_BP" },
-                { name: "S-Deinonychus", path: "/SDinoVariants/S-Deinonychus/S-Deinonychus_Character_BP.S-Deinonychus_Character_BP" },
-                { name: "S-Deinosuchus", path: "/SDinoVariants/S-Deinosuchus/S-DeinosuchusASA_Character_BP.S-DeinosuchusASA_Character_BP" },
-                { name: "S-Desmodus", path: "/SDinoVariants/S-Desmodus/S-Desmodus_Character_BP.S-Desmodus_Character_BP" },
-                { name: "S-Direbear", path: "/SDinoVariants/S-Direbear/S-Direbear_Character_BP.S-Direbear_Character_BP" },
-                { name: "S-Direwolf", path: "/SDinoVariants/S-Direwolf/S-Direwolf_Character_BP.S-Direwolf_Character_BP" },
-                { name: "S-Doedicurus", path: "/SDinoVariants/S-Doedicurus/S-Doed_Character_BP.S-Doed_Character_BP" },
-                { name: "S-Dunkleosteus", path: "/SDinoVariants/S-Dunkleosteus/S-Dunkle_Character_BP.S-Dunkle_Character_BP" },
-                { name: "S-Fasolasuchus", path: "/SDinoVariants/S-Fasolasuchus/S-Fasola_Character_BP.S-Fasola_Character_BP" },
-                { name: "S-Fire Wyvern", path: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Fire.S-Wyvern_Character_BP_Fire" },
-                { name: "S-Lightning Wyvern", path: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Lightning.S-Wyvern_Character_BP_Lightning" },
-                { name: "S-Poison Wyvern", path: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Poison.S-Wyvern_Character_BP_Poison" },
-                { name: "S-Ice Wyvern", path: "/SDinoVariants/S-IceWyvern/S-Wyvern_Character_BP_Ice.S-Wyvern_Character_BP_Ice" },
-                { name: "S-Fenrir", path: "/SDinoVariants/S-Fenrir/S-Fenrir_Character_BP.S-Fenrir_Character_BP" },
-                { name: "S-Griffin", path: "/SDinoVariants/S-Griffin/S-Griffin_Character_BP.S-Griffin_Character_BP" },
-                { name: "S-Maeguana", path: "/SDinoVariants/S-Maeguana/S-Maelizard_Character_BP.S-Maelizard_Character_BP" },
-                { name: "S-Maewing", path: "/SDinoVariants/S-Maewing/S-MilkGlider_Character_BP.S-MilkGlider_Character_BP" },
-                { name: "S-Mantis", path: "/SDinoVariants/S-Mantis/S-Mantis_Character_BP.S-Mantis_Character_BP" },
-                { name: "S-Megalodon", path: "/SDinoVariants/S-Megalodon/S-Megalodon_Character_BP.S-Megalodon_Character_BP" },
-                { name: "S-Megalosaurus", path: "/SDinoVariants/S-Megalosaurus/S-Megalosaurus_Character_BP.S-Megalosaurus_Character_BP" },
-                { name: "S-Megaraptor", path: "/SDinoVariants/S-Megaraptor/S-Megaraptor_Character_BP.S-Megaraptor_Character_BP" },
-                { name: "S-Mosa", path: "/SDinoVariants/S-Mosa/S-Mosa_Character_BP.S-Mosa_Character_BP" },
-                { name: "S-Otter", path: "/SDinoVariants/S-Otter/S-Otter_Character_BP.S-Otter_Character_BP" },
-                { name: "S-Plesiosaur", path: "/SDinoVariants/S-Plesiosaur/S-Plesiosaur_Character_BP.S-Plesiosaur_Character_BP" },
-                { name: "S-Queen Bee", path: "/SDinoVariants/S-Bee/S-QueenBee_Character_BP.S-QueenBee_Character_BP" },
-                { name: "S-Rex", path: "/SDinoVariants/S-Rex/S-Rex_Character_BP.S-Rex_Character_BP" },
-                { name: "S-Reaper (Male)", path: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Male_Tamed.S-Xenomorph_Character_BP_Male_Tamed" },
-                { name: "S-Reaper (Female)", path: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Female.S-Xenomorph_Character_BP_Female" },
-                { name: "S-Rhynio", path: "/SDinoVariants/S-Rhynio/S-Rhynio_Character_BP.S-Rhynio_Character_BP" },
-                { name: "S-Rockdrake", path: "/SDinoVariants/S-Rockdrake/S-RockDrake_Character_BP.S-RockDrake_Character_BP" },
-                { name: "S-Shinehorn", path: "/SDinoVariants/S-Shinehorn/S-LanternGoat_Character_BP.S-LanternGoat_Character_BP" },
-                { name: "S-Snow Owl", path: "/SDinoVariants/S-SnowOwl/S-Owl_Character_BP.S-Owl_Character_BP" },
-                { name: "S-Spinosaurus", path: "/SDinoVariants/S-Spinosaurus/S-Spino_Character_BP.S-Spino_Character_BP" },
-                { name: "S-Therizinosaur", path: "/SDinoVariants/S-Therizinosaur/S-Therizino_Character_BP.S-Therizino_Character_BP" },
-                { name: "S-Thylacoleo", path: "/SDinoVariants/S-Thylacoleo/S-Thylacoleo_Character_BP.S-Thylacoleo_Character_BP" },
-                { name: "S-Triceratops", path: "/SDinoVariants/S-Trike/S-Trike_Character_BP.S-Trike_Character_BP" },
-                { name: "S-Unicorn", path: "/SDinoVariants/S-Unicorn/S-Equus_Character_BP_Unicorn.S-Equus_Character_BP_Unicorn" },
-                { name: "S-Velonasaur", path: "/SDinoVariants/S-Velonasaur/S-Spindles_Character_BP.S-Spindles_Character_BP" }
-            ],
-            "Modded / Others": [
-                { name: "Gen 2 Moro Raptor", path: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/Gen2MoroRaptor.Gen2MoroRaptor" },
-                { name: "Gen 2 Moros Rex", path: "/Moros_Indomitable_Duo/MoroRex_Gen2/Blueprints/MoroRexGen2_Character_BP.MoroRexGen2_Character_BP" },
-                { name: "Moro Raptor", path: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/MoroRaptor_Character_BP.MoroRaptor_Character_BP" },
-                { name: "Moros Rex", path: "/Moros_Indomitable_Duo/IndominusRex/Models/MorosRex_Character_BP.MorosRex_Character_BP" },
-                { name: "Thorax Spider (Jungle)", path: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/JungleThoraxSpider_Character_BP.JungleThoraxSpider_Character_BP" },
-                { name: "Thorax Spider (Snow)", path: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/SnowThoraxSpider_Character_BP.SnowThoraxSpider_Character_BP" },
-                { name: "Thorax Spider (Cute)", path: "/CyrusJumpingSpider/Content/Spider/Jumper/CuteThoraxSpider_Character_BP.CuteThoraxSpider_Character_BP" },
-                { name: "Glaucus (Sea Slug)", path: "/Glaucus/Content/Glaucus_Character_BP.Glaucus_Character_BP" },
-                { name: "Drakara (Standard)", path: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP.Drakara_Character_BP" },
-                { name: "Drakara (Bloodfang)", path: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Bloodfang.Drakara_Character_BP_Bloodfang" },
-                { name: "Moros Nothosaurus", path: "/Moros_Nothosaurus/Dinos/Blueprints/MorosNothosaurus_Character_BP.MorosNothosaurus_Character_BP" }
-            ]
-        };
-
-        const CATEGORY_CLASSES = {
-            "Lost Colony": "category-lostcolony",
-            "The Island (Official)": "category-island",
-            "Scorched Earth (Official)": "category-scorched",
-            "Extinction (Official)": "category-extinction",
-            "Aberration (Official)": "category-aberration",
-            "Aquatic & Marine": "category-aquatic",
-            "S-Dino Variants": "category-s-variants",
-            "Draconic Chronicles (DC)": "category-draconic",
-            "Astraeos Additions": "category-astraeos",
-            "Modded / Others": "category-modded"
-        };
-
-        let selectedPath = ""; 
-        let selectedName = "";
-
-        function populateCreatureSelector() {
-            const listContainer = document.getElementById('creatureList');
-            listContainer.innerHTML = '';
-            const sortedCats = Object.keys(CREATURE_BLUEPRINTS).sort();
-            sortedCats.forEach(cat => {
-                const header = document.createElement('li');
-                header.className = `dropdown-category-header ${CATEGORY_CLASSES[cat] || ''}`;
-                header.textContent = `--- ${cat} ---`;
-                listContainer.appendChild(header);
-                const sortedDinos = [...CREATURE_BLUEPRINTS[cat]].sort((a, b) => a.name.localeCompare(b.name));
-                sortedDinos.forEach(c => {
-                    const li = document.createElement('li');
-                    li.className = CATEGORY_CLASSES[cat] || '';
-                    li.textContent = c.name;
-                    li.onclick = (e) => {
-                        e.stopPropagation();
-                        selectedPath = c.path;
-                        selectedName = c.name;
-                        document.getElementById('selectedCreatureText').textContent = c.name;
-                        document.getElementById('dropdownContent').style.display = 'none';
-                        document.getElementById('commandOutput').textContent = "Ready to Generate...";
-                    };
-                    listContainer.appendChild(li);
-                });
-            });
-        }
-
-        function toggleDropdown() {
-            const d = document.getElementById('dropdownContent');
-            d.style.display = (d.style.display === 'block') ? 'none' : 'block';
-        }
-
-        window.onclick = function(e) {
-            if (!e.target.closest('#dropdownDisplay')) {
-                document.getElementById('dropdownContent').style.display = 'none';
-            }
-        }
-
-        function filterCreatures(val) {
-            const items = document.querySelectorAll('#creatureList li');
-            document.getElementById('dropdownContent').style.display = 'block';
-            items.forEach(item => {
-                if (!item.classList.contains('dropdown-category-header')) {
-                    item.style.display = item.textContent.toLowerCase().includes(val.toLowerCase()) ? "" : "none";
-                }
-            });
-        }
-
-        async function handleAllActions() {
-            const id = document.getElementById('playerInput').value.trim();
-            const gender = document.querySelector('input[name="genderRadio"]:checked').value;
-            const status = document.getElementById('statusMessage');
-            if (!selectedPath || !id) {
-                status.textContent = "❌ Error: Select a creature and ID first!";
-                status.style.opacity = "1";
-                return;
-            }
-            const cmd = `Scriptcommand SpawnDinoInBall -p=${id} -t=${selectedPath} -f=${gender} -b=1 -i=1 -a=1 -s=255,255,255,255,255,255,255,255`;
-            document.getElementById('commandOutput').textContent = cmd;
-            await navigator.clipboard.writeText(cmd);
-            const now = new Date();
-            const timestampString = now.toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            const logData = { 
-                embeds: [{
-                    title: "Sent Creature Log",
-                    color: 3447003,
-                    fields: [
-                        { name: "EOS ID", value: `\`${id}\``, inline: true },
-                        { name: "Creature", value: selectedName, inline: true }
-                    ],
-                    footer: { text: `Logged at: ${timestampString}` },
-                    timestamp: new Date()
-                }]
-            };
-            try {
-                await fetch(STAFF_WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(logData) });
-                status.textContent = "✅ Generated, Copied & Logged!";
-            } catch (e) {
-                status.textContent = "✅ Copied (Log failed to send)";
-            }
-            status.style.opacity = "1";
-            setTimeout(() => status.style.opacity = "0", 3000);
-        }
-        window.onload = populateCreatureSelector;
-    </script>
+let sP = "", sN = "";
+function populate() {
+    const list = document.getElementById('creatureList'); list.innerHTML = '';
+    Object.keys(DATA).sort().forEach(cat => {
+        const h = document.createElement('li'); h.className = 'dropdown-category-header'; h.textContent = `--- ${cat} ---`; list.appendChild(h);
+        DATA[cat].sort((a,b)=>a.n.localeCompare(b.n)).forEach(c => {
+            const li = document.createElement('li'); li.textContent = c.n;
+            li.onclick = (e) => { e.stopPropagation(); sP = c.p; sN = c.n; document.getElementById('selectedCreatureText').textContent = c.n; document.getElementById('dropdownContent').style.display = 'none'; document.getElementById('commandOutput').textContent = "Ready..."; };
+            list.appendChild(li);
+        });
+    });
+}
+function toggleDropdown() { const d = document.getElementById('dropdownContent'); d.style.display = (d.style.display === 'block') ? 'none' : 'block'; }
+function filterCreatures(val) {
+    const items = document.querySelectorAll('#creatureList li'); document.getElementById('dropdownContent').style.display = 'block';
+    items.forEach(i => { if(!i.classList.contains('dropdown-category-header')) i.style.display = i.textContent.toLowerCase().includes(val.toLowerCase()) ? "" : "none"; });
+}
+async function handleAllActions() {
+    const id = document.getElementById('playerInput').value.trim(), g = document.querySelector('input[name="genderRadio"]:checked').value, s = document.getElementById('statusMessage');
+    if(!sP || !id) { s.textContent = "❌ Error: Selection missing!"; s.style.opacity = "1"; return; }
+    const cmd = `Scriptcommand SpawnDinoInBall -p=${id} -t=${sP} -f=${g} -b=1 -i=1 -a=1 -s=255,255,255,255,255,255,255,255`;
+    document.getElementById('commandOutput').textContent = cmd; await navigator.clipboard.writeText(cmd);
+    const log = { embeds: [{ title: "Sent Creature Log", color: 3447003, fields: [{ name: "EOS ID", value: id, inline: true }, { name: "Creature", value: sN, inline: true }], footer: { text: `Logged: ${new Date().toLocaleString('en-GB')}` }, timestamp: new Date() }] };
+    try { await fetch(STAFF_WEBHOOK, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(log) }); s.textContent = "✅ Generated, Copied & Logged!"; } 
+    catch(e) { s.textContent = "✅ Copied (Log failed)"; }
+    s.style.opacity = "1"; setTimeout(() => s.style.opacity = "0", 3000);
+}
+window.onclick = e => { if (!e.target.closest('#dropdownDisplay')) document.getElementById('dropdownContent').style.display = 'none'; };
+window.onload = populate;
+</script>
 </body>
 </html>
