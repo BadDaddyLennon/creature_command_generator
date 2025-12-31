@@ -7,13 +7,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #0d1117; color: #e6e6e6; }
-        .container-card { max-width: 90%; margin: 2rem auto; padding: 1.5rem; background-color: #161b22; border-radius: 12px; box-shadow: 0 0 20px rgba(0, 255, 133, 0.1); }
+        .container-card { max-width: 95%; margin: 2rem auto; padding: 1.5rem; background-color: #161b22; border-radius: 12px; box-shadow: 0 0 20px rgba(0, 255, 133, 0.1); }
         .neon-heading { color: #00FF85; text-shadow: 0 0 5px rgba(0, 255, 133, 0.5); }
         .input-label { color: #1E90FF; font-weight: 600; margin-bottom: 0.5rem; display: block; }
         .input-style { background-color: #0d1117; border: 1px solid #30363d; color: #00FF85; border-radius: 8px; padding: 0.75rem; width: 100%; cursor: pointer; }
         .command-output { background-color: #0d1117; border: 1px solid #30363d; font-family: monospace; white-space: pre-wrap; word-break: break-all; min-height: 4rem; color: #FFFFFF; padding: 1rem; border-radius: 8px; }
         .dropdown-content { display: none; position: absolute; background-color: #161b22; width: 100%; max-height: 500px; overflow-y: auto; border: 1px solid #30363d; border-radius: 8px; z-index: 1000; margin-top: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .dropdown-content li { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #1a202a; font-size: 0.85rem; list-style: none; }
+        .dropdown-content li { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #1a202a; font-size: 0.85rem; list-style: none; }
         .dropdown-content li:hover { background-color: #30363d; }
         .dropdown-category-header { padding: 10px 12px; font-weight: 800; border-top: 2px solid #30363d; background-color: #0d1117; color: #ffffff !important; pointer-events: none; position: sticky; top: 0; }
         .radio-label { display: inline-flex; align-items: center; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; border: 1px solid #484f58; background-color: #30363d; margin-right: 0.5rem; }
@@ -35,13 +35,13 @@
             <input type="radio" id="genderFemale" name="genderRadio" value="1" checked class="hidden"><label for="genderFemale" class="radio-label">♀️ Female</label>
             <input type="radio" id="genderMale" name="genderRadio" value="0" class="hidden"><label for="genderMale" class="radio-label">♂️ Male</label>
         </div></div>
-        <div class="mb-4"><label class="input-label">4. Output Box:</label><div id="commandOutput" class="command-output">Pending selection...</div></div>
+        <div class="mb-4"><label class="input-label">4. Generated Command:</label><div id="commandOutput" class="command-output">Ready...</div></div>
         <button onclick="handleAllActions()" class="button-action">Generate, Copy & Log</button>
         <div id="statusMessage" class="mt-4 text-center text-sm opacity-0 transition-opacity"></div>
     </div>
 <script>
 const STAFF_WEBHOOK = "https://discord.com/api/webhooks/1452903052947361986/ed0mhejPa-kyQo7AAH69NK67DcJIVL8QzTve-1V_gb8CmW1kpIMkA8UMcg_jZRHLxdie";
-const DATA = {
+const MASTER_DATA = {
  "Lost Colony": [
   {n: "Gigadesmodus", p: "/Game/LostColony/Dinos/BossBat/BossBat_Character_BP.BossBat_Character_BP"},
   {n: "Gloon", p: "/Game/LostColony/Dinos/LostChargePet/LostCharge_LanternPet_Char_BP.LostCharge_LanternPet_Char_BP"},
@@ -62,6 +62,7 @@ const DATA = {
   {n: "Baryonyx", p: "/Game/PrimalEarth/Dinos/Baryonyx/Baryonyx_Character_BP.Baryonyx_Character_BP"},
   {n: "Beelzebufo", p: "/Game/PrimalEarth/Dinos/Beelzebufo/Toad_Character_BP.Toad_Character_BP"},
   {n: "Brontosaurus", p: "/Game/PrimalEarth/Dinos/Sauropod/Sauropod_Character_BP.Sauropod_Character_BP"},
+  {n: "Carcharodontosaurus", p: "/Game/PrimalEarth/Dinos/Carcharodontosaurus/Carcha_Character_BP.Carcha_Character_BP"},
   {n: "Carbonemys", p: "/Game/PrimalEarth/Dinos/Turtle/Turtle_Character_BP.Turtle_Character_BP"},
   {n: "Carnotaurus", p: "/Game/PrimalEarth/Dinos/Carno/Carno_Character_BP.Carno_Character_BP"},
   {n: "Castoroides", p: "/Game/PrimalEarth/Dinos/Beaver/Beaver_Character_BP.Beaver_Character_BP"},
@@ -94,7 +95,7 @@ const DATA = {
   {n: "Oviraptor", p: "/Game/PrimalEarth/Dinos/Oviraptor/Oviraptor_Character_BP.Oviraptor_Character_BP"},
   {n: "Ovis", p: "/Game/PrimalEarth/Dinos/Sheep/Sheep_Character_BP.Sheep_Character_BP"},
   {n: "Pachy", p: "/Game/PrimalEarth/Dinos/Pachy/Pachy_Character_BP.Pachy_Character_BP"},
-  {n: "Pachyrhino", p: "/Game/PrimalEarth/Dinos/Pachyrhinosaurus/Pachyrhino_Character_BP.Pachyrhino_Character_BP"},
+  {n: "Pachyrhinosaurus", p: "/Game/PrimalEarth/Dinos/Pachyrhinosaurus/Pachyrhino_Character_BP.Pachyrhino_Character_BP"},
   {n: "Paracer", p: "/Game/PrimalEarth/Dinos/Paraceratherium/Paracer_Character_BP.Paracer_Character_BP"},
   {n: "Parasaur", p: "/Game/PrimalEarth/Dinos/Para/Para_Character_BP.Para_Character_BP"},
   {n: "Pegomastax", p: "/Game/PrimalEarth/Dinos/Pegomastax/Pegomastax_Character_BP.Pegomastax_Character_BP"},
@@ -106,6 +107,7 @@ const DATA = {
   {n: "Quetzal", p: "/Game/PrimalEarth/Dinos/Quetzalcoatlus/Quetz_Character_BP.Quetz_Character_BP"},
   {n: "Raptor", p: "/Game/PrimalEarth/Dinos/Raptor/Raptor_Character_BP.Raptor_Character_BP"},
   {n: "Rex", p: "/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP.Rex_Character_BP"},
+  {n: "Rhyniognatha", p: "/Game/PrimalEarth/Dinos/Rhyniognatha/Rhynio_Character_BP.Rhynio_Character_BP"},
   {n: "Sabertooth", p: "/Game/PrimalEarth/Dinos/Saber/Saber_Character_BP.Saber_Character_BP"},
   {n: "Sarcosuchus", p: "/Game/PrimalEarth/Dinos/Sarco/Sarco_Character_BP.Sarco_Character_BP"},
   {n: "Spinosaurus", p: "/Game/PrimalEarth/Dinos/Spino/Spino_Character_BP.Spino_Character_BP"},
@@ -161,6 +163,7 @@ const DATA = {
   {n: "Shinehorn", p: "/Game/Aberration/Dinos/LanternGoat/LanternGoat_Character_BP.LanternGoat_Character_BP"}
  ],
  "Extinction": [
+  {n: "Corrupted Reaper King (Tamed)", p: "/Game/Extinction/Dinos/Corrupt/Nameless/Xenomorph_Character_BP_Male_Tamed_Corrupt.Xenomorph_Character_BP_Male_Tamed_Corrupt"},
   {n: "Enforcer", p: "/Game/Extinction/Dinos/Enforcer/Enforcer_Character_BP.Enforcer_Character_BP"},
   {n: "Gacha", p: "/Game/Extinction/Dinos/Gacha/Gacha_Character_BP.Gacha_Character_BP"},
   {n: "Gasbags", p: "/Game/Extinction/Dinos/Gasbags/Gasbags_Character_BP.Gasbags_Character_BP"},
@@ -179,7 +182,7 @@ const DATA = {
   {n: "Manta", p: "/Game/PrimalEarth/Dinos/Manta/Manta_Character_BP.Manta_Character_BP"},
   {n: "Megalodon", p: "/Game/PrimalEarth/Dinos/Megalodon/Megalodon_Character_BP.Megalodon_Character_BP"},
   {n: "Mosasaurus", p: "/Game/PrimalEarth/Dinos/Mosasaurus/Mosa_Character_BP.Mosasaurus_Character_BP"},
-  {n: "Plesiosaurus", p: "/Game/PrimalEarth/Dinos/Plesiosaur/Plesiosaur_Character_BP.Plesiosaur_Character_BP"},
+  {n: "Plesiosaur", p: "/Game/PrimalEarth/Dinos/Plesiosaur/Plesiosaur_Character_BP.Plesiosaur_Character_BP"},
   {n: "Tusoteuthis", p: "/Game/PrimalEarth/Dinos/Tusoteuthis/Tusoteuthis_Character_BP.Tusoteuthis_Character_BP"}
  ],
  "S-Variants": [
@@ -211,44 +214,44 @@ const DATA = {
   {n: "S-Megalodon", p: "/SDinoVariants/S-Megalodon/S-Megalodon_Character_BP.S-Megalodon_Character_BP"},
   {n: "S-Megalosaur", p: "/SDinoVariants/S-Megalosaurus/S-Megalosaurus_Character_BP.S-Megalosaurus_Character_BP"},
   {n: "S-Megaraptor", p: "/SDinoVariants/S-Megaraptor/S-Megaraptor_Character_BP.S-Megaraptor_Character_BP"},
-  {n: "S-Mosasaur", p: "/SDinoVariants/S-Mosa/S-Mosa_Character_BP.S-Mosa_Character_BP"},
+  {n: "S-Mosasaurus", p: "/SDinoVariants/S-Mosa/S-Mosa_Character_BP.S-Mosa_Character_BP"},
   {n: "S-Otter", p: "/SDinoVariants/S-Otter/S-Otter_Character_BP.S-Otter_Character_BP"},
   {n: "S-Plesio", p: "/SDinoVariants/S-Plesiosaur/S-Plesiosaur_Character_BP.S-Plesiosaur_Character_BP"},
   {n: "S-Queen Bee", p: "/SDinoVariants/S-Bee/S-QueenBee_Character_BP.S-QueenBee_Character_BP"},
   {n: "S-Rex", p: "/SDinoVariants/S-Rex/S-Rex_Character_BP.S-Rex_Character_BP"},
-  {n: "S-Reaper M", p: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Male_Tamed.S-Xenomorph_Character_BP_Male_Tamed"},
-  {n: "S-Reaper F", p: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Female.S-Xenomorph_Character_BP_Female"},
+  {n: "S-Reaper (Male)", p: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Male_Tamed.S-Xenomorph_Character_BP_Male_Tamed"},
+  {n: "S-Reaper (Female)", p: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Female.S-Xenomorph_Character_BP_Female"},
   {n: "S-Rhynio", p: "/SDinoVariants/S-Rhynio/S-Rhynio_Character_BP.S-Rhynio_Character_BP"},
   {n: "S-Rock Drake", p: "/SDinoVariants/S-Rockdrake/S-RockDrake_Character_BP.S-RockDrake_Character_BP"},
   {n: "S-Shinehorn", p: "/SDinoVariants/S-Shinehorn/S-LanternGoat_Character_BP.S-LanternGoat_Character_BP"},
   {n: "S-Snow Owl", p: "/SDinoVariants/S-SnowOwl/S-Owl_Character_BP.S-Owl_Character_BP"},
   {n: "S-Spino", p: "/SDinoVariants/S-Spinosaurus/S-Spino_Character_BP.S-Spino_Character_BP"},
   {n: "S-Therizino", p: "/SDinoVariants/S-Therizinosaur/S-Therizino_Character_BP.S-Therizino_Character_BP"},
-  {n: "S-Thyla", p: "/SDinoVariants/S-Thylacoleo/S-Thylacoleo_Character_BP.S-Thylacoleo_Character_BP"},
+  {n: "S-Thylacoleo", p: "/SDinoVariants/S-Thylacoleo/S-Thylacoleo_Character_BP.S-Thylacoleo_Character_BP"},
   {n: "S-Trike", p: "/SDinoVariants/S-Trike/S-Trike_Character_BP.S-Trike_Character_BP"},
   {n: "S-Unicorn", p: "/SDinoVariants/S-Unicorn/S-Equus_Character_BP_Unicorn.S-Equus_Character_BP_Unicorn"},
   {n: "S-Velona", p: "/SDinoVariants/S-Velonasaur/S-Spindles_Character_BP.S-Spindles_Character_BP"}
  ],
  "Draconic Chronicles": [
-  {n: "Brawler", p: "/DraconicChronicles/Dino/Dragonkin/DragonKin_BrawlerBP.DragonKin_BrawlerBP"},
+  {n: "Dragonkin Brawler", p: "/DraconicChronicles/Dino/Dragonkin/DragonKin_BrawlerBP.DragonKin_BrawlerBP"},
   {n: "Hydro Dragon", p: "/DraconicChronicles/Dino/HydroDragon/HydroDragonBP.HydroDragonBP"},
   {n: "Undead Wyvern", p: "/DraconicChronicles/Dino/UndeadWyvern/UndeadWyvern_BP.UndeadWyvern_BP"},
-  {n: "Glowveil", p: "/DraconicChronicles/Dino/GlowveilDragon/GlowveilDragon_BP.GlowveilDragon_BP"},
+  {n: "Glowveil Dragon", p: "/DraconicChronicles/Dino/GlowveilDragon/GlowveilDragon_BP.GlowveilDragon_BP"},
   {n: "Undead Dragon", p: "/DraconicChronicles/Dino/UndeadDragon/UndeadDragonBP_Tamed.UndeadDragonBP_Tamed"},
   {n: "Headless Hydra", p: "/DraconicChronicles/Dino/HeadlessHydra/HeadlessHydraBP.HeadlessHydraBP"},
   {n: "Elder Wyvern", p: "/DraconicChronicles/Dino/Dragon/ElderWyvernBP.ElderWyvernBP"},
   {n: "Shadow Wyvern", p: "/DraconicChronicles/Dino/ShadowWyvern/ShadowWyvern_BP.ShadowWyvern_BP"},
   {n: "Lightning Wyvern", p: "/DraconicChronicles/Dino/LightningWyvern/Wyvern_Character_BP_Lightning1.Wyvern_Character_BP_Lightning1"},
   {n: "Ember Wyvern", p: "/DraconicChronicles/Dino/EmberWyvern/CrystalWyvern_Character_BP_Ember1.CrystalWyvern_Character_BP_Ember1"},
-  {n: "Blood Storm", p: "/DraconicChronicles/Dino/Gigant/BloodStormDragon.BloodStormDragon"},
+  {n: "Blood Storm Dragon", p: "/DraconicChronicles/Dino/Gigant/BloodStormDragon.BloodStormDragon"},
   {n: "Blood Wyvern", p: "/DraconicChronicles/Dino/BloodWyvern/CrystalWyvern_Character_BP_Blood1.CrystalWyvern_Character_BP_Blood1"},
   {n: "Dragonkin", p: "/DraconicChronicles/Dino/Dragonkin/DragonKinBP.DragonKinBP"},
-  {n: "Flameforge", p: "/DraconicChronicles/Dino/FlameforgeDragon/FlameforgeDragonBP.FlameforgeDragonBP"},
+  {n: "Flameforge Dragon", p: "/DraconicChronicles/Dino/FlameforgeDragon/FlameforgeDragonBP.FlameforgeDragonBP"},
   {n: "Frost Wyvern", p: "/DraconicChronicles/Dino/FrostWyvern/Ragnarok_Wyvern_Override_Ice1.Ragnarok_Wyvern_Override_Ice1"},
   {n: "Inferno Wyvern", p: "/DraconicChronicles/Dino/Wyvern/InfernoWyvernBP.InfernoWyvernBP"},
   {n: "Poison Wyvern", p: "/DraconicChronicles/Dino/PoisonWyvern/Wyvern_Character_BP_Poison1.Wyvern_Character_BP_Poison1"},
   {n: "Polar Dragon", p: "/DraconicChronicles/Dino/PolarDragon/PolarDragonBP.PolarDragonBP"},
-  {n: "Rejuvenating", p: "/DraconicChronicles/Dino/RejuvenatingDragon/RejuvenatingDragonBP.RejuvenatingDragonBP"},
+  {n: "Rejuvenating Dragon", p: "/DraconicChronicles/Dino/RejuvenatingDragon/RejuvenatingDragonBP.RejuvenatingDragonBP"},
   {n: "Sand Dragon", p: "/DraconicChronicles/Dino/SandDragon/SandDragonBP.SandDragonBP"},
   {n: "Tidal Dragon", p: "/DraconicChronicles/Dino/TidalDragon/TidalDragon_BP.TidalDragon_BP"},
   {n: "Tropical Wyvern", p: "/DraconicChronicles/Dino/TropicalWyvern/CrystalWyvernTropicalBP.CrystalWyvernTropicalBP"},
@@ -272,27 +275,26 @@ const DATA = {
  ],
  "Modded / Others": [
   {n: "Gen 2 Moro Raptor", p: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/Gen2MoroRaptor.Gen2MoroRaptor"},
-  {n: "Gen 2 Moro Rex", p: "/Moros_Indomitable_Duo/MoroRex_Gen2/Blueprints/MoroRexGen2_Character_BP.MoroRexGen2_Character_BP"},
+  {n: "Gen 2 Moros Rex", p: "/Moros_Indomitable_Duo/MoroRex_Gen2/Blueprints/MoroRexGen2_Character_BP.MoroRexGen2_Character_BP"},
   {n: "Moro Raptor", p: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/MoroRaptor_Character_BP.MoroRaptor_Character_BP"},
-  {n: "Moro Rex", p: "/Moros_Indomitable_Duo/IndominusRex/Models/MorosRex_Character_BP.MorosRex_Character_BP"},
-  {n: "Thorax Spider Jungle", p: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/JungleThoraxSpider_Character_BP.JungleThoraxSpider_Character_BP"},
-  {n: "Thorax Spider Snow", p: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/SnowThoraxSpider_Character_BP.SnowThoraxSpider_Character_BP"},
-  {n: "Thorax Spider Cute", p: "/CyrusJumpingSpider/Content/Spider/Jumper/CuteThoraxSpider_Character_BP.CuteThoraxSpider_Character_BP"},
+  {n: "Moros Rex", p: "/Moros_Indomitable_Duo/IndominusRex/Models/MorosRex_Character_BP.MorosRex_Character_BP"},
+  {n: "Spider Jungle", p: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/JungleThoraxSpider_Character_BP.JungleThoraxSpider_Character_BP"},
+  {n: "Spider Snow", p: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/SnowThoraxSpider_Character_BP.SnowThoraxSpider_Character_BP"},
+  {n: "Spider Cute", p: "/CyrusJumpingSpider/Content/Spider/Jumper/CuteThoraxSpider_Character_BP.CuteThoraxSpider_Character_BP"},
   {n: "Glaucus", p: "/Glaucus/Content/Glaucus_Character_BP.Glaucus_Character_BP"},
   {n: "Drakara Standard", p: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP.Drakara_Character_BP"},
   {n: "Drakara Bloodfang", p: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Bloodfang.Drakara_Character_BP_Bloodfang"},
   {n: "Moros Nothosaurus", p: "/Moros_Nothosaurus/Dinos/Blueprints/MorosNothosaurus_Character_BP.MorosNothosaurus_Character_BP"}
  ]
 };
-
 let sP = "", sN = "";
 function populate() {
     const list = document.getElementById('creatureList'); list.innerHTML = '';
-    Object.keys(DATA).sort().forEach(cat => {
+    Object.keys(MASTER_DATA).sort().forEach(cat => {
         const h = document.createElement('li'); h.className = 'dropdown-category-header'; h.textContent = `--- ${cat} ---`; list.appendChild(h);
-        DATA[cat].sort((a,b)=>a.n.localeCompare(b.n)).forEach(c => {
+        MASTER_DATA[cat].sort((a,b)=>a.n.localeCompare(b.n)).forEach(c => {
             const li = document.createElement('li'); li.textContent = c.n;
-            li.onclick = (e) => { e.stopPropagation(); sP = c.p; sN = c.n; document.getElementById('selectedCreatureText').textContent = c.n; document.getElementById('dropdownContent').style.display = 'none'; document.getElementById('commandOutput').textContent = "Ready..."; };
+            li.onclick = (e) => { e.stopPropagation(); sP = c.p; sN = c.n; document.getElementById('selectedCreatureText').textContent = c.n; document.getElementById('dropdownContent').style.display = 'none'; };
             list.appendChild(li);
         });
     });
@@ -304,7 +306,7 @@ function filterCreatures(val) {
 }
 async function handleAllActions() {
     const id = document.getElementById('playerInput').value.trim(), g = document.querySelector('input[name="genderRadio"]:checked').value, s = document.getElementById('statusMessage');
-    if(!sP || !id) { s.textContent = "❌ Error: Selection missing!"; s.style.opacity = "1"; return; }
+    if(!sP || !id) { s.textContent = "❌ Error: ID or Dino missing!"; s.style.opacity = "1"; return; }
     const cmd = `Scriptcommand SpawnDinoInBall -p=${id} -t=${sP} -f=${g} -b=1 -i=1 -a=1 -s=255,255,255,255,255,255,255,255`;
     document.getElementById('commandOutput').textContent = cmd; await navigator.clipboard.writeText(cmd);
     const log = { embeds: [{ title: "Sent Creature Log", color: 3447003, fields: [{ name: "EOS ID", value: id, inline: true }, { name: "Creature", value: sN, inline: true }], footer: { text: `Logged: ${new Date().toLocaleString('en-GB')}` }, timestamp: new Date() }] };
