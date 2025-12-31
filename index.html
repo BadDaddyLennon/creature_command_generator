@@ -13,316 +13,311 @@
         .input-style { background-color: #0d1117; border: 1px solid #30363d; color: #00FF85; border-radius: 8px; padding: 0.75rem; width: 100%; cursor: pointer; }
         .command-output { background-color: #0d1117; border: 1px solid #30363d; font-family: monospace; white-space: pre-wrap; word-break: break-all; min-height: 4rem; color: #FFFFFF; padding: 1rem; border-radius: 8px; }
         .dropdown-content { display: none; position: absolute; background-color: #161b22; width: 100%; max-height: 500px; overflow-y: auto; border: 1px solid #30363d; border-radius: 8px; z-index: 1000; margin-top: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .dropdown-content li { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #1a202a; font-size: 0.85rem; list-style: none; }
+        .dropdown-content li { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #1a202a; font-size: 0.85rem; list-style: none; }
         .dropdown-content li:hover { background-color: #30363d; }
         .dropdown-category-header { padding: 10px 12px; font-weight: 800; border-top: 2px solid #30363d; background-color: #0d1117; color: #ffffff !important; pointer-events: none; position: sticky; top: 0; }
         .radio-label { display: inline-flex; align-items: center; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; border: 1px solid #484f58; background-color: #30363d; margin-right: 0.5rem; }
         input[type="radio"]:checked + .radio-label { background-color: #FF0099; color: white; }
         #genderMale:checked + .radio-label { background-color: #1E90FF; }
         .button-action { background-color: #00FF85; color: #0d1117; font-weight: 800; width: 100%; padding: 1rem; border-radius: 12px; margin-top: 1rem; text-transform: uppercase; cursor: pointer; }
-
-        /* Verified Category Colors */
-        .cat-colony { color: #E5E4E2; } .cat-island { color: #00FF00; }
-        .cat-scorched { color: #FFFF00; } .cat-aberration { color: #90EE90; }
-        .cat-extinction { color: #FFA500; } .cat-marine { color: #00FFFF; }
-        .cat-svariants { color: #ADD8E6; } .cat-draconic { color: #FF0000; }
-        .cat-astraeos { color: #008080; } .cat-modded { color: #FF69B4; }
+        /* Colors */
+        .c-col { color: #E5E4E2; } .c-isl { color: #00FF00; } .c-sco { color: #FFFF00; } .c-abe { color: #90EE90; } .c-ext { color: #FFA500; } .c-mar { color: #00FFFF; } .c-sva { color: #ADD8E6; } .c-dra { color: #FF0000; } .c-ast { color: #008080; } .c-mod { color: #FF69B4; }
     </style>
 </head>
 <body>
     <div class="container-card">
         <h1 class="text-2xl font-bold neon-heading mb-6 text-center">ArkLegendsPVE Master Generator</h1>
         <div class="mb-4"><label class="input-label">1. Target EOS ID:</label><input type="text" id="pId" value="00024953ec774cf98878f25e96eca484" class="input-style"></div>
-        <div class="mb-4"><label class="input-label">Search:</label><input type="text" id="sBox" oninput="filterList(this.value)" class="input-style" placeholder="Search by name..."></div>
+        <div class="mb-4"><label class="input-label">Search:</label><input type="text" id="sBx" oninput="fltr(this.value)" class="input-style" placeholder="Type name..."></div>
         <div class="mb-4 relative"><label class="input-label">2. Select Creature:</label>
-            <div id="dBox" class="input-style flex justify-between items-center" onclick="toggleD()"><span id="sText">--- Select Dino ---</span><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg></div>
-            <div id="dList" class="dropdown-content"><ul id="cItems"></ul></div>
+            <div id="dBx" class="input-style flex justify-between items-center" onclick="tgl()"><span id="sTx">--- Select Dino ---</span><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg></div>
+            <div id="dLi" class="dropdown-content"><ul id="cIt"></ul></div>
         </div>
         <div class="mb-6"><label class="input-label">3. Gender:</label><div class="flex">
-            <input type="radio" id="f" name="g" value="1" checked class="hidden"><label for="f" class="radio-label">♀️ Female</label>
-            <input type="radio" id="m" name="g" value="0" class="hidden"><label for="m" class="radio-label">♂️ Male</label>
+            <input type="radio" id="gF" name="g" value="1" checked class="hidden"><label for="gF" class="radio-label">♀️ Female</label>
+            <input type="radio" id="gM" name="g" value="0" class="hidden"><label for="gM" class="radio-label">♂️ Male</label>
         </div></div>
-        <div class="mb-4"><label class="input-label">4. Output:</label><div id="oBox" class="command-output">Waiting...</div></div>
-        <button onclick="execute()" class="button-action">Generate, Copy & Log</button>
-        <div id="status" class="mt-4 text-center text-sm opacity-0 transition-opacity"></div>
+        <div class="mb-4"><label class="input-label">4. Output:</label><div id="oBx" class="command-output">Ready...</div></div>
+        <button onclick="exe()" class="button-action">Generate, Copy & Log</button>
+        <div id="st" class="mt-4 text-center text-sm opacity-0 transition-opacity"></div>
     </div>
 <script>
-const WEBHOOK = "https://discord.com/api/webhooks/1452903052947361986/ed0mhejPa-kyQo7AAH69NK67DcJIVL8QzTve-1V_gb8CmW1kpIMkA8UMcg_jZRHLxdie";
-const MASTER_LIST = {
+const WH = "https://discord.com/api/webhooks/1452903052947361986/ed0mhejPa-kyQo7AAH69NK67DcJIVL8QzTve-1V_gb8CmW1kpIMkA8UMcg_jZRHLxdie";
+const MASTER = {
  "Lost Colony": [
-  {n: "Gigadesmodus", p: "/Game/LostColony/Dinos/BossBat/BossBat_Character_BP.BossBat_Character_BP", c: "cat-colony"},
-  {n: "Gloon", p: "/Game/LostColony/Dinos/LostChargePet/LostCharge_LanternPet_Char_BP.LostCharge_LanternPet_Char_BP", c: "cat-colony"},
-  {n: "Aureliax", p: "/Game/LostColony/Dinos/SnowDragon/SnowDragon_Character_BP.SnowDragon_Character_BP", c: "cat-colony"},
-  {n: "Ossidon", p: "/Game/LostColony/Dinos/SnowMonster/SnowMonster_Character_BP.SnowMonster_Character_BP", c: "cat-colony"},
-  {n: "Solwyn", p: "/Game/LostColony/Dinos/AngelFox/AngelFox_Character_BP.AngelFox_Character_BP", c: "cat-colony"},
-  {n: "Lost Malwyn", p: "/Game/LostColony/Dinos/DevilFox/DevilFox_Character_BP.DevilFox_Character_BP", c: "cat-colony"},
-  {n: "Revenant Malwyn", p: "/Game/LostColony/Dinos/ZombieDino/DevilFox/DevilFox_Character_BP_Corrupt_Zombie.DevilFox_Character_BP_Corrupt_Zombie", c: "cat-colony"}
+  {n: "Gigadesmodus", p: "/Game/LostColony/Dinos/BossBat/BossBat_Character_BP.BossBat_Character_BP", c: "c-col"},
+  {n: "Gloon", p: "/Game/LostColony/Dinos/LostChargePet/LostCharge_LanternPet_Char_BP.LostCharge_LanternPet_Char_BP", c: "c-col"},
+  {n: "Aureliax", p: "/Game/LostColony/Dinos/SnowDragon/SnowDragon_Character_BP.SnowDragon_Character_BP", c: "c-col"},
+  {n: "Ossidon", p: "/Game/LostColony/Dinos/SnowMonster/SnowMonster_Character_BP.SnowMonster_Character_BP", c: "c-col"},
+  {n: "Solwyn", p: "/Game/LostColony/Dinos/AngelFox/AngelFox_Character_BP.AngelFox_Character_BP", c: "c-col"},
+  {n: "Lost Malwyn", p: "/Game/LostColony/Dinos/DevilFox/DevilFox_Character_BP.DevilFox_Character_BP", c: "c-col"},
+  {n: "Revenant Malwyn", p: "/Game/LostColony/Dinos/ZombieDino/DevilFox/DevilFox_Character_BP_Corrupt_Zombie.DevilFox_Character_BP_Corrupt_Zombie", c: "c-col"}
  ],
  "The Island": [
-  {n: "Achatina", p: "/Game/PrimalEarth/Dinos/Achatina/Achatina_Character_BP.Achatina_Character_BP", c: "cat-island"},
-  {n: "Allosaurus", p: "/Game/PrimalEarth/Dinos/Allosaurus/Allo_Character_BP.Allosaurus_Character_BP", c: "cat-island"},
-  {n: "Anky", p: "/Game/PrimalEarth/Dinos/Ankylo/Ankylo_Character_BP.Ankylo_Character_BP", c: "cat-island"},
-  {n: "Spider", p: "/Game/PrimalEarth/Dinos/Spider-Araneo/SpiderS_Character_BP.SpiderS_Character_BP", c: "cat-island"},
-  {n: "Archaeopteryx", p: "/Game/PrimalEarth/Dinos/Archaeopteryx/Archa_Character_BP.Archaeopteryx_Character_BP", c: "cat-island"},
-  {n: "Argentavis", p: "/Game/PrimalEarth/Dinos/Argentavis/Argent_Character_BP.Argent_Character_BP", c: "cat-island"},
-  {n: "Arthro", p: "/Game/PrimalEarth/Dinos/Arthropluera/Arthro_Character_BP.Arthro_Character_BP", c: "cat-island"},
-  {n: "Baryonyx", p: "/Game/PrimalEarth/Dinos/Baryonyx/Baryonyx_Character_BP.Baryonyx_Character_BP", c: "cat-island"},
-  {n: "Beelzebufo", p: "/Game/PrimalEarth/Dinos/Beelzebufo/Toad_Character_BP.Toad_Character_BP", c: "cat-island"},
-  {n: "Bronto", p: "/Game/PrimalEarth/Dinos/Sauropod/Sauropod_Character_BP.Sauropod_Character_BP", c: "cat-island"},
-  {n: "Carcha", p: "/Game/PrimalEarth/Dinos/Carcharodontosaurus/Carcha_Character_BP.Carcha_Character_BP", c: "cat-island"},
-  {n: "Carno", p: "/Game/PrimalEarth/Dinos/Carno/Carno_Character_BP.Carno_Character_BP", c: "cat-island"},
-  {n: "Beaver", p: "/Game/PrimalEarth/Dinos/Beaver/Beaver_Character_BP.Beaver_Character_BP", c: "cat-island"},
-  {n: "Compy", p: "/Game/PrimalEarth/Dinos/Compsognathus/Compsognathus_Character_BP.Compsognathus_Character_BP", c: "cat-island"},
-  {n: "Daeodon", p: "/Game/PrimalEarth/Dinos/Daeodon/Daeodon_Character_BP.Daeodon_Character_BP", c: "cat-island"},
-  {n: "Dilo", p: "/Game/PrimalEarth/Dinos/Dilo/Dilo_Character_BP.Dilo_Character_BP", c: "cat-island"},
-  {n: "Dimetrodon", p: "/Game/PrimalEarth/Dinos/Dimetrodon/Dimetrodon_Character_BP.Dimetrodon_Character_BP", c: "cat-island"},
-  {n: "Dimorph", p: "/Game/PrimalEarth/Dinos/Dimorphodon/Dimorph_Character_BP.Dimorph_Character_BP", c: "cat-island"},
-  {n: "Diplodocus", p: "/Game/PrimalEarth/Dinos/Diplodocus/Diplodocus_Character_BP.Diplodocus_Character_BP", c: "cat-island"},
-  {n: "Dodo", p: "/Game/PrimalEarth/Dinos/Dodo/Dodo_Character_BP.Dodo_Character_BP", c: "cat-island"},
-  {n: "Doed", p: "/Game/PrimalEarth/Dinos/Doed/Doed_Character_BP.Doed_Character_BP", c: "cat-island"},
-  {n: "Dung Beetle", p: "/Game/PrimalEarth/Dinos/DungBeetle/DungBeetle_Character_BP.DungBeetle_Character_BP", c: "cat-island"},
-  {n: "Equus", p: "/Game/PrimalEarth/Dinos/Equus/Equus_Character_BP.Equus_Character_BP", c: "cat-island"},
-  {n: "Galli", p: "/Game/PrimalEarth/Dinos/Galli/Galli_Character_BP.Galli_Character_BP", c: "cat-island"},
-  {n: "Giganoto", p: "/Game/PrimalEarth/Dinos/Gigant/Gigant_Character_BP.Gigant_Character_BP", c: "cat-island"},
-  {n: "Hesperornis", p: "/Game/PrimalEarth/Dinos/Hesperornis/Hesperornis_Character_BP.Hesperornis_Character_BP", c: "cat-island"},
-  {n: "Hyenadon", p: "/Game/PrimalEarth/Dinos/Hyaenodon/Hyaenodon_Character_BP.Hyaenodon_Character_BP", c: "cat-island"},
-  {n: "Kairuku", p: "/Game/PrimalEarth/Dinos/Kairuku/Kairuku_Character_BP.Kairuku_Character_BP", c: "cat-island"},
-  {n: "Kaprosuchus", p: "/Game/PrimalEarth/Dinos/Kaprosuchus/Kaprosuchus_Character_BP.Kaprosuchus_Character_BP", c: "cat-island"},
-  {n: "Lystro", p: "/Game/PrimalEarth/Dinos/Lystro/Lystro_Character_BP.Lystro_Character_BP", c: "cat-island"},
-  {n: "Mammoth", p: "/Game/PrimalEarth/Dinos/Mammoth/Mammoth_Character_BP.Mammoth_Character_BP", c: "cat-island"},
-  {n: "Deer", p: "/Game/PrimalEarth/Dinos/Stag/Stag_Character_BP.Stag_Character_BP", c: "cat-island"},
-  {n: "Megalosaur", p: "/Game/PrimalEarth/Dinos/Megalosaurus/Megalosaurus_Character_BP.Megalosaurus_Character_BP", c: "cat-island"},
-  {n: "Megatherium", p: "/Game/PrimalEarth/Dinos/Megatherium/Megatherium_Character_BP.Megatherium_Character_BP", c: "cat-island"},
-  {n: "Monkey", p: "/Game/PrimalEarth/Dinos/Monkey/Monkey_Character_BP.Monkey_Character_BP", c: "cat-island"},
-  {n: "Microraptor", p: "/Game/PrimalEarth/Dinos/Microraptor/Microraptor_Character_BP.Microraptor_Character_BP", c: "cat-island"},
-  {n: "Moschops", p: "/Game/PrimalEarth/Dinos/Moschops/Moschops_Character_BP.Moschops_Character_BP", c: "cat-island"},
-  {n: "Onyc", p: "/Game/PrimalEarth/Dinos/Bat/Bat_Character_BP.Bat_Character_BP", c: "cat-island"},
-  {n: "Otter", p: "/Game/PrimalEarth/Dinos/Otter/Otter_Character_BP.Otter_Character_BP", c: "cat-island"},
-  {n: "Oviraptor", p: "/Game/PrimalEarth/Dinos/Oviraptor/Oviraptor_Character_BP.Oviraptor_Character_BP", c: "cat-island"},
-  {n: "Ovis", p: "/Game/PrimalEarth/Dinos/Sheep/Sheep_Character_BP.Sheep_Character_BP", c: "cat-island"},
-  {n: "Pachy", p: "/Game/PrimalEarth/Dinos/Pachy/Pachy_Character_BP.Pachy_Character_BP", c: "cat-island"},
-  {n: "Pachyrhino", p: "/Game/PrimalEarth/Dinos/Pachyrhinosaurus/Pachyrhino_Character_BP.Pachyrhino_Character_BP", c: "cat-island"},
-  {n: "Paracer", p: "/Game/PrimalEarth/Dinos/Paraceratherium/Paracer_Character_BP.Paracer_Character_BP", c: "cat-island"},
-  {n: "Parasaur", p: "/Game/PrimalEarth/Dinos/Para/Para_Character_BP.Para_Character_BP", c: "cat-island"},
-  {n: "Pegomastax", p: "/Game/PrimalEarth/Dinos/Pegomastax/Pegomastax_Character_BP.Pegomastax_Character_BP", c: "cat-island"},
-  {n: "Phiomia", p: "/Game/PrimalEarth/Dinos/Phiomia/Phiomia_Character_BP.Phiomia_Character_BP", c: "cat-island"},
-  {n: "Procoptodon", p: "/Game/PrimalEarth/Dinos/Procoptodon/Procoptodon_Character_BP.Procoptodon_Character_BP", c: "cat-island"},
-  {n: "Ptero", p: "/Game/PrimalEarth/Dinos/Ptero/Ptero_Character_BP.Ptero_Character_BP", c: "cat-island"},
-  {n: "Scorpion", p: "/Game/PrimalEarth/Dinos/Scorpion/Scorpion_Character_BP.Scorpion_Character_BP", c: "cat-island"},
-  {n: "Purlovia", p: "/Game/PrimalEarth/Dinos/Purlovia/Purlovia_Character_BP.Purlovia_Character_BP", c: "cat-island"},
-  {n: "Quetz", p: "/Game/PrimalEarth/Dinos/Quetzalcoatlus/Quetz_Character_BP.Quetz_Character_BP", c: "cat-island"},
-  {n: "Raptor", p: "/Game/PrimalEarth/Dinos/Raptor/Raptor_Character_BP.Raptor_Character_BP", c: "cat-island"},
-  {n: "Rex", p: "/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP.Rex_Character_BP", c: "cat-island"},
-  {n: "Rhynio", p: "/Game/PrimalEarth/Dinos/Rhyniognatha/Rhynio_Character_BP.Rhynio_Character_BP", c: "cat-island"},
-  {n: "Sabertooth", p: "/Game/PrimalEarth/Dinos/Saber/Saber_Character_BP.Saber_Character_BP", c: "cat-island"},
-  {n: "Sarco", p: "/Game/PrimalEarth/Dinos/Sarco/Sarco_Character_BP.Sarco_Character_BP", c: "cat-island"},
-  {n: "Spino", p: "/Game/PrimalEarth/Dinos/Spino/Spino_Character_BP.Spino_Character_BP", c: "cat-island"},
-  {n: "Stego", p: "/Game/PrimalEarth/Dinos/Stego/Stego_Character_BP.Stego_Character_BP", c: "cat-island"},
-  {n: "Tapejara", p: "/Game/PrimalEarth/Dinos/Tapejara/Tapejara_Character_BP.Tapejara_Character_BP", c: "cat-island"},
-  {n: "Terror Bird", p: "/Game/PrimalEarth/Dinos/TerrorBird/TerrorBird_Character_BP.TerrorBird_Character_BP", c: "cat-island"},
-  {n: "Therizino", p: "/Game/PrimalEarth/Dinos/Therizinosaurus/Therizino_Character_BP.Therizino_Character_BP", c: "cat-island"},
-  {n: "Thyla", p: "/Game/PrimalEarth/Dinos/Thylacoleo/Thylacoleo_Character_BP.Thylacoleo_Character_BP", c: "cat-island"},
-  {n: "Snake", p: "/Game/PrimalEarth/Dinos/Snake/Snake_Character_BP.Snake_Character_BP", c: "cat-island"},
-  {n: "Titanosaur", p: "/Game/PrimalEarth/Dinos/Titanosaur/Titanosaur_Character_BP.Titanosaur_Character_BP", c: "cat-island"},
-  {n: "Trike", p: "/Game/PrimalEarth/Dinos/Trike/Trike_Character_BP.Trike_Character_BP", c: "cat-island"},
-  {n: "Troodon", p: "/Game/PrimalEarth/Dinos/Troodon/Troodon_Character_BP.Troodon_Character_BP", c: "cat-island"},
-  {n: "Rhino", p: "/Game/PrimalEarth/Dinos/Rhino/Rhino_Character_BP.Rhino_Character_BP", c: "cat-island"},
-  {n: "Yutyrannus", p: "/Game/PrimalEarth/Dinos/Yutyrannus/Yutyrannus_Character_BP.Yutyrannus_Character_BP", c: "cat-island"}
+  {n: "Achatina", p: "/Game/PrimalEarth/Dinos/Achatina/Achatina_Character_BP.Achatina_Character_BP", c: "c-isl"},
+  {n: "Allosaurus", p: "/Game/PrimalEarth/Dinos/Allosaurus/Allo_Character_BP.Allosaurus_Character_BP", c: "c-isl"},
+  {n: "Anky", p: "/Game/PrimalEarth/Dinos/Ankylo/Ankylo_Character_BP.Ankylo_Character_BP", c: "c-isl"},
+  {n: "Araneo", p: "/Game/PrimalEarth/Dinos/Spider-Araneo/SpiderS_Character_BP.SpiderS_Character_BP", c: "c-isl"},
+  {n: "Archaeopteryx", p: "/Game/PrimalEarth/Dinos/Archaeopteryx/Archa_Character_BP.Archaeopteryx_Character_BP", c: "c-isl"},
+  {n: "Argentavis", p: "/Game/PrimalEarth/Dinos/Argentavis/Argent_Character_BP.Argent_Character_BP", c: "c-isl"},
+  {n: "Arthro", p: "/Game/PrimalEarth/Dinos/Arthropluera/Arthro_Character_BP.Arthro_Character_BP", c: "c-isl"},
+  {n: "Baryonyx", p: "/Game/PrimalEarth/Dinos/Baryonyx/Baryonyx_Character_BP.Baryonyx_Character_BP", c: "c-isl"},
+  {n: "Beelzebufo", p: "/Game/PrimalEarth/Dinos/Beelzebufo/Toad_Character_BP.Toad_Character_BP", c: "c-isl"},
+  {n: "Bronto", p: "/Game/PrimalEarth/Dinos/Sauropod/Sauropod_Character_BP.Sauropod_Character_BP", c: "c-isl"},
+  {n: "Carcha", p: "/Game/PrimalEarth/Dinos/Carcharodontosaurus/Carcha_Character_BP.Carcha_Character_BP", c: "c-isl"},
+  {n: "Turtle", p: "/Game/PrimalEarth/Dinos/Turtle/Turtle_Character_BP.Turtle_Character_BP", c: "c-isl"},
+  {n: "Carno", p: "/Game/PrimalEarth/Dinos/Carno/Carno_Character_BP.Carno_Character_BP", c: "c-isl"},
+  {n: "Beaver", p: "/Game/PrimalEarth/Dinos/Beaver/Beaver_Character_BP.Beaver_Character_BP", c: "c-isl"},
+  {n: "Compy", p: "/Game/PrimalEarth/Dinos/Compsognathus/Compsognathus_Character_BP.Compsognathus_Character_BP", c: "c-isl"},
+  {n: "Daeodon", p: "/Game/PrimalEarth/Dinos/Daeodon/Daeodon_Character_BP.Daeodon_Character_BP", c: "c-isl"},
+  {n: "Dilo", p: "/Game/PrimalEarth/Dinos/Dilo/Dilo_Character_BP.Dilo_Character_BP", c: "c-isl"},
+  {n: "Dimetrodon", p: "/Game/PrimalEarth/Dinos/Dimetrodon/Dimetrodon_Character_BP.Dimetrodon_Character_BP", c: "c-isl"},
+  {n: "Dimorph", p: "/Game/PrimalEarth/Dinos/Dimorphodon/Dimorph_Character_BP.Dimorph_Character_BP", c: "c-isl"},
+  {n: "Diplodocus", p: "/Game/PrimalEarth/Dinos/Diplodocus/Diplodocus_Character_BP.Diplodocus_Character_BP", c: "c-isl"},
+  {n: "Dodo", p: "/Game/PrimalEarth/Dinos/Dodo/Dodo_Character_BP.Dodo_Character_BP", c: "c-isl"},
+  {n: "Doed", p: "/Game/PrimalEarth/Dinos/Doed/Doed_Character_BP.Doed_Character_BP", c: "c-isl"},
+  {n: "Dung Beetle", p: "/Game/PrimalEarth/Dinos/DungBeetle/DungBeetle_Character_BP.DungBeetle_Character_BP", c: "c-isl"},
+  {n: "Equus", p: "/Game/PrimalEarth/Dinos/Equus/Equus_Character_BP.Equus_Character_BP", c: "c-isl"},
+  {n: "Galli", p: "/Game/PrimalEarth/Dinos/Galli/Galli_Character_BP.Galli_Character_BP", c: "c-isl"},
+  {n: "Giganoto", p: "/Game/PrimalEarth/Dinos/Gigant/Gigant_Character_BP.Gigant_Character_BP", c: "c-isl"},
+  {n: "Hesperornis", p: "/Game/PrimalEarth/Dinos/Hesperornis/Hesperornis_Character_BP.Hesperornis_Character_BP", c: "c-isl"},
+  {n: "Hyenadon", p: "/Game/PrimalEarth/Dinos/Hyaenodon/Hyaenodon_Character_BP.Hyaenodon_Character_BP", c: "c-isl"},
+  {n: "Kairuku", p: "/Game/PrimalEarth/Dinos/Kairuku/Kairuku_Character_BP.Kairuku_Character_BP", c: "c-isl"},
+  {n: "Kapro", p: "/Game/PrimalEarth/Dinos/Kaprosuchus/Kaprosuchus_Character_BP.Kaprosuchus_Character_BP", c: "c-isl"},
+  {n: "Lystro", p: "/Game/PrimalEarth/Dinos/Lystro/Lystro_Character_BP.Lystro_Character_BP", c: "c-isl"},
+  {n: "Mammoth", p: "/Game/PrimalEarth/Dinos/Mammoth/Mammoth_Character_BP.Mammoth_Character_BP", c: "c-isl"},
+  {n: "Deer", p: "/Game/PrimalEarth/Dinos/Stag/Stag_Character_BP.Stag_Character_BP", c: "c-isl"},
+  {n: "Megalosaur", p: "/Game/PrimalEarth/Dinos/Megalosaurus/Megalosaurus_Character_BP.Megalosaurus_Character_BP", c: "c-isl"},
+  {n: "Megatherium", p: "/Game/PrimalEarth/Dinos/Megatherium/Megatherium_Character_BP.Megatherium_Character_BP", c: "c-isl"},
+  {n: "Monkey", p: "/Game/PrimalEarth/Dinos/Monkey/Monkey_Character_BP.Monkey_Character_BP", c: "c-isl"},
+  {n: "Microraptor", p: "/Game/PrimalEarth/Dinos/Microraptor/Microraptor_Character_BP.Microraptor_Character_BP", c: "c-isl"},
+  {n: "Moschops", p: "/Game/PrimalEarth/Dinos/Moschops/Moschops_Character_BP.Moschops_Character_BP", c: "c-isl"},
+  {n: "Onyc", p: "/Game/PrimalEarth/Dinos/Bat/Bat_Character_BP.Bat_Character_BP", c: "c-isl"},
+  {n: "Otter", p: "/Game/PrimalEarth/Dinos/Otter/Otter_Character_BP.Otter_Character_BP", c: "c-isl"},
+  {n: "Oviraptor", p: "/Game/PrimalEarth/Dinos/Oviraptor/Oviraptor_Character_BP.Oviraptor_Character_BP", c: "c-isl"},
+  {n: "Ovis", p: "/Game/PrimalEarth/Dinos/Sheep/Sheep_Character_BP.Sheep_Character_BP", c: "c-isl"},
+  {n: "Pachy", p: "/Game/PrimalEarth/Dinos/Pachy/Pachy_Character_BP.Pachy_Character_BP", c: "c-isl"},
+  {n: "Pachyrhino", p: "/Game/PrimalEarth/Dinos/Pachyrhinosaurus/Pachyrhino_Character_BP.Pachyrhino_Character_BP", c: "c-isl"},
+  {n: "Paracer", p: "/Game/PrimalEarth/Dinos/Paraceratherium/Paracer_Character_BP.Paracer_Character_BP", c: "c-isl"},
+  {n: "Parasaur", p: "/Game/PrimalEarth/Dinos/Para/Para_Character_BP.Para_Character_BP", c: "c-isl"},
+  {n: "Pegomastax", p: "/Game/PrimalEarth/Dinos/Pegomastax/Pegomastax_Character_BP.Pegomastax_Character_BP", c: "c-isl"},
+  {n: "Phiomia", p: "/Game/PrimalEarth/Dinos/Phiomia/Phiomia_Character_BP.Phiomia_Character_BP", c: "c-isl"},
+  {n: "Procoptodon", p: "/Game/PrimalEarth/Dinos/Procoptodon/Procoptodon_Character_BP.Procoptodon_Character_BP", c: "c-isl"},
+  {n: "Ptero", p: "/Game/PrimalEarth/Dinos/Ptero/Ptero_Character_BP.Ptero_Character_BP", c: "c-isl"},
+  {n: "Scorpion", p: "/Game/PrimalEarth/Dinos/Scorpion/Scorpion_Character_BP.Scorpion_Character_BP", c: "c-isl"},
+  {n: "Purlovia", p: "/Game/PrimalEarth/Dinos/Purlovia/Purlovia_Character_BP.Purlovia_Character_BP", c: "c-isl"},
+  {n: "Quetz", p: "/Game/PrimalEarth/Dinos/Quetzalcoatlus/Quetz_Character_BP.Quetz_Character_BP", c: "c-isl"},
+  {n: "Raptor", p: "/Game/PrimalEarth/Dinos/Raptor/Raptor_Character_BP.Raptor_Character_BP", c: "c-isl"},
+  {n: "Rex", p: "/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP.Rex_Character_BP", c: "c-isl"},
+  {n: "Rhynio", p: "/Game/PrimalEarth/Dinos/Rhyniognatha/Rhynio_Character_BP.Rhynio_Character_BP", c: "c-isl"},
+  {n: "Sabertooth", p: "/Game/PrimalEarth/Dinos/Saber/Saber_Character_BP.Saber_Character_BP", c: "c-isl"},
+  {n: "Sarco", p: "/Game/PrimalEarth/Dinos/Sarco/Sarco_Character_BP.Sarco_Character_BP", c: "c-isl"},
+  {n: "Spino", p: "/Game/PrimalEarth/Dinos/Spino/Spino_Character_BP.Spino_Character_BP", c: "c-isl"},
+  {n: "Stego", p: "/Game/PrimalEarth/Dinos/Stego/Stego_Character_BP.Stego_Character_BP", c: "c-isl"},
+  {n: "Tapejara", p: "/Game/PrimalEarth/Dinos/Tapejara/Tapejara_Character_BP.Tapejara_Character_BP", c: "c-isl"},
+  {n: "Terror Bird", p: "/Game/PrimalEarth/Dinos/TerrorBird/TerrorBird_Character_BP.TerrorBird_Character_BP", c: "c-isl"},
+  {n: "Therizino", p: "/Game/PrimalEarth/Dinos/Therizinosaurus/Therizino_Character_BP.Therizino_Character_BP", c: "c-isl"},
+  {n: "Thyla", p: "/Game/PrimalEarth/Dinos/Thylacoleo/Thylacoleo_Character_BP.Thylacoleo_Character_BP", c: "c-isl"},
+  {n: "Snake", p: "/Game/PrimalEarth/Dinos/Snake/Snake_Character_BP.Snake_Character_BP", c: "c-isl"},
+  {n: "Titanosaur", p: "/Game/PrimalEarth/Dinos/Titanosaur/Titanosaur_Character_BP.Titanosaur_Character_BP", c: "c-isl"},
+  {n: "Trike", p: "/Game/PrimalEarth/Dinos/Trike/Trike_Character_BP.Trike_Character_BP", c: "c-isl"},
+  {n: "Troodon", p: "/Game/PrimalEarth/Dinos/Troodon/Troodon_Character_BP.Troodon_Character_BP", c: "c-isl"},
+  {n: "Rhino", p: "/Game/PrimalEarth/Dinos/Rhino/Rhino_Character_BP.Rhino_Character_BP", c: "c-isl"},
+  {n: "Yutyrannus", p: "/Game/PrimalEarth/Dinos/Yutyrannus/Yutyrannus_Character_BP.Yutyrannus_Character_BP", c: "c-isl"}
  ],
  "Scorched Earth": [
-  {n: "Deathworm", p: "/Game/ScorchedEarth/Dinos/Deathworm/Deathworm_Character_BP.Deathworm_Character_BP", c: "cat-scorched"},
-  {n: "Fasola", p: "/Game/ASA/Dinos/Fasolasuchus/Fasola_Character_BP.Fasola_Character_BP", c: "cat-scorched"},
-  {n: "Jerboa", p: "/Game/ScorchedEarth/Dinos/Jerboa/Jerboa_Character_BP.Jerboa_Character_BP", c: "cat-scorched"},
-  {n: "Moth", p: "/Game/ScorchedEarth/Dinos/Moth/Moth_Character_BP.Moth_Character_BP", c: "cat-scorched"},
-  {n: "Mantis", p: "/Game/ScorchedEarth/Dinos/Mantis/Mantis_Character_BP.Mantis_Character_BP", c: "cat-scorched"},
-  {n: "Morellatops", p: "/Game/ScorchedEarth/Dinos/Morellatops/Morellatops_Character_BP.Morellatops_Character_BP", c: "cat-scorched"},
-  {n: "Phoenix", p: "/Game/ScorchedEarth/Dinos/Phoenix/Phoenix_Character_BP.Phoenix_Character_BP", c: "cat-scorched"},
-  {n: "Golem", p: "/Game/ScorchedEarth/Dinos/RockGolem/RockGolem_Character_BP.RockGolem_Character_BP", c: "cat-scorched"},
-  {n: "Thorny Dragon", p: "/Game/ScorchedEarth/Dinos/SpinyLizard/SpinyLizard_Character_BP.SpinyLizard_Character_BP", c: "cat-scorched"},
-  {n: "Fire Wyvern", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Fire.Wyvern_Character_BP_Fire", c: "cat-scorched"},
-  {n: "Light Wyvern", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Lightning.Wyvern_Character_BP_Lightning", c: "cat-scorched"},
-  {n: "Poison Wyvern", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Poison.Wyvern_Character_BP_Poison", c: "cat-scorched"}
+  {n: "Deathworm", p: "/Game/ScorchedEarth/Dinos/Deathworm/Deathworm_Character_BP.Deathworm_Character_BP", c: "c-sco"},
+  {n: "Fasola", p: "/Game/ASA/Dinos/Fasolasuchus/Fasola_Character_BP.Fasola_Character_BP", c: "c-sco"},
+  {n: "Jerboa", p: "/Game/ScorchedEarth/Dinos/Jerboa/Jerboa_Character_BP.Jerboa_Character_BP", c: "c-sco"},
+  {n: "Moth", p: "/Game/ScorchedEarth/Dinos/Moth/Moth_Character_BP.Moth_Character_BP", c: "c-sco"},
+  {n: "Mantis", p: "/Game/ScorchedEarth/Dinos/Mantis/Mantis_Character_BP.Mantis_Character_BP", c: "c-sco"},
+  {n: "Morellatops", p: "/Game/ScorchedEarth/Dinos/Morellatops/Morellatops_Character_BP.Morellatops_Character_BP", c: "c-sco"},
+  {n: "Phoenix", p: "/Game/ScorchedEarth/Dinos/Phoenix/Phoenix_Character_BP.Phoenix_Character_BP", c: "c-sco"},
+  {n: "Golem", p: "/Game/ScorchedEarth/Dinos/RockGolem/RockGolem_Character_BP.RockGolem_Character_BP", c: "c-sco"},
+  {n: "Thorny Dragon", p: "/Game/ScorchedEarth/Dinos/SpinyLizard/SpinyLizard_Character_BP.SpinyLizard_Character_BP", c: "c-sco"},
+  {n: "Fire Wyvern", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Fire.Wyvern_Character_BP_Fire", c: "c-sco"},
+  {n: "Light Wyvern", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Lightning.Wyvern_Character_BP_Lightning", c: "c-sco"},
+  {n: "Poison Wyvern", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Poison.Wyvern_Character_BP_Poison", c: "c-sco"}
  ],
  "Aberration": [
-  {n: "Ab Anky", p: "/Game/Aberration/Dinos/Ankylo_Aberrant/Ankylo_Character_BP_Aberrant.Ankylo_Character_BP_Aberrant", c: "cat-aberration"},
-  {n: "Ab Arthro", p: "/Game/Aberration/Dinos/Arthropluera/Arthro_Character_BP_Aberrant.Arthro_Character_BP_Aberrant", c: "cat-aberration"},
-  {n: "Ab Bary", p: "/Game/Aberration/Dinos/Baryonyx/Baryonyx_Character_BP_Aberrant.Baryonyx_Character_BP_Aberrant", c: "cat-aberration"},
-  {n: "Ab Carno", p: "/Game/Aberration/Dinos/Carno/Carno_Character_BP_Aberrant.Carno_Character_BP_Aberrant", c: "cat-aberration"},
-  {n: "Ab Shark", p: "/Game/Aberration/Dinos/Megalodon/Megalodon_Character_BP_Aberrant.Megalodon_Character_BP_Aberrant", c: "cat-aberration"},
-  {n: "Ab Megalosaur", p: "/Game/Aberration/Dinos/Megalosaurus/Megalosaurus_Character_BP_Aberrant.Megalosaurus_Character_BP_Aberrant", c: "cat-aberration"},
-  {n: "Ab Otter", p: "/Game/Aberration/Dinos/Otter/Otter_Character_BP_Aberrant.Otter_Character_BP_Aberrant", c: "cat-aberration"},
-  {n: "Ab Paracer", p: "/Game/Aberration/Dinos/Paracer/Paracer_Character_BP_Aberrant.Paracer_Character_BP_Aberrant", c: "cat-aberration"},
-  {n: "Ab Scorpion", p: "/Game/Aberration/Dinos/Scorpion/Scorpion_Character_BP_Aberrant.Scorpion_Character_BP_Aberrant", c: "cat-aberration"},
-  {n: "Ab Spino", p: "/Game/Aberration/Dinos/Spino_Aberrant/Spino_Character_BP_Aberrant.Spino_Character_BP_Aberrant", c: "cat-aberration"},
-  {n: "Ab Stego", p: "/Game/Aberration/Dinos/Stego/Stego_Character_BP_Aberrant.Stego_Character_BP_Aberrant", c: "cat-aberration"},
-  {n: "Ab Trike", p: "/Game/Aberration/Dinos/Trike/Trike_Character_BP_Aberrant.Trike_Character_BP_Aberrant", c: "cat-aberration"},
-  {n: "Basilisk", p: "/Game/Aberration/Dinos/Basilisk/Basilisk_Character_BP.Basilisk_Character_BP", c: "cat-aberration"},
-  {n: "Bulbdog", p: "/Game/Aberration/Dinos/LanternPug/LanternPug_Character_BP.LanternPug_Character_BP", c: "cat-aberration"},
-  {n: "Featherlight", p: "/Game/Aberration/Dinos/LanternBird/LanternBird_Character_BP.LanternBird_Character_BP", c: "cat-aberration"},
-  {n: "Glowtail", p: "/Game/Aberration/Dinos/LanternLizard/LanternLizard_Character_BP.LanternLizard_Character_BP", c: "cat-aberration"},
-  {n: "Karkinos", p: "/Game/Aberration/Dinos/Crab/Crab_Character_BP.Crab_Character_BP", c: "cat-aberration"},
-  {n: "Ravager", p: "/Game/Aberration/Dinos/CaveWolf/CaveWolf_Character_BP.CaveWolf_Character_BP", c: "cat-aberration"},
-  {n: "Reaper King", p: "/Game/Aberration/Dinos/Nameless/Xenomorph_Character_BP_Male_Tamed.Xenomorph_Character_BP_Male_Tamed", c: "cat-aberration"},
-  {n: "Reaper Queen", p: "/Game/Aberration/Dinos/Reaper/ReaperQueen_Character_BP.ReaperQueen_Character_BP", c: "cat-aberration"},
-  {n: "Rock Drake", p: "/Game/Aberration/Dinos/RockDrake/RockDrake_Character_BP.RockDrake_Character_BP", c: "cat-aberration"},
-  {n: "Roll Rat", p: "/Game/Aberration/Dinos/RollRat/RollRat_Character_BP.RollRat_Character_BP", c: "cat-aberration"},
-  {n: "Shinehorn", p: "/Game/Aberration/Dinos/LanternGoat/LanternGoat_Character_BP.LanternGoat_Character_BP", c: "cat-aberration"}
+  {n: "Ab Anky", p: "/Game/Aberration/Dinos/Ankylo_Aberrant/Ankylo_Character_BP_Aberrant.Ankylo_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Ab Arthro", p: "/Game/Aberration/Dinos/Arthropluera/Arthro_Character_BP_Aberrant.Arthro_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Ab Bary", p: "/Game/Aberration/Dinos/Baryonyx/Baryonyx_Character_BP_Aberrant.Baryonyx_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Ab Carno", p: "/Game/Aberration/Dinos/Carno/Carno_Character_BP_Aberrant.Carno_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Ab Shark", p: "/Game/Aberration/Dinos/Megalodon/Megalodon_Character_BP_Aberrant.Megalodon_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Ab Megalosaur", p: "/Game/Aberration/Dinos/Megalosaurus/Megalosaurus_Character_BP_Aberrant.Megalosaurus_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Ab Otter", p: "/Game/Aberration/Dinos/Otter/Otter_Character_BP_Aberrant.Otter_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Ab Paracer", p: "/Game/Aberration/Dinos/Paracer/Paracer_Character_BP_Aberrant.Paracer_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Ab Scorpion", p: "/Game/Aberration/Dinos/Scorpion/Scorpion_Character_BP_Aberrant.Scorpion_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Ab Spino", p: "/Game/Aberration/Dinos/Spino_Aberrant/Spino_Character_BP_Aberrant.Spino_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Ab Stego", p: "/Game/Aberration/Dinos/Stego/Stego_Character_BP_Aberrant.Stego_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Ab Trike", p: "/Game/Aberration/Dinos/Trike/Trike_Character_BP_Aberrant.Trike_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Basilisk", p: "/Game/Aberration/Dinos/Basilisk/Basilisk_Character_BP.Basilisk_Character_BP", c: "c-abe"},
+  {n: "Bulbdog", p: "/Game/Aberration/Dinos/LanternPug/LanternPug_Character_BP.LanternPug_Character_BP", c: "c-abe"},
+  {n: "Featherlight", p: "/Game/Aberration/Dinos/LanternBird/LanternBird_Character_BP.LanternBird_Character_BP", c: "c-abe"},
+  {n: "Glowtail", p: "/Game/Aberration/Dinos/LanternLizard/LanternLizard_Character_BP.LanternLizard_Character_BP", c: "c-abe"},
+  {n: "Karkinos", p: "/Game/Aberration/Dinos/Crab/Crab_Character_BP.Crab_Character_BP", c: "c-abe"},
+  {n: "Ravager", p: "/Game/Aberration/Dinos/CaveWolf/CaveWolf_Character_BP.CaveWolf_Character_BP", c: "c-abe"},
+  {n: "Reaper King", p: "/Game/Aberration/Dinos/Nameless/Xenomorph_Character_BP_Male_Tamed.Xenomorph_Character_BP_Male_Tamed", c: "c-abe"},
+  {n: "Reaper Queen", p: "/Game/Aberration/Dinos/Reaper/ReaperQueen_Character_BP.ReaperQueen_Character_BP", c: "c-abe"},
+  {n: "Rock Drake", p: "/Game/Aberration/Dinos/RockDrake/RockDrake_Character_BP.RockDrake_Character_BP", c: "c-abe"},
+  {n: "Roll Rat", p: "/Game/Aberration/Dinos/RollRat/RollRat_Character_BP.RollRat_Character_BP", c: "c-abe"},
+  {n: "Shinehorn", p: "/Game/Aberration/Dinos/LanternGoat/LanternGoat_Character_BP.LanternGoat_Character_BP", c: "c-abe"}
  ],
  "Extinction": [
-  {n: "Corrupt Reaper", p: "/Game/Extinction/Dinos/Corrupt/Nameless/Xenomorph_Character_BP_Male_Tamed_Corrupt.Xenomorph_Character_BP_Male_Tamed_Corrupt", c: "cat-extinction"},
-  {n: "Enforcer", p: "/Game/Extinction/Dinos/Enforcer/Enforcer_Character_BP.Enforcer_Character_BP", c: "cat-extinction"},
-  {n: "Gacha", p: "/Game/Extinction/Dinos/Gacha/Gacha_Character_BP.Gacha_Character_BP", c: "cat-extinction"},
-  {n: "Gasbags", p: "/Game/Extinction/Dinos/Gasbags/Gasbags_Character_BP.Gasbags_Character_BP", c: "cat-extinction"},
-  {n: "Managarmr", p: "/Game/Extinction/Dinos/IceJumper/IceJumper_Character_BP.IceJumper_Character_BP", c: "cat-extinction"},
-  {n: "Snow Owl", p: "/Game/Extinction/Dinos/SnowOwl/SnowOwl_Character_BP.SnowOwl_Character_BP", c: "cat-extinction"},
-  {n: "Velonasaur", p: "/Game/Extinction/Dinos/Spiker/Spiker_Character_BP.Spiker_Character_BP", c: "cat-extinction"}
+  {n: "Corrupt Reaper", p: "/Game/Extinction/Dinos/Corrupt/Nameless/Xenomorph_Character_BP_Male_Tamed_Corrupt.Xenomorph_Character_BP_Male_Tamed_Corrupt", c: "c-ext"},
+  {n: "Enforcer", p: "/Game/Extinction/Dinos/Enforcer/Enforcer_Character_BP.Enforcer_Character_BP", c: "c-ext"},
+  {n: "Gacha", p: "/Game/Extinction/Dinos/Gacha/Gacha_Character_BP.Gacha_Character_BP", c: "c-ext"},
+  {n: "Gasbags", p: "/Game/Extinction/Dinos/Gasbags/Gasbags_Character_BP.Gasbags_Character_BP", c: "c-ext"},
+  {n: "Managarmr", p: "/Game/Extinction/Dinos/IceJumper/IceJumper_Character_BP.IceJumper_Character_BP", c: "c-ext"},
+  {n: "Snow Owl", p: "/Game/Extinction/Dinos/SnowOwl/SnowOwl_Character_BP.SnowOwl_Character_BP", c: "c-ext"},
+  {n: "Velonasaur", p: "/Game/Extinction/Dinos/Spiker/Spiker_Character_BP.Spiker_Character_BP", c: "c-ext"}
  ],
  "Aquatic": [
-  {n: "Anglerfish", p: "/Game/PrimalEarth/Dinos/Anglerfish/Angler_Character_BP.Angler_Character_BP", c: "cat-marine"},
-  {n: "Basilo", p: "/Game/PrimalEarth/Dinos/Basilosaurus/Basilosaurus_Character_BP.Basilosaurus_Character_BP", c: "cat-marine"},
-  {n: "Dunkle", p: "/Game/PrimalEarth/Dinos/Dunkleosteus/Dunkle_Character_BP.Dunkle_Character_BP", c: "cat-marine"},
-  {n: "Eel", p: "/Game/PrimalEarth/Dinos/Electrophorus/Electrophorus_Character_BP.Electrophorus_Character_BP", c: "cat-marine"},
-  {n: "Ichthy", p: "/Game/PrimalEarth/Dinos/Ichthyosaurus/Ichthy_Character_BP.Ichthy_Character_BP", c: "cat-marine"},
-  {n: "Leeds", p: "/Game/PrimalEarth/Dinos/Leedsichthys/Leedsichthys_Character_BP.Leedsichthys_Character_BP", c: "cat-marine"},
-  {n: "Liopleurodon", p: "/Game/PrimalEarth/Dinos/Liopleurodon/Liopleurodon_Character_BP.Liopleurodon_Character_BP", c: "cat-marine"},
-  {n: "Manta", p: "/Game/PrimalEarth/Dinos/Manta/Manta_Character_BP.Manta_Character_BP", c: "cat-marine"},
-  {n: "Megalodon", p: "/Game/PrimalEarth/Dinos/Megalodon/Megalodon_Character_BP.Megalodon_Character_BP", c: "cat-marine"},
-  {n: "Mosa", p: "/Game/PrimalEarth/Dinos/Mosasaurus/Mosa_Character_BP.Mosasaurus_Character_BP", c: "cat-marine"},
-  {n: "Plesio", p: "/Game/PrimalEarth/Dinos/Plesiosaur/Plesiosaur_Character_BP.Plesiosaur_Character_BP", c: "cat-marine"},
-  {n: "Squid", p: "/Game/PrimalEarth/Dinos/Tusoteuthis/Tusoteuthis_Character_BP.Tusoteuthis_Character_BP", c: "cat-marine"}
+  {n: "Anglerfish", p: "/Game/PrimalEarth/Dinos/Anglerfish/Angler_Character_BP.Angler_Character_BP", c: "c-mar"},
+  {n: "Basilo", p: "/Game/PrimalEarth/Dinos/Basilosaurus/Basilosaurus_Character_BP.Basilosaurus_Character_BP", c: "c-mar"},
+  {n: "Dunkle", p: "/Game/PrimalEarth/Dinos/Dunkleosteus/Dunkle_Character_BP.Dunkle_Character_BP", c: "c-mar"},
+  {n: "Eel", p: "/Game/PrimalEarth/Dinos/Electrophorus/Electrophorus_Character_BP.Electrophorus_Character_BP", c: "c-mar"},
+  {n: "Ichthy", p: "/Game/PrimalEarth/Dinos/Ichthyosaurus/Ichthy_Character_BP.Ichthy_Character_BP", c: "c-mar"},
+  {n: "Leeds", p: "/Game/PrimalEarth/Dinos/Leedsichthys/Leedsichthys_Character_BP.Leedsichthys_Character_BP", c: "c-mar"},
+  {n: "Liopleurodon", p: "/Game/PrimalEarth/Dinos/Liopleurodon/Liopleurodon_Character_BP.Liopleurodon_Character_BP", c: "c-mar"},
+  {n: "Manta", p: "/Game/PrimalEarth/Dinos/Manta/Manta_Character_BP.Manta_Character_BP", c: "c-mar"},
+  {n: "Megalodon", p: "/Game/PrimalEarth/Dinos/Megalodon/Megalodon_Character_BP.Megalodon_Character_BP", c: "c-mar"},
+  {n: "Mosa", p: "/Game/PrimalEarth/Dinos/Mosasaurus/Mosa_Character_BP.Mosasaurus_Character_BP", c: "c-mar"},
+  {n: "Plesio", p: "/Game/PrimalEarth/Dinos/Plesiosaur/Plesiosaur_Character_BP.Plesiosaur_Character_BP", c: "c-mar"},
+  {n: "Squid", p: "/Game/PrimalEarth/Dinos/Tusoteuthis/Tusoteuthis_Character_BP.Tusoteuthis_Character_BP", c: "c-mar"}
  ],
  "S-Variants": [
-  {n: "S-Allo", p: "/SDinoVariants/S-Allosaurus/S-Allo_Character_BP.S-Allo_Character_BP", c: "cat-svariants"},
-  {n: "S-Anky", p: "/SDinoVariants/S-Ankylosaurus/S-Ankylo_Character_BP.S-Ankylo_Character_BP", c: "cat-svariants"},
-  {n: "S-Andrews", p: "/SDinoVariants/S-Andrewsarchus/S-Andrewsarchus_Character_BP.S-Andrewsarchus_Character_BP", c: "cat-svariants"},
-  {n: "S-Basilo", p: "/SDinoVariants/S-Basilosaurus/S-Basilosaurus_Character_BP.S-Basilosaurus_Character_BP", c: "cat-svariants"},
-  {n: "S-Carcha", p: "/SDinoVariants/S-Carcha/S-Carcha_Character_BP.S-Carcha_Character_BP", c: "cat-svariants"},
-  {n: "S-Cat", p: "/SDinoVariants/S-Cat/S-Cat_Character_BP.S-Cat_Character_BP", c: "cat-svariants"},
-  {n: "S-Cerato", p: "/SDinoVariants/S-Cerato/S-Ceratosaurus_Character_BP_ASA.S-Ceratosaurus_Character_BP_ASA", c: "cat-svariants"},
-  {n: "S-Daeodon", p: "/SDinoVariants/S-Daeodon/S-Daeodon_Character_BP.S-Daeodon_Character_BP", c: "cat-svariants"},
-  {n: "S-Deinon", p: "/SDinoVariants/S-Deinonychus/S-Deinonychus_Character_BP.S-Deinonychus_Character_BP", c: "cat-svariants"},
-  {n: "S-Deino", p: "/SDinoVariants/S-Deinosuchus/S-DeinosuchusASA_Character_BP.S-DeinosuchusASA_Character_BP", c: "cat-svariants"},
-  {n: "S-Desmo", p: "/SDinoVariants/S-Desmodus/S-Desmodus_Character_BP.S-Desmodus_Character_BP", c: "cat-svariants"},
-  {n: "S-Bear", p: "/SDinoVariants/S-Direbear/S-Direbear_Character_BP.S-Direbear_Character_BP", c: "cat-svariants"},
-  {n: "S-Wolf", p: "/SDinoVariants/S-Direwolf/S-Direwolf_Character_BP.S-Direwolf_Character_BP", c: "cat-svariants"},
-  {n: "S-Doed", p: "/SDinoVariants/S-Doedicurus/S-Doed_Character_BP.S-Doed_Character_BP", c: "cat-svariants"},
-  {n: "S-Dunkle", p: "/SDinoVariants/S-Dunkleosteus/S-Dunkle_Character_BP.S-Dunkle_Character_BP", c: "cat-svariants"},
-  {n: "S-Fasola", p: "/SDinoVariants/S-Fasolasuchus/S-Fasola_Character_BP.S-Fasola_Character_BP", c: "cat-svariants"},
-  {n: "S-Fire Wyvern", p: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Fire.S-Wyvern_Character_BP_Fire", c: "cat-svariants"},
-  {n: "S-Light Wyvern", p: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Lightning.S-Wyvern_Character_BP_Lightning", c: "cat-svariants"},
-  {n: "S-Poison Wyvern", p: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Poison.S-Wyvern_Character_BP_Poison", c: "cat-svariants"},
-  {n: "S-Ice Wyvern", p: "/SDinoVariants/S-IceWyvern/S-Wyvern_Character_BP_Ice.S-Wyvern_Character_BP_Ice", c: "cat-svariants"},
-  {n: "S-Fenrir", p: "/SDinoVariants/S-Fenrir/S-Fenrir_Character_BP.S-Fenrir_Character_BP", c: "cat-svariants"},
-  {n: "S-Griffin", p: "/SDinoVariants/S-Griffin/S-Griffin_Character_BP.S-Griffin_Character_BP", c: "cat-svariants"},
-  {n: "S-Maeguana", p: "/SDinoVariants/S-Maeguana/S-Maelizard_Character_BP.S-Maelizard_Character_BP", c: "cat-svariants"},
-  {n: "S-Maewing", p: "/SDinoVariants/S-Maewing/S-MilkGlider_Character_BP.S-MilkGlider_Character_BP", c: "cat-svariants"},
-  {n: "S-Mantis", p: "/SDinoVariants/S-Mantis/S-Mantis_Character_BP.S-Mantis_Character_BP", c: "cat-svariants"},
-  {n: "S-Shark", p: "/SDinoVariants/S-Megalodon/S-Megalodon_Character_BP.S-Megalodon_Character_BP", c: "cat-svariants"},
-  {n: "S-Megalosaur", p: "/SDinoVariants/S-Megalosaurus/S-Megalosaurus_Character_BP.S-Megalosaurus_Character_BP", c: "cat-svariants"},
-  {n: "S-Megaraptor", p: "/SDinoVariants/S-Megaraptor/S-Megaraptor_Character_BP.S-Megaraptor_Character_BP", c: "cat-svariants"},
-  {n: "S-Mosa", p: "/SDinoVariants/S-Mosa/S-Mosa_Character_BP.S-Mosa_Character_BP", c: "cat-svariants"},
-  {n: "S-Otter", p: "/SDinoVariants/S-Otter/S-Otter_Character_BP.S-Otter_Character_BP", c: "cat-svariants"},
-  {n: "S-Plesio", p: "/SDinoVariants/S-Plesiosaur/S-Plesiosaur_Character_BP.S-Plesiosaur_Character_BP", c: "cat-svariants"},
-  {n: "S-Bee", p: "/SDinoVariants/S-Bee/S-QueenBee_Character_BP.S-QueenBee_Character_BP", c: "cat-svariants"},
-  {n: "S-Rex", p: "/SDinoVariants/S-Rex/S-Rex_Character_BP.S-Rex_Character_BP", c: "cat-svariants"},
-  {n: "S-Reaper M", p: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Male_Tamed.S-Xenomorph_Character_BP_Male_Tamed", c: "cat-svariants"},
-  {n: "S-Reaper F", p: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Female.S-Xenomorph_Character_BP_Female", c: "cat-svariants"},
-  {n: "S-Rhynio", p: "/SDinoVariants/S-Rhynio/S-Rhynio_Character_BP.S-Rhynio_Character_BP", c: "cat-svariants"},
-  {n: "S-Rock Drake", p: "/SDinoVariants/S-Rockdrake/S-RockDrake_Character_BP.S-RockDrake_Character_BP", c: "cat-svariants"},
-  {n: "S-Shinehorn", p: "/SDinoVariants/S-Shinehorn/S-LanternGoat_Character_BP.S-LanternGoat_Character_BP", c: "cat-svariants"},
-  {n: "S-Owl", p: "/SDinoVariants/S-SnowOwl/S-Owl_Character_BP.S-Owl_Character_BP", c: "cat-svariants"},
-  {n: "S-Spino", p: "/SDinoVariants/S-Spinosaurus/S-Spino_Character_BP.S-Spino_Character_BP", c: "cat-svariants"},
-  {n: "S-Therizino", p: "/SDinoVariants/S-Therizinosaur/S-Therizino_Character_BP.S-Therizino_Character_BP", c: "cat-svariants"},
-  {n: "S-Thyla", p: "/SDinoVariants/S-Thylacoleo/S-Thylacoleo_Character_BP.S-Thylacoleo_Character_BP", c: "cat-svariants"},
-  {n: "S-Trike", p: "/SDinoVariants/S-Trike/S-Trike_Character_BP.S-Trike_Character_BP", c: "cat-svariants"},
-  {n: "S-Unicorn", p: "/SDinoVariants/S-Unicorn/S-Equus_Character_BP_Unicorn.S-Equus_Character_BP_Unicorn", c: "cat-svariants"},
-  {n: "S-Velona", p: "/SDinoVariants/S-Velonasaur/S-Spindles_Character_BP.S-Spindles_Character_BP", c: "cat-svariants"}
+  {n: "S-Allo", p: "/SDinoVariants/S-Allosaurus/S-Allo_Character_BP.S-Allo_Character_BP", c: "c-sva"},
+  {n: "S-Anky", p: "/SDinoVariants/S-Ankylosaurus/S-Ankylo_Character_BP.S-Ankylo_Character_BP", c: "c-sva"},
+  {n: "S-Andrews", p: "/SDinoVariants/S-Andrewsarchus/S-Andrewsarchus_Character_BP.S-Andrewsarchus_Character_BP", c: "c-sva"},
+  {n: "S-Basilo", p: "/SDinoVariants/S-Basilosaurus/S-Basilosaurus_Character_BP.S-Basilosaurus_Character_BP", c: "c-sva"},
+  {n: "S-Carcha", p: "/SDinoVariants/S-Carcha/S-Carcha_Character_BP.S-Carcha_Character_BP", c: "c-sva"},
+  {n: "S-Cat", p: "/SDinoVariants/S-Cat/S-Cat_Character_BP.S-Cat_Character_BP", c: "c-sva"},
+  {n: "S-Cerato", p: "/SDinoVariants/S-Cerato/S-Ceratosaurus_Character_BP_ASA.S-Ceratosaurus_Character_BP_ASA", c: "c-sva"},
+  {n: "S-Daeodon", p: "/SDinoVariants/S-Daeodon/S-Daeodon_Character_BP.S-Daeodon_Character_BP", c: "c-sva"},
+  {n: "S-Deinon", p: "/SDinoVariants/S-Deinonychus/S-Deinonychus_Character_BP.S-Deinonychus_Character_BP", c: "c-sva"},
+  {n: "S-Deino", p: "/SDinoVariants/S-Deinosuchus/S-DeinosuchusASA_Character_BP.S-DeinosuchusASA_Character_BP", c: "c-sva"},
+  {n: "S-Desmo", p: "/SDinoVariants/S-Desmodus/S-Desmodus_Character_BP.S-Desmodus_Character_BP", c: "c-sva"},
+  {n: "S-Bear", p: "/SDinoVariants/S-Direbear/S-Direbear_Character_BP.S-Direbear_Character_BP", c: "c-sva"},
+  {n: "S-Wolf", p: "/SDinoVariants/S-Direwolf/S-Direwolf_Character_BP.S-Direwolf_Character_BP", c: "c-sva"},
+  {n: "S-Doed", p: "/SDinoVariants/S-Doedicurus/S-Doed_Character_BP.S-Doed_Character_BP", c: "c-sva"},
+  {n: "S-Dunkle", p: "/SDinoVariants/S-Dunkleosteus/S-Dunkle_Character_BP.S-Dunkle_Character_BP", c: "c-sva"},
+  {n: "S-Fasola", p: "/SDinoVariants/S-Fasolasuchus/S-Fasola_Character_BP.S-Fasola_Character_BP", c: "c-sva"},
+  {n: "S-Wyvern Fire", p: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Fire.S-Wyvern_Character_BP_Fire", c: "c-sva"},
+  {n: "S-Light Wyvern", p: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Lightning.S-Wyvern_Character_BP_Lightning", c: "c-sva"},
+  {n: "S-Poison Wyvern", p: "/SDinoVariants/S-Wyvern/S-Wyvern_Character_BP_Poison.S-Wyvern_Character_BP_Poison", c: "c-sva"},
+  {n: "S-Ice Wyvern", p: "/SDinoVariants/S-IceWyvern/S-Wyvern_Character_BP_Ice.S-Wyvern_Character_BP_Ice", c: "c-sva"},
+  {n: "S-Fenrir", p: "/SDinoVariants/S-Fenrir/S-Fenrir_Character_BP.S-Fenrir_Character_BP", c: "c-sva"},
+  {n: "S-Griffin", p: "/SDinoVariants/S-Griffin/S-Griffin_Character_BP.S-Griffin_Character_BP", c: "c-sva"},
+  {n: "S-Maeguana", p: "/SDinoVariants/S-Maeguana/S-Maelizard_Character_BP.S-Maelizard_Character_BP", c: "c-sva"},
+  {n: "S-Maewing", p: "/SDinoVariants/S-Maewing/S-MilkGlider_Character_BP.S-MilkGlider_Character_BP", c: "c-sva"},
+  {n: "S-Mantis", p: "/SDinoVariants/S-Mantis/S-Mantis_Character_BP.S-Mantis_Character_BP", c: "c-sva"},
+  {n: "S-Shark", p: "/SDinoVariants/S-Megalodon/S-Megalodon_Character_BP.S-Megalodon_Character_BP", c: "c-sva"},
+  {n: "S-Megalosaur", p: "/SDinoVariants/S-Megalosaurus/S-Megalosaurus_Character_BP.S-Megalosaurus_Character_BP", c: "c-sva"},
+  {n: "S-Megaraptor", p: "/SDinoVariants/S-Megaraptor/S-Megaraptor_Character_BP.S-Megaraptor_Character_BP", c: "c-sva"},
+  {n: "S-Mosa", p: "/SDinoVariants/S-Mosa/S-Mosa_Character_BP.S-Mosa_Character_BP", c: "c-sva"},
+  {n: "S-Otter", p: "/SDinoVariants/S-Otter/S-Otter_Character_BP.S-Otter_Character_BP", c: "c-sva"},
+  {n: "S-Plesio", p: "/SDinoVariants/S-Plesiosaur/S-Plesiosaur_Character_BP.S-Plesiosaur_Character_BP", c: "c-sva"},
+  {n: "S-Bee", p: "/SDinoVariants/S-Bee/S-QueenBee_Character_BP.S-QueenBee_Character_BP", c: "c-sva"},
+  {n: "S-Rex", p: "/SDinoVariants/S-Rex/S-Rex_Character_BP.S-Rex_Character_BP", c: "c-sva"},
+  {n: "S-Reaper M", p: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Male_Tamed.S-Xenomorph_Character_BP_Male_Tamed", c: "c-sva"},
+  {n: "S-Reaper F", p: "/SDinoVariants/S-Reaper/S-Xenomorph_Character_BP_Female.S-Xenomorph_Character_BP_Female", c: "c-sva"},
+  {n: "S-Rhynio", p: "/SDinoVariants/S-Rhynio/S-Rhynio_Character_BP.S-Rhynio_Character_BP", c: "c-sva"},
+  {n: "S-Rock Drake", p: "/SDinoVariants/S-Rockdrake/S-RockDrake_Character_BP.S-RockDrake_Character_BP", c: "c-sva"},
+  {n: "S-Shinehorn", p: "/SDinoVariants/S-Shinehorn/S-LanternGoat_Character_BP.S-LanternGoat_Character_BP", c: "c-sva"},
+  {n: "S-Owl", p: "/SDinoVariants/S-SnowOwl/S-Owl_Character_BP.S-Owl_Character_BP", c: "c-sva"},
+  {n: "S-Spino", p: "/SDinoVariants/S-Spinosaurus/S-Spino_Character_BP.S-Spino_Character_BP", c: "c-sva"},
+  {n: "S-Therizino", p: "/SDinoVariants/S-Therizinosaur/S-Therizino_Character_BP.S-Therizino_Character_BP", c: "c-sva"},
+  {n: "S-Thyla", p: "/SDinoVariants/S-Thylacoleo/S-Thylacoleo_Character_BP.S-Thylacoleo_Character_BP", c: "c-sva"},
+  {n: "S-Trike", p: "/SDinoVariants/S-Trike/S-Trike_Character_BP.S-Trike_Character_BP", c: "c-sva"},
+  {n: "S-Unicorn", p: "/SDinoVariants/S-Unicorn/S-Equus_Character_BP_Unicorn.S-Equus_Character_BP_Unicorn", c: "c-sva"},
+  {n: "S-Velona", p: "/SDinoVariants/S-Velonasaur/S-Spindles_Character_BP.S-Spindles_Character_BP", c: "c-sva"}
  ],
  "Draconic Chronicles": [
-  {n: "Brawler", p: "/DraconicChronicles/Dino/Dragonkin/DragonKin_BrawlerBP.DragonKin_BrawlerBP", c: "cat-draconic"},
-  {n: "Hydro Dragon", p: "/DraconicChronicles/Dino/HydroDragon/HydroDragonBP.HydroDragonBP", c: "cat-draconic"},
-  {n: "Undead Wyvern", p: "/DraconicChronicles/Dino/UndeadWyvern/UndeadWyvern_BP.UndeadWyvern_BP", c: "cat-draconic"},
-  {n: "Glowveil", p: "/DraconicChronicles/Dino/GlowveilDragon/GlowveilDragon_BP.GlowveilDragon_BP", c: "cat-draconic"},
-  {n: "Undead Dragon", p: "/DraconicChronicles/Dino/UndeadDragon/UndeadDragonBP_Tamed.UndeadDragonBP_Tamed", c: "cat-draconic"},
-  {n: "Hydra", p: "/DraconicChronicles/Dino/HeadlessHydra/HeadlessHydraBP.HeadlessHydraBP", c: "cat-draconic"},
-  {n: "Elder Wyvern", p: "/DraconicChronicles/Dino/Dragon/ElderWyvernBP.ElderWyvernBP", c: "cat-draconic"},
-  {n: "Shadow Wyvern", p: "/DraconicChronicles/Dino/ShadowWyvern/ShadowWyvern_BP.ShadowWyvern_BP", c: "cat-draconic"},
-  {n: "Light Wyvern", p: "/DraconicChronicles/Dino/LightningWyvern/Wyvern_Character_BP_Lightning1.Wyvern_Character_BP_Lightning1", c: "cat-draconic"},
-  {n: "Ember Wyvern", p: "/DraconicChronicles/Dino/EmberWyvern/CrystalWyvern_Character_BP_Ember1.CrystalWyvern_Character_BP_Ember1", c: "cat-draconic"},
-  {n: "Blood Storm", p: "/DraconicChronicles/Dino/Gigant/BloodStormDragon.BloodStormDragon", c: "cat-draconic"},
-  {n: "Blood Wyvern", p: "/DraconicChronicles/Dino/BloodWyvern/CrystalWyvern_Character_BP_Blood1.CrystalWyvern_Character_BP_Blood1", c: "cat-draconic"},
-  {n: "Dragonkin", p: "/DraconicChronicles/Dino/Dragonkin/DragonKinBP.DragonKinBP", c: "cat-draconic"},
-  {n: "Flameforge", p: "/DraconicChronicles/Dino/FlameforgeDragon/FlameforgeDragonBP.FlameforgeDragonBP", c: "cat-draconic"},
-  {n: "Frost Wyvern", p: "/DraconicChronicles/Dino/FrostWyvern/Ragnarok_Wyvern_Override_Ice1.Ragnarok_Wyvern_Override_Ice1", c: "cat-draconic"},
-  {n: "Inferno Wyvern", p: "/DraconicChronicles/Dino/Wyvern/InfernoWyvernBP.InfernoWyvernBP", c: "cat-draconic"},
-  {n: "Poison Wyvern", p: "/DraconicChronicles/Dino/PoisonWyvern/Wyvern_Character_BP_Poison1.Wyvern_Character_BP_Poison1", c: "cat-draconic"},
-  {n: "Polar Dragon", p: "/DraconicChronicles/Dino/PolarDragon/PolarDragonBP.PolarDragonBP", c: "cat-draconic"},
-  {n: "Rejuvenating", p: "/DraconicChronicles/Dino/RejuvenatingDragon/RejuvenatingDragonBP.RejuvenatingDragonBP", c: "cat-draconic"},
-  {n: "Sand Dragon", p: "/DraconicChronicles/Dino/SandDragon/SandDragonBP.SandDragonBP", c: "cat-draconic"},
-  {n: "Tidal Dragon", p: "/DraconicChronicles/Dino/TidalDragon/TidalDragon_BP.TidalDragon_BP", c: "cat-draconic"},
-  {n: "Tropical Wyvern", p: "/DraconicChronicles/Dino/TropicalWyvern/CrystalWyvernTropicalBP.CrystalWyvernTropicalBP", c: "cat-draconic"},
-  {n: "Wyrm", p: "/DraconicChronicles/Dino/Wyrm/WyrmBP.WyrmBP", c: "cat-draconic"},
-  {n: "Wyvernicorn", p: "/DraconicChronicles/Dino/Wyvernicorn/Wyvernicorn_BP.Wyvernicorn_BP", c: "cat-draconic"}
+  {n: "Brawler", p: "/DraconicChronicles/Dino/Dragonkin/DragonKin_BrawlerBP.DragonKin_BrawlerBP", c: "c-dra"},
+  {n: "Hydro Dragon", p: "/DraconicChronicles/Dino/HydroDragon/HydroDragonBP.HydroDragonBP", c: "c-dra"},
+  {n: "Undead Wyvern", p: "/DraconicChronicles/Dino/UndeadWyvern/UndeadWyvern_BP.UndeadWyvern_BP", c: "c-dra"},
+  {n: "Glowveil", p: "/DraconicChronicles/Dino/GlowveilDragon/GlowveilDragon_BP.GlowveilDragon_BP", c: "c-dra"},
+  {n: "Undead Dragon", p: "/DraconicChronicles/Dino/UndeadDragon/UndeadDragonBP_Tamed.UndeadDragonBP_Tamed", c: "c-dra"},
+  {n: "Hydra", p: "/DraconicChronicles/Dino/HeadlessHydra/HeadlessHydraBP.HeadlessHydraBP", c: "c-dra"},
+  {n: "Elder Wyvern", p: "/DraconicChronicles/Dino/Dragon/ElderWyvernBP.ElderWyvernBP", c: "c-dra"},
+  {n: "Shadow Wyvern", p: "/DraconicChronicles/Dino/ShadowWyvern/ShadowWyvern_BP.ShadowWyvern_BP", c: "c-dra"},
+  {n: "Lightning Wyvern", p: "/DraconicChronicles/Dino/LightningWyvern/Wyvern_Character_BP_Lightning1.Wyvern_Character_BP_Lightning1", c: "c-dra"},
+  {n: "Ember Wyvern", p: "/DraconicChronicles/Dino/EmberWyvern/CrystalWyvern_Character_BP_Ember1.CrystalWyvern_Character_BP_Ember1", c: "c-dra"},
+  {n: "Blood Storm", p: "/DraconicChronicles/Dino/Gigant/BloodStormDragon.BloodStormDragon", c: "c-dra"},
+  {n: "Blood Wyvern", p: "/DraconicChronicles/Dino/BloodWyvern/CrystalWyvern_Character_BP_Blood1.CrystalWyvern_Character_BP_Blood1", c: "c-dra"},
+  {n: "Dragonkin", p: "/DraconicChronicles/Dino/Dragonkin/DragonKinBP.DragonKinBP", c: "c-dra"},
+  {n: "Flameforge", p: "/DraconicChronicles/Dino/FlameforgeDragon/FlameforgeDragonBP.FlameforgeDragonBP", c: "c-dra"},
+  {n: "Frost Wyvern", p: "/DraconicChronicles/Dino/FrostWyvern/Ragnarok_Wyvern_Override_Ice1.Ragnarok_Wyvern_Override_Ice1", c: "c-dra"},
+  {n: "Inferno Wyvern", p: "/DraconicChronicles/Dino/Wyvern/InfernoWyvernBP.InfernoWyvernBP", c: "c-dra"},
+  {n: "Poison Wyvern", p: "/DraconicChronicles/Dino/PoisonWyvern/Wyvern_Character_BP_Poison1.Wyvern_Character_BP_Poison1", c: "c-dra"},
+  {n: "Polar Dragon", p: "/DraconicChronicles/Dino/PolarDragon/PolarDragonBP.PolarDragonBP", c: "c-dra"},
+  {n: "Rejuvenating", p: "/DraconicChronicles/Dino/RejuvenatingDragon/RejuvenatingDragonBP.RejuvenatingDragonBP", c: "c-dra"},
+  {n: "Sand Dragon", p: "/DraconicChronicles/Dino/SandDragon/SandDragonBP.SandDragonBP", c: "c-dra"},
+  {n: "Tidal Dragon", p: "/DraconicChronicles/Dino/TidalDragon/TidalDragon_BP.TidalDragon_BP", c: "c-dra"},
+  {n: "Tropical Wyvern", p: "/DraconicChronicles/Dino/TropicalWyvern/CrystalWyvernTropicalBP.CrystalWyvernTropicalBP", c: "c-dra"},
+  {n: "Wyrm", p: "/DraconicChronicles/Dino/Wyrm/WyrmBP.WyrmBP", c: "c-dra"},
+  {n: "Wyvernicorn", p: "/DraconicChronicles/Dino/Wyvernicorn/Wyvernicorn_BP.Wyvernicorn_BP", c: "c-dra"}
  ],
- "Astraeos": [
-  {n: "Astral Argent", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Argentavis/AstralArgent_Character_BP.AstralArgent_Character_BP", c: "cat-astraeos"},
-  {n: "Astral Carno", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Carno/AstralCarno_Character_BP.AstralCarno_Character_BP", c: "cat-astraeos"},
-  {n: "Astral Deino", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Deinosuchus/AstralDeinosuchusASA_Character_BP.AstralDeinosuchusASA_Character_BP", c: "cat-astraeos"},
-  {n: "Astral Wolf", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Direwolf/AstralDirewolf_Character_BP.AstralDirewolf_Character_BP", c: "cat-astraeos"},
-  {n: "Astral Mammoth", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Mammoth/AstralMammoth_Character_BP.AstralMammoth_Character_BP", c: "cat-astraeos"},
-  {n: "Astral Shark", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Megalodon/AstralMegalodon_Character_BP.AstralMegalodon_Character_BP", c: "cat-astraeos"},
-  {n: "Astral Mosa", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Mosasaurus/Astral_Mosa_Character_BP.Astral_Mosa_Character_BP", c: "cat-astraeos"},
-  {n: "Astral Raptor", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Raptor/AstralRaptor_Character_BP.AstralRaptor_Character_BP", c: "cat-astraeos"},
-  {n: "Astral Rex", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Rex/AstralRex_Character_BP.AstralRex_Character_BP", c: "cat-astraeos"},
-  {n: "Astral Squid", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Tusoteuthis/AstralTusoteuthis_Character_BP.AstralTusoteuthis_Character_BP", c: "cat-astraeos"},
-  {n: "Minotaur", p: "/AstraeosCreatures/Minotaur/Minotaur_Character_BP.Minotaur_Character_BP", c: "cat-astraeos"},
-  {n: "Seahorse", p: "/AstraeosCreatures/Seahorse/Seahorse_Character_BP.Seahorse_Character_BP", c: "cat-astraeos"},
-  {n: "Cyclops", p: "/AstraeosCreatures/Cyclops/Cyclops_Character_BP.Cyclops_Character_BP", c: "cat-astraeos"}
+ "Astraeos Additions": [
+  {n: "Astral Argent", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Argentavis/AstralArgent_Character_BP.AstralArgent_Character_BP", c: "c-ast"},
+  {n: "Astral Carno", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Carno/AstralCarno_Character_BP.AstralCarno_Character_BP", c: "c-ast"},
+  {n: "Astral Deino", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Deinosuchus/AstralDeinosuchusASA_Character_BP.AstralDeinosuchusASA_Character_BP", c: "c-ast"},
+  {n: "Astral Wolf", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Direwolf/AstralDirewolf_Character_BP.AstralDirewolf_Character_BP", c: "c-ast"},
+  {n: "Astral Mammoth", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Mammoth/AstralMammoth_Character_BP.AstralMammoth_Character_BP", c: "c-ast"},
+  {n: "Astral Shark", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Megalodon/AstralMegalodon_Character_BP.AstralMegalodon_Character_BP", c: "c-ast"},
+  {n: "Astral Mosa", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Mosasaurus/Astral_Mosa_Character_BP.Astral_Mosa_Character_BP", c: "c-ast"},
+  {n: "Astral Raptor", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Raptor/AstralRaptor_Character_BP.AstralRaptor_Character_BP", c: "c-ast"},
+  {n: "Astral Rex", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Rex/AstralRex_Character_BP.AstralRex_Character_BP", c: "c-ast"},
+  {n: "Astral Squid", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Tusoteuthis/AstralTusoteuthis_Character_BP.AstralTusoteuthis_Character_BP", c: "c-ast"},
+  {n: "Minotaur", p: "/AstraeosCreatures/Minotaur/Minotaur_Character_BP.Minotaur_Character_BP", c: "c-ast"},
+  {n: "Seahorse", p: "/AstraeosCreatures/Seahorse/Seahorse_Character_BP.Seahorse_Character_BP", c: "c-ast"},
+  {n: "Cyclops", p: "/AstraeosCreatures/Cyclops/Cyclops_Character_BP.Cyclops_Character_BP", c: "c-ast"}
  ],
  "Modded": [
-  {n: "Gen 2 Moro Raptor", p: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/Gen2MoroRaptor.Gen2MoroRaptor", c: "cat-modded"},
-  {n: "Gen 2 Moro Rex", p: "/Moros_Indomitable_Duo/MoroRex_Gen2/Blueprints/MoroRexGen2_Character_BP.MoroRexGen2_Character_BP", c: "cat-modded"},
-  {n: "Moro Raptor", p: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/MoroRaptor_Character_BP.MoroRaptor_Character_BP", c: "cat-modded"},
-  {n: "Moro Rex", p: "/Moros_Indomitable_Duo/IndominusRex/Models/MorosRex_Character_BP.MorosRex_Character_BP", c: "cat-modded"},
-  {n: "Spider Jungle", p: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/JungleThoraxSpider_Character_BP.JungleThoraxSpider_Character_BP", c: "cat-modded"},
-  {n: "Spider Snow", p: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/SnowThoraxSpider_Character_BP.SnowThoraxSpider_Character_BP", c: "cat-modded"},
-  {n: "Spider Cute", p: "/CyrusJumpingSpider/Content/Spider/Jumper/CuteThoraxSpider_Character_BP.CuteThoraxSpider_Character_BP", c: "cat-modded"},
-  {n: "Glaucus", p: "/Glaucus/Content/Glaucus_Character_BP.Glaucus_Character_BP", c: "cat-modded"},
-  {n: "Drakara", p: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP.Drakara_Character_BP", c: "cat-modded"},
-  {n: "Drakara Bloodfang", p: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Bloodfang.Drakara_Character_BP_Bloodfang", c: "cat-modded"},
-  {n: "Nothosaurus", p: "/Moros_Nothosaurus/Dinos/Blueprints/MorosNothosaurus_Character_BP.MorosNothosaurus_Character_BP", c: "cat-modded"}
+  {n: "Gen 2 Moro Raptor", p: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/Gen2MoroRaptor.Gen2MoroRaptor", c: "c-mod"},
+  {n: "Gen 2 Moro Rex", p: "/Moros_Indomitable_Duo/MoroRex_Gen2/Blueprints/MoroRexGen2_Character_BP.MoroRexGen2_Character_BP", c: "c-mod"},
+  {n: "Moro Raptor", p: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/MoroRaptor_Character_BP.MoroRaptor_Character_BP", c: "c-mod"},
+  {n: "Moro Rex", p: "/Moros_Indomitable_Duo/IndominusRex/Models/MorosRex_Character_BP.MorosRex_Character_BP", c: "c-mod"},
+  {n: "Spider Jungle", p: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/JungleThoraxSpider_Character_BP.JungleThoraxSpider_Character_BP", c: "c-mod"},
+  {n: "Spider Snow", p: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/SnowThoraxSpider_Character_BP.SnowThoraxSpider_Character_BP", c: "c-mod"},
+  {n: "Spider Cute", p: "/CyrusJumpingSpider/Content/Spider/Jumper/CuteThoraxSpider_Character_BP.CuteThoraxSpider_Character_BP", c: "c-mod"},
+  {n: "Glaucus", p: "/Glaucus/Content/Glaucus_Character_BP.Glaucus_Character_BP", c: "c-mod"},
+  {n: "Drakara", p: "/Skyshroud_Drakara/Dinos/Drakara/Drakara_Character_BP.Drakara_Character_BP", c: "c-mod"},
+  {n: "Drakara Bloodfang", p: "/Skyshroud_Dinos/Drakara/Drakara_Character_BP_Bloodfang.Drakara_Character_BP_Bloodfang", c: "c-mod"},
+  {n: "Nothosaurus", p: "/Moros_Nothosaurus/Dinos/Blueprints/MorosNothosaurus_Character_BP.MorosNothosaurus_Character_BP", c: "c-mod"}
  ]
 };
-
-let selP = "", selN = "";
-function populateList() {
-    const list = document.getElementById('cItems'); list.innerHTML = '';
-    Object.keys(MASTER_LIST).sort().forEach(cat => {
+let selP="", selN="";
+function populate() {
+    const list = document.getElementById('cIt'); list.innerHTML = '';
+    Object.keys(MASTER).sort().forEach(cat => {
         const h = document.createElement('li'); h.className = 'dropdown-category-header'; h.textContent = `--- ${cat} ---`; list.appendChild(h);
-        MASTER_LIST[cat].sort((a,b)=>a.n.localeCompare(b.n)).forEach(c => {
+        MASTER[cat].sort((a,b)=>a.n.localeCompare(b.n)).forEach(c => {
             const li = document.createElement('li'); li.className = c.c; li.textContent = c.n;
-            li.onclick = (e) => { e.stopPropagation(); selP = c.p; selN = c.n; document.getElementById('sText').textContent = c.n; document.getElementById('dCont').style.display = 'none'; };
+            li.onclick = (e) => { e.stopPropagation(); selP = c.p; selN = c.n; document.getElementById('sTx').textContent = c.n; document.getElementById('dLi').style.display = 'none'; };
             list.appendChild(li);
         });
     });
 }
-function toggleD() { const d = document.getElementById('dList'); d.style.display = (d.style.display === 'block') ? 'none' : 'block'; }
-function filterList(val) {
-    const items = document.querySelectorAll('#cItems li'); document.getElementById('dList').style.display = 'block';
+function tgl() { const d = document.getElementById('dLi'); d.style.display = (d.style.display === 'block') ? 'none' : 'block'; }
+function fltr(val) {
+    const items = document.querySelectorAll('#cIt li'); document.getElementById('dLi').style.display = 'block';
     items.forEach(i => { if(!i.classList.contains('dropdown-category-header')) i.style.display = i.textContent.toLowerCase().includes(val.toLowerCase()) ? "" : "none"; });
 }
-async function execute() {
-    const id = document.getElementById('pId').value.trim(), g = document.querySelector('input[name="g"]:checked').value, sMsg = document.getElementById('status');
-    if(!selP || !id) { sMsg.textContent = "❌ Error: Selection missing!"; sMsg.style.opacity = "1"; return; }
+async function exe() {
+    const id = document.getElementById('pId').value.trim(), g = document.querySelector('input[name="g"]:checked').value, st = document.getElementById('st');
+    if(!selP || !id) { st.textContent = "❌ Error: Selection missing!"; st.style.opacity = "1"; return; }
     const cmd = `Scriptcommand SpawnDinoInBall -p=${id} -t=${selP} -f=${g} -b=1 -i=1 -a=1 -s=255,255,255,255,255,255,255,255`;
-    document.getElementById('oBox').textContent = cmd; await navigator.clipboard.writeText(cmd);
+    document.getElementById('oBx').textContent = cmd; await navigator.clipboard.writeText(cmd);
     const log = { embeds: [{ title: "Sent Creature Log", color: 3447003, fields: [{ name: "EOS ID", value: id, inline: true }, { name: "Creature", value: selN, inline: true }], footer: { text: `Logged: ${new Date().toLocaleString('en-GB')}` }, timestamp: new Date() }] };
-    try { await fetch(WEBHOOK, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(log) }); sMsg.textContent = "✅ Generated, Copied & Logged!"; } 
-    catch(e) { sMsg.textContent = "✅ Copied (Log failed)"; }
-    sMsg.style.opacity = "1"; setTimeout(() => sMsg.style.opacity = "0", 3000);
+    try { await fetch(WH, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(log) }); st.textContent = "✅ Generated, Copied & Logged!"; } 
+    catch(e) { st.textContent = "✅ Copied (Log failed)"; }
+    st.style.opacity = "1"; setTimeout(() => st.style.opacity = "0", 3000);
 }
-window.onclick = e => { if (!e.target.closest('#dDisp')) document.getElementById('dList').style.display = 'none'; };
-window.onload = populateList;
+window.onclick = e => { if (!e.target.closest('#dBx')) document.getElementById('dLi').style.display = 'none'; };
+window.onload = populate;
 </script>
 </body>
 </html>
