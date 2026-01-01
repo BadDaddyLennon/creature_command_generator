@@ -20,7 +20,7 @@
         input[type="radio"]:checked + .radio-label { background-color: #FF0099; color: white; }
         #genderMale:checked + .radio-label { background-color: #1E90FF; }
         .button-action { background-color: #00FF85; color: #0d1117; font-weight: 800; width: 100%; padding: 1rem; border-radius: 12px; margin-top: 1rem; text-transform: uppercase; cursor: pointer; }
-        
+        .button-action:disabled { background-color: #30363d; color: #888; cursor: not-allowed; }
         .c-col { color: #E5E4E2; } .c-isl { color: #00FF00; } .c-sco { color: #FFFF00; } .c-abe { color: #90EE90; } .c-ext { color: #FFA500; } .c-mar { color: #00FFFF; } .c-sva { color: #ADD8E6; } .c-dra { color: #FF0000; } .c-ast { color: #008080; } .c-mod { color: #FF69B4; }
     </style>
 </head>
@@ -28,12 +28,12 @@
     <div class="container-card">
         <h1 class="text-2xl font-bold neon-heading mb-6 text-center">ArkLegendsPVE Master Generator</h1>
         <div class="mb-4"><label class="input-label">1. Target EOS ID:</label><input type="text" id="pId" value="00024953ec774cf98878f25e96eca484" class="input-style"></div>
-        <div class="mb-4"><label class="input-label">Search Dino:</label><input type="text" id="sBox" oninput="filterList(this.value)" class="input-style" placeholder="Type Dino name..."></div>
+        <div class="mb-4"><label class="input-label">Search Dino:</label><input type="text" id="sBox" oninput="filterList(this.value)" class="input-style" placeholder="Type name..."></div>
         <div class="mb-4 relative"><label class="input-label">2. Select Creature:</label>
             <div id="dBox" class="input-style flex justify-between items-center" onclick="toggleD()"><span id="sText">--- Choose a Dino ---</span><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg></div>
             <div id="dList" class="dropdown-content"><ul id="cItems"></ul></div>
         </div>
-        <div class="mb-6"><label class="input-label">3. Creature Gender:</label><div class="flex">
+        <div class="mb-6"><label class="input-label">3. Gender:</label><div class="flex">
             <input type="radio" id="f" name="g" value="1" checked class="hidden"><label for="f" class="radio-label">♀️ Female</label>
             <input type="radio" id="m" name="g" value="0" class="hidden"><label for="m" class="radio-label">♂️ Male</label>
         </div></div>
@@ -68,11 +68,11 @@ const MASTER_DATA = {
   {n: "Turtle", p: "/Game/PrimalEarth/Dinos/Turtle/Turtle_Character_BP.Turtle_Character_BP", c: "c-isl"},
   {n: "Carno", p: "/Game/PrimalEarth/Dinos/Carno/Carno_Character_BP.Carno_Character_BP", c: "c-isl"},
   {n: "Beaver", p: "/Game/PrimalEarth/Dinos/Beaver/Beaver_Character_BP.Beaver_Character_BP", c: "c-isl"},
-  {n: "Ceratosaurus", p: "/Game/ASA/Dinos/Ceratosaurus/Dinos/Ceratosaurus_Character_BP_ASA.Ceratosaurus_Character_BP_ASA", c: "c-isl"},
+  {n: "Cerato", p: "/Game/ASA/Dinos/Ceratosaurus/Dinos/Ceratosaurus_Character_BP_ASA.Ceratosaurus_Character_BP_ASA", c: "c-isl"},
   {n: "Compy", p: "/Game/PrimalEarth/Dinos/Compsognathus/Compsognathus_Character_BP.Compsognathus_Character_BP", c: "c-isl"},
   {n: "Daeodon", p: "/Game/PrimalEarth/Dinos/Daeodon/Daeodon_Character_BP.Daeodon_Character_BP", c: "c-isl"},
-  {n: "Dark Pegasus", p: "/Game/ASA/Dinos/DarkPegasus/DarkPegasus_Character_BP.DarkPegasus_Character_BP", c: "c-isl"},
-  {n: "Deinosuchus", p: "/Game/ASA/Dinos/Deinosuchus/DeinosuchusASA_Character_BP.DeinosuchusASA_Character_BP", c: "c-isl"},
+  {n: "Pegasus", p: "/Game/ASA/Dinos/DarkPegasus/DarkPegasus_Character_BP.DarkPegasus_Character_BP", c: "c-isl"},
+  {n: "Deino", p: "/Game/ASA/Dinos/Deinosuchus/DeinosuchusASA_Character_BP.DeinosuchusASA_Character_BP", c: "c-isl"},
   {n: "Deinotherium", p: "/Game/ASA/Dinos/Deinotherium/Dinos/DeinotheriumASA_Character_BP.DeinotheriumASA_Character_BP", c: "c-isl"},
   {n: "Dilo", p: "/Game/PrimalEarth/Dinos/Dilo/Dilo_Character_BP.Dilo_Character_BP", c: "c-isl"},
   {n: "Dimetrodon", p: "/Game/PrimalEarth/Dinos/Dimetrodon/Dimetro_Character_BP.Dimetro_Character_BP", c: "c-isl"},
@@ -147,9 +147,12 @@ const MASTER_DATA = {
   {n: "Poison Wyvern", p: "/Game/ScorchedEarth/Dinos/Wyvern/Wyvern_Character_BP_Poison.Wyvern_Character_BP_Poison", c: "c-sco"}
  ],
  "Aberration": [
+  {n: "Ab Achatina", p: "/Game/PrimalEarth/Dinos/Achatina/Achatina_Character_BP_Aberrant.Achatina_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Ab Angler", p: "/Game/PrimalEarth/Dinos/Anglerfish/Angler_Character_BP_Aberrant.Angler_Character_BP_Aberrant", c: "c-abe"},
   {n: "Ab Anky", p: "/Game/Aberration/Dinos/Ankylo_Aberrant/Ankylo_Character_BP_Aberrant.Ankylo_Character_BP_Aberrant", c: "c-abe"},
   {n: "Ab Arthro", p: "/Game/Aberration/Dinos/Arthropluera/Arthro_Character_BP_Aberrant.Arthro_Character_BP_Aberrant", c: "c-abe"},
   {n: "Ab Bary", p: "/Game/Aberration/Dinos/Baryonyx/Baryonyx_Character_BP_Aberrant.Baryonyx_Character_BP_Aberrant", c: "c-abe"},
+  {n: "Ab Bigfoot", p: "/Game/PrimalEarth/Dinos/Bigfoot/Bigfoot_Character_BP_Aberrant.Bigfoot_Character_BP_Aberrant", c: "c-abe"},
   {n: "Ab Carno", p: "/Game/Aberration/Dinos/Carno/Carno_Character_BP_Aberrant.Carno_Character_BP_Aberrant", c: "c-abe"},
   {n: "Ab Shark", p: "/Game/Aberration/Dinos/Megalodon/Megalodon_Character_BP_Aberrant.Megalodon_Character_BP_Aberrant", c: "c-abe"},
   {n: "Ab Megalosaur", p: "/Game/Aberration/Dinos/Megalosaurus/Megalosaurus_Character_BP_Aberrant.Megalosaurus_Character_BP_Aberrant", c: "c-abe"},
@@ -175,6 +178,11 @@ const MASTER_DATA = {
  ],
  "Extinction": [
   {n: "Corrupt Reaper", p: "/Game/Extinction/Dinos/Corrupt/Nameless/Xenomorph_Character_BP_Male_Tamed_Corrupt.Xenomorph_Character_BP_Male_Tamed_Corrupt", c: "c-ext"},
+  {n: "Corrupt Arthro", p: "/Game/Extinction/Dinos/Corrupt/Arthropluera/Arthro_Character_BP_Corrupt.Arthro_Character_BP_Corrupt", c: "c-ext"},
+  {n: "Corrupt Carno", p: "/Game/Extinction/Dinos/Corrupt/Carno/Carno_Character_BP_Corrupt.Carno_Character_BP_Corrupt", c: "c-ext"},
+  {n: "Corrupt Giganoto", p: "/Game/Extinction/Dinos/Corrupt/Giganotosaurus/Gigant_Character_BP_Corrupt.Gigant_Character_BP_Corrupt", c: "c-ext"},
+  {n: "Corrupt Rex", p: "/Game/Extinction/Dinos/Corrupt/Rex/Rex_Character_BP_Corrupt.Rex_Character_BP_Corrupt", c: "c-ext"},
+  {n: "Corrupt Wyvern", p: "/Game/Extinction/Dinos/Corrupt/Wyvern/Wyvern_Character_BP_Fire_Corrupt.Wyvern_Character_BP_Fire_Corrupt", c: "c-ext"},
   {n: "Dreadnoughtus", p: "/Game/ASA/Dinos/Dreadnoughtus/Dreadnoughtus_Character_BP.Dreadnoughtus_Character_BP", c: "c-ext"},
   {n: "Enforcer", p: "/Game/Extinction/Dinos/Enforcer/Enforcer_Character_BP.Enforcer_Character_BP", c: "c-ext"},
   {n: "Gacha", p: "/Game/Extinction/Dinos/Gacha/Gacha_Character_BP.Gacha_Character_BP", c: "c-ext"},
@@ -249,12 +257,12 @@ const MASTER_DATA = {
   {n: "Brawler", p: "/DraconicChronicles/Dino/Dragonkin/DragonKin_BrawlerBP.DragonKin_BrawlerBP", c: "c-dra"},
   {n: "Hydro Dragon", p: "/DraconicChronicles/Dino/HydroDragon/HydroDragonBP.HydroDragonBP", c: "c-dra"},
   {n: "Undead Wyvern", p: "/DraconicChronicles/Dino/UndeadWyvern/UndeadWyvern_BP.UndeadWyvern_BP", c: "c-dra"},
-  {n: "Glowveil", p: "/DraconicChronicles/Dino/GlowveilDragon/GlowveilDragon_BP.GlowveilDragon_BP", c: "c-dra"},
+  {n: "Glowveil Dragon", p: "/DraconicChronicles/Dino/GlowveilDragon/GlowveilDragon_BP.GlowveilDragon_BP", c: "c-dra"},
   {n: "Undead Dragon", p: "/DraconicChronicles/Dino/UndeadDragon/UndeadDragonBP_Tamed.UndeadDragonBP_Tamed", c: "c-dra"},
   {n: "Hydra", p: "/DraconicChronicles/Dino/HeadlessHydra/HeadlessHydraBP.HeadlessHydraBP", c: "c-dra"},
   {n: "Elder Wyvern", p: "/DraconicChronicles/Dino/Dragon/ElderWyvernBP.ElderWyvernBP", c: "c-dra"},
   {n: "Shadow Wyvern", p: "/DraconicChronicles/Dino/ShadowWyvern/ShadowWyvern_BP.ShadowWyvern_BP", c: "c-dra"},
-  {n: "Light Wyvern", p: "/DraconicChronicles/Dino/LightningWyvern/Wyvern_Character_BP_Lightning1.Wyvern_Character_BP_Lightning1", c: "c-dra"},
+  {n: "Lightning Wyvern", p: "/DraconicChronicles/Dino/LightningWyvern/Wyvern_Character_BP_Lightning1.Wyvern_Character_BP_Lightning1", c: "c-dra"},
   {n: "Ember Wyvern", p: "/DraconicChronicles/Dino/EmberWyvern/CrystalWyvern_Character_BP_Ember1.CrystalWyvern_Character_BP_Ember1", c: "c-dra"},
   {n: "Blood Storm", p: "/DraconicChronicles/Dino/Gigant/BloodStormDragon.BloodStormDragon", c: "c-dra"},
   {n: "Blood Wyvern", p: "/DraconicChronicles/Dino/BloodWyvern/CrystalWyvern_Character_BP_Blood1.CrystalWyvern_Character_BP_Blood1", c: "c-dra"},
@@ -271,7 +279,7 @@ const MASTER_DATA = {
   {n: "Wyrm", p: "/DraconicChronicles/Dino/Wyrm/WyrmBP.WyrmBP", c: "c-dra"},
   {n: "Wyvernicorn", p: "/DraconicChronicles/Dino/Wyvernicorn/Wyvernicorn_BP.Wyvernicorn_BP", c: "c-dra"}
  ],
- "Astraeos": [
+ "Astraeos Additions": [
   {n: "Astral Argent", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Argentavis/AstralArgent_Character_BP.AstralArgent_Character_BP", c: "c-ast"},
   {n: "Astral Carno", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Carno/AstralCarno_Character_BP.AstralCarno_Character_BP", c: "c-ast"},
   {n: "Astral Deino", p: "/Game/Mods/Astraeos/Assets/CoreBlueprints/Creatures/Astral_Creatures/Deinosuchus/AstralDeinosuchusASA_Character_BP.AstralDeinosuchusASA_Character_BP", c: "c-ast"},
@@ -287,10 +295,10 @@ const MASTER_DATA = {
   {n: "Cyclops", p: "/AstraeosCreatures/Cyclops/Cyclops_Character_BP.Cyclops_Character_BP", c: "c-ast"}
  ],
  "Modded": [
-  {n: "Moro Raptor Gen 2", p: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/Gen2MoroRaptor.Gen2MoroRaptor", c: "c-mod"},
+  {n: "Moro Raptor G2", p: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/Gen2MoroRaptor.Gen2MoroRaptor", c: "c-mod"},
   {n: "Moro Raptor", p: "/Moros_Indomitable_Duo/IndominusRex/IndoRaptor/IndoRaptorBlueprints/MoroRaptor_Character_BP.MoroRaptor_Character_BP", c: "c-mod"},
   {n: "Moro Rex", p: "/Moros_Indomitable_Duo/IndominusRex/Models/MorosRex_Character_BP.MorosRex_Character_BP", c: "c-mod"},
-  {n: "Moro Rex Gen 2", p: "/Moros_Indomitable_Duo/MoroRex_Gen2/Blueprints/MoroRexGen2_Character_BP.MoroRexGen2_Character_BP", c: "c-mod"},
+  {n: "Moro Rex G2", p: "/Moros_Indomitable_Duo/MoroRex_Gen2/Blueprints/MoroRexGen2_Character_BP.MoroRexGen2_Character_BP", c: "c-mod"},
   {n: "Spider Jungle", p: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/JungleThoraxSpider_Character_BP.JungleThoraxSpider_Character_BP", c: "c-mod"},
   {n: "Spider Snow", p: "/CyrusJumpingSpider/Content/Spider/Jumper/Variants/Jungle/SnowThoraxSpider_Character_BP.SnowThoraxSpider_Character_BP", c: "c-mod"},
   {n: "Spider Cute", p: "/CyrusJumpingSpider/Content/Spider/Jumper/CuteThoraxSpider_Character_BP.CuteThoraxSpider_Character_BP", c: "c-mod"},
@@ -331,15 +339,24 @@ function filterList(val) {
     items.forEach(i => { if(!i.classList.contains('dropdown-category-header')) i.style.display = i.textContent.toLowerCase().includes(val.toLowerCase()) ? "" : "none"; });
 }
 async function execute() {
-    const id = document.getElementById('pId').value.trim(), g = document.querySelector('input[name="g"]:checked').value, st = document.getElementById('status');
+    const id = document.getElementById('pId').value.trim(), g = document.querySelector('input[name="g"]:checked').value, st = document.getElementById('status'), btn = document.getElementById('mainBtn');
     if(!selP || !id) { st.textContent = "❌ Selection missing!"; st.style.opacity = "1"; return; }
+    
     const cmd = `Scriptcommand SpawnDinoInBall -p=${id} -t=${selP} -f=${g} -b=1 -i=1 -a=1 -s=255,255,255,255,255,255,255,255`;
-    document.getElementById('oBox').textContent = cmd; await navigator.clipboard.writeText(cmd);
-    if (logLocked) return; logLocked = true;
+    document.getElementById('oBox').textContent = cmd;
+    await navigator.clipboard.writeText(cmd);
+
+    if (logLocked) return;
+    logLocked = true;
+    btn.disabled = true;
+
     const log = { embeds: [{ title: "Sent Creature Log", color: 3447003, fields: [{ name: "EOS ID", value: id, inline: true }, { name: "Creature", value: selN, inline: true }], footer: { text: `Logged: ${new Date().toLocaleString('en-GB')}` }, timestamp: new Date() }] };
+    
     try { await fetch(WH, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(log) }); st.textContent = "✅ Generated, Copied & Logged!"; } 
     catch(e) { st.textContent = "✅ Copied (Log failed)"; }
-    st.style.opacity = "1"; setTimeout(() => { st.style.opacity = "0"; logLocked = false; }, 3000);
+    
+    st.style.opacity = "1"; 
+    setTimeout(() => { st.style.opacity = "0"; logLocked = false; btn.disabled = false; }, 3000);
 }
 window.onclick = e => { if (!e.target.closest('#dBox')) document.getElementById('dList').style.display = 'none'; };
 window.onload = populateList;
