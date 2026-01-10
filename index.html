@@ -16,34 +16,44 @@
         .dropdown-content li { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #1a202a; font-size: 0.85rem; list-style: none; }
         .dropdown-content li:hover { background-color: #30363d; }
         .dropdown-category-header { padding: 10px 12px; font-weight: 800; border-top: 2px solid #30363d; background-color: #0d1117; color: #ffffff !important; pointer-events: none; position: sticky; top: 0; }
-        .radio-label { display: inline-flex; align-items: center; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; border: 1px solid #484f58; background-color: #30363d; margin-right: 0.5rem; }
-        input[type="radio"]:checked + .radio-label { background-color: #FF0099; color: white; }
-        #genderMale:checked + .radio-label { background-color: #1E90FF; }
+        .radio-label { display: inline-flex; align-items: center; padding: 0.5rem 1.5rem; border-radius: 8px; cursor: pointer; border: 1px solid #484f58; background-color: #30363d; margin-right: 0.5rem; font-weight: 600; transition: all 0.2s; }
+        #f:checked + .radio-label { background-color: #FF0099; border-color: #FF0099; color: white; }
+        #m:checked + .radio-label { background-color: #1E90FF; border-color: #1E90FF; color: white; }
         .button-action { background-color: #00FF85; color: #0d1117; font-weight: 800; width: 100%; padding: 1rem; border-radius: 12px; margin-top: 1rem; text-transform: uppercase; cursor: pointer; }
         .button-action:disabled { background-color: #30363d; color: #888; cursor: not-allowed; }
-        
         .c-col { color: #E5E4E2; } .c-isl { color: #00FF00; } .c-sco { color: #FFFF00; } .c-abe { color: #90EE90; } .c-ext { color: #FFA500; } .c-mar { color: #00FFFF; } .c-sva { color: #ADD8E6; } .c-dra { color: #FF0000; } .c-ast { color: #008080; } .c-mod { color: #FF69B4; } .c-zom { color: #FF4500; }
     </style>
 </head>
 <body>
     <div class="container-card">
         <h1 class="text-2xl font-bold neon-heading mb-6 text-center">ArkLegendsPVE Master Generator</h1>
-        <div class="mb-4"><label class="input-label">1. Target EOS ID:</label><input type="text" id="pId" value="00024953ec774cf98878f25e96eca484" class="input-style"></div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div><label class="input-label">1. Target EOS ID:</label><input type="text" id="pId" value="00024953ec774cf98878f25e96eca484" class="input-style"></div>
+            <div><label class="input-label">Optional: Staff Note (for log):</label><input type="text" id="staffNote" placeholder="e.g. Reward for event" class="input-style" style="color: white;"></div>
+        </div>
+
         <div class="mb-4"><label class="input-label">Search Dino:</label><input type="text" id="sBox" oninput="filterList(this.value)" class="input-style" placeholder="Type Dino name..."></div>
+        
         <div class="mb-4 relative"><label class="input-label">2. Select Creature:</label>
             <div id="dBox" class="input-style flex justify-between items-center" onclick="toggleD()"><span id="sText">--- Choose a Dino ---</span><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg></div>
             <div id="dList" class="dropdown-content"><ul id="cItems"></ul></div>
         </div>
+
         <div class="mb-6"><label class="input-label">3. Gender:</label><div class="flex">
             <input type="radio" id="f" name="g" value="1" checked class="hidden"><label for="f" class="radio-label">♀️ Female</label>
             <input type="radio" id="m" name="g" value="0" class="hidden"><label for="m" class="radio-label">♂️ Male</label>
         </div></div>
+
         <div class="mb-4"><label class="input-label">4. Generated Command:</label><div id="oBox" class="command-output">Ready...</div></div>
         <button id="mainBtn" onclick="execute()" class="button-action">Generate, Copy & Log</button>
         <div id="status" class="mt-4 text-center text-sm opacity-0 transition-opacity"></div>
     </div>
+
 <script>
-const WH = "https://discord.com/api/webhooks/1452903052947361986/ed0mhejPa-kyQo7AAH69NK67DcJIVL8QzTve-1V_gb8CmW1kpIMkA8UMcg_jZRHLxdie";
+const WH_BASE = "https://discord.com/api/webhooks/1459631306999599229/iupMtQCVAOzQs7bdOshKoj5lKChcB9RHACgJjzDbSe137DUrvzFdfnm2pLpcokiSpKKi";
+const THREAD_ID = "1459632898196901975";
+
 const MASTER_DATA = {
  "Lost Colony Zombies": [
   {n: "Mega Zombie (Hulking)", p: "/Game/LostColony/Dinos/Zombie/MegaZombie_Character_BP_Hulking.MegaZombie_Character_BP_Hulking", c: "c-zom"},
@@ -333,6 +343,7 @@ const MASTER_DATA = {
 };
 
 let selP="", selN="", logLocked=false;
+
 function populateList() {
     const list = document.getElementById('cItems'); list.innerHTML = '';
     const sortedCats = Object.keys(MASTER_DATA).sort();
@@ -351,16 +362,46 @@ function filterList(val) {
     items.forEach(i => { if(!i.classList.contains('dropdown-category-header')) i.style.display = i.textContent.toLowerCase().includes(val.toLowerCase()) ? "" : "none"; });
 }
 async function execute() {
-    const id = document.getElementById('pId').value.trim(), g = document.querySelector('input[name="g"]:checked').value, st = document.getElementById('status'), btn = document.getElementById('mainBtn');
+    const id = document.getElementById('pId').value.trim();
+    const gVal = document.querySelector('input[name="g"]:checked').value;
+    const note = document.getElementById('staffNote').value.trim() || "No note provided";
+    const st = document.getElementById('status'), btn = document.getElementById('mainBtn');
+    
     if(!selP || !id) { st.textContent = "❌ Selection missing!"; st.style.opacity = "1"; return; }
-    const cmd = `Scriptcommand SpawnDinoInBall -p=${id} -t=${selP} -f=${g} -b=1 -i=1 -a=1 -s=255,255,255,255,255,255,255,255`;
-    document.getElementById('oBox').textContent = cmd; await navigator.clipboard.writeText(cmd);
-    if (logLocked) return; logLocked = true; btn.disabled = true;
-    const log = { embeds: [{ title: "Sent Creature Log", color: 3447003, fields: [{ name: "EOS ID", value: id, inline: true }, { name: "Creature", value: selN, inline: true }], footer: { text: `Logged: ${new Date().toLocaleString('en-GB')}` }, timestamp: new Date() }] };
-    try { await fetch(WH, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(log) }); st.textContent = "✅ Generated, Copied & Logged!"; } 
+    
+    const cmd = `Scriptcommand SpawnDinoInBall -p=${id} -t=${selP} -f=${gVal} -b=1 -i=1 -a=1 -s=255,255,255,255,255,255,255,255`;
+    document.getElementById('oBox').textContent = cmd; 
+    await navigator.clipboard.writeText(cmd);
+    
+    if (logLocked) return; 
+    logLocked = true; btn.disabled = true;
+    
+    const finalUrl = `${WH_BASE}?thread_id=${THREAD_ID}`;
+    const log = { 
+        embeds: [{ 
+            title: "Sent Creature Log", 
+            color: 2003199, 
+            fields: [
+                { name: "EOS ID", value: id, inline: true }, 
+                { name: "Creature", value: selN, inline: true },
+                { name: "Gender", value: gVal == "1" ? "Female" : "Male", inline: true },
+                { name: "Staff Note", value: note, inline: false }
+            ], 
+            footer: { text: `Logged: ${new Date().toLocaleString('en-GB')}` }, 
+            timestamp: new Date() 
+        }] 
+    };
+    
+    try { 
+        await fetch(finalUrl, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(log) }); 
+        st.textContent = "✅ Generated, Copied & Logged to Thread!"; 
+    } 
     catch(e) { st.textContent = "✅ Copied (Log failed)"; }
-    st.style.opacity = "1"; setTimeout(() => { st.style.opacity = "0"; logLocked = false; btn.disabled = false; }, 3000);
+    
+    st.style.opacity = "1"; 
+    setTimeout(() => { st.style.opacity = "0"; logLocked = false; btn.disabled = false; }, 3000);
 }
+
 window.onclick = e => { if (!e.target.closest('#dBox')) document.getElementById('dList').style.display = 'none'; };
 window.onload = populateList;
 </script>
